@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "build:android": "eas build -p android --profile preview",
+    "build:android": "eas build --platform android --profile preview",
     "offline": "expo start --offline",
     "publish:expo": "eas update --branch preview && npx sentry-expo-upload-sourcemaps dist",
     "publish:sentry": "bunx sentry-expo-upload-sourcemaps dist",
@@ -25,6 +25,7 @@
     "@react-navigation/native": "^7.0.14",
     "@sentry/react-native": "~6.3.0",
     "expo": "~52.0.32",
+    "expo-application": "~6.0.2",
     "expo-constants": "~17.0.5",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",

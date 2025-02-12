@@ -63,14 +63,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/icons/Android-Prod.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
-          dark: {
-            image: "./assets/images/splash-icon.png",
-            backgroundColor: "#141414",
-          },
         },
       ],
       [
@@ -99,7 +95,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           androidIcons: {
             help_icon: {
               foregroundImage: "",
-              backgroundColor: "#50e3c2",
+              backgroundColor: "#069140",
             },
           },
         },

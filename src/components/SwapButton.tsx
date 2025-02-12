@@ -6,7 +6,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from "react-native-unistyles";
 
-const BreakerText = ({ onPress }: { onPress: () => void }) => {
+const SwapButton = ({ onPress }: { onPress: () => void }) => {
   return (
     <View style={styles.breakerContainer}>
       <View style={styles.horizontalLine} />
@@ -26,7 +26,7 @@ const BreakerText = ({ onPress }: { onPress: () => void }) => {
   );
 };
 
-export default BreakerText;
+export default SwapButton;
 
 const styles = StyleSheet.create((theme) => ({
   breakerContainer: {

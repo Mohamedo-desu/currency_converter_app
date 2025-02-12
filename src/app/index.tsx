@@ -1,4 +1,13 @@
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import CurrenciesModal from "@/components/CurrenciesModal";
+import CurrencySelector from "@/components/CurrencySelector";
+import CustomText from "@/components/CustomText";
+import SwapButton from "@/components/SwapButton";
+import { Colors } from "@/constants/Colors";
+import { Fonts } from "@/constants/Fonts";
+import { getStoredValues, saveSecurely } from "@/store/storage";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
+import { Ionicons } from "@expo/vector-icons";
+import * as Application from "expo-application";
 import React, {
   useCallback,
   useContext,
@@ -6,21 +15,11 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Alert, TextInput, TouchableOpacity, View } from "react-native";
-import CountryFlag from "react-native-country-flag";
+import { Alert, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from "react-native-unistyles";
 
-import BreakerText from "@/components/BreakerText";
-import CurrenciesModal from "@/components/CurrenciesModal";
-import CustomText from "@/components/CustomText";
-import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
-import { getStoredValues, saveSecurely } from "@/store/storage";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
-
-const HEADER_ICON_SIZE = RFValue(12);
 const API_URL = `https://v6.exchangerate-api.com/v6/${process.env.EXPO_PUBLIC_RATES_API_URL}/latest/`;
 
 interface Currency {
@@ -29,10 +28,6 @@ interface Currency {
   flag: string;
 }
 
-/**
- * Formats a number to include thousand separators and two decimal places.
- * Example: 2500 becomes "2,500.00"
- */
 const formatNumber = (num: number): string =>
   num.toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -40,7 +35,7 @@ const formatNumber = (num: number): string =>
   });
 
 const CurrencyConverterScreen = () => {
-  const { theme, setTheme } = useContext(ThemeContext);
+  const { setTheme } = useContext(ThemeContext);
 
   // State management
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -94,12 +89,9 @@ const CurrencyConverterScreen = () => {
 
     loadStoredData();
     fetchCurrencies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch exchange rates when fromCurrency changes
-
-  // Fetch available currencies and set defaults using stored values if available
+  // Fetch available currencies
   const fetchCurrencies = useCallback(async () => {
     try {
       const response = await fetch(`${API_URL}USD`);
@@ -175,6 +167,7 @@ const CurrencyConverterScreen = () => {
       fetchExchangeRates();
     }
   }, [fromCurrency, fetchExchangeRates]);
+
   // Handle currency selection from modal
   const handleCurrencySelect = useCallback(
     (currency: Currency) => {
@@ -259,102 +252,33 @@ const CurrencyConverterScreen = () => {
 
       <View style={styles.card}>
         {/* From Currency Selection */}
-        <View style={styles.amountContainer}>
-          <CustomText
-            variant="h5"
-            fontFamily={Fonts.Medium}
-            style={styles.cardTitle}
-          >
-            Amount
-          </CustomText>
-          <View style={styles.headerCurrencyContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setIsSelectingFrom(true);
-                setIsModalVisible(true);
-              }}
-              style={styles.headerCurrency}
-              activeOpacity={0.8}
-            >
-              {fromCurrency && (
-                <CountryFlag
-                  isoCode={fromCurrency.flag}
-                  size={HEADER_ICON_SIZE}
-                  style={styles.flagIcon}
-                />
-              )}
-              <CustomText
-                fontFamily={Fonts.Medium}
-                style={styles.headerText}
-                variant="h5"
-              >
-                {fromCurrency?.code || "Select"}
-              </CustomText>
-              <AntDesign
-                name="down"
-                size={HEADER_ICON_SIZE}
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter amount"
-              keyboardType="numeric"
-              value={amount}
-              onChangeText={setAmount}
-            />
-          </View>
-        </View>
+        <CurrencySelector
+          label={"Amount"}
+          onPress={() => {
+            setIsSelectingFrom(true);
+            setIsModalVisible(true);
+          }}
+          placeholder="Enter Amount"
+          currency={fromCurrency}
+          value={amount}
+          onChangeText={setAmount}
+        />
 
         {/* Swap Button */}
-        <BreakerText onPress={swapCurrencies} />
+        <SwapButton onPress={swapCurrencies} />
 
         {/* To Currency Selection */}
-        <View style={styles.convertedAmountContainer}>
-          <CustomText
-            variant="h5"
-            fontFamily={Fonts.Medium}
-            style={styles.cardTitle}
-          >
-            Converted Amount
-          </CustomText>
-          <View style={styles.headerCurrencyContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setIsSelectingFrom(false);
-                setIsModalVisible(true);
-              }}
-              style={styles.headerCurrency}
-              activeOpacity={0.8}
-            >
-              {toCurrency && (
-                <CountryFlag
-                  isoCode={toCurrency.flag}
-                  size={HEADER_ICON_SIZE}
-                  style={styles.flagIcon}
-                />
-              )}
-              <CustomText
-                fontFamily={Fonts.Medium}
-                style={styles.headerText}
-                variant="h5"
-              >
-                {toCurrency?.code || "Select"}
-              </CustomText>
-              <AntDesign
-                name="down"
-                size={HEADER_ICON_SIZE}
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
-            <TextInput
-              style={styles.input}
-              placeholder="0.00"
-              value={convertedDisplay}
-              editable={false}
-            />
-          </View>
-        </View>
+        <CurrencySelector
+          label={"Converted Amount"}
+          placeholder="0.00"
+          onPress={() => {
+            setIsSelectingFrom(false);
+            setIsModalVisible(true);
+          }}
+          currency={toCurrency}
+          value={convertedDisplay}
+          editable={false}
+        />
       </View>
 
       {/* Convert Button */}
@@ -383,6 +307,9 @@ const CurrencyConverterScreen = () => {
         )}
       </View>
 
+      <CustomText variant="h6" style={styles.versionCode}>
+        Version: {Application.nativeApplicationVersion}
+      </CustomText>
       {/* Currency Selection Modal */}
       <CurrenciesModal
         visible={isModalVisible}
@@ -400,7 +327,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   screen: {
     flex: 1,
     backgroundColor: theme.Colors.background,
-    paddingVertical: rt.insets.top,
+    paddingVertical: rt.insets.top + 15,
     paddingHorizontal: 20,
   },
   header: {
@@ -418,29 +345,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     borderRadius: theme.border.md,
     marginTop: 30,
   },
-  cardTitle: {
-    color: theme.Colors.gray[400],
-  },
-  flagIcon: {
-    width: moderateScale(45),
-    height: moderateScale(45),
-    borderRadius: moderateScale(25),
-    overflow: "hidden",
-    marginRight: 10,
-  },
-  headerCurrency: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  headerText: {
-    color: theme.Colors.primary,
-  },
-  headerCurrencyContainer: {
-    marginTop: 15,
-    flexDirection: "row",
-    alignItems: "center",
-  },
+
   exchangeRateContainer: {
     marginTop: 30,
     gap: 10,
@@ -448,17 +353,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   indicativeExchangeRate: {
     color: theme.Colors.gray[400],
   },
-  input: {
-    flex: 1,
-    fontSize: RFValue(17),
-    color: theme.Colors.typography,
-    backgroundColor: theme.Colors.gray[300],
-    padding: 10,
-    marginLeft: 15,
-    borderRadius: theme.border.xs,
-  },
-  amountContainer: {},
-  convertedAmountContainer: {},
+
   button: {
     backgroundColor: theme.Colors.primary,
     alignItems: "center",
@@ -466,5 +361,12 @@ const styles = StyleSheet.create((theme, rt) => ({
     padding: 20,
     borderRadius: theme.border.md,
     marginTop: 30,
+  },
+  versionCode: {
+    position: "absolute",
+    bottom: rt.insets.bottom + 10,
+    textAlign: "center",
+    alignSelf: "center",
+    color: theme.Colors.gray[500],
   },
 }));
