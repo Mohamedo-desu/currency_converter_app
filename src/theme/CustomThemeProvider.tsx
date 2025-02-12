@@ -1,9 +1,4 @@
 import { getStoredValues, saveSecurely } from "@/store/storage";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider as NavigationThemeProvider,
-} from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import {
   createContext,
@@ -50,18 +45,13 @@ const CustomThemeProvider = ({ children }: PropsWithChildren) => {
     }
   }, [selectedTheme]);
 
-  const currentNavigationTheme = useMemo(
-    () => (selectedTheme === "dark" ? DarkTheme : DefaultTheme),
-    [selectedTheme]
-  );
-
   return (
-    <NavigationThemeProvider value={currentNavigationTheme}>
+    <>
       <ThemeContext.Provider value={{ theme, setTheme }}>
         {children}
       </ThemeContext.Provider>
       <StatusBar style={selectedTheme === "dark" ? "light" : "dark"} />
-    </NavigationThemeProvider>
+    </>
   );
 };
 

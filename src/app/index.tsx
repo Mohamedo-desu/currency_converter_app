@@ -241,14 +241,14 @@ const CurrencyConverterScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.textContainer}>
+      {/* <View style={styles.textContainer}>
         <CustomText variant="h1" fontFamily={Fonts.Bold}>
           Currency Converter
         </CustomText>
-        <CustomText variant="h5" fontFamily={Fonts.Medium}>
+        <CustomText variant="h6" fontFamily={Fonts.Medium}>
           Convert between any currencies
         </CustomText>
-      </View>
+      </View> */}
 
       <View style={styles.card}>
         {/* From Currency Selection */}
@@ -307,9 +307,11 @@ const CurrencyConverterScreen = () => {
         )}
       </View>
 
-      <CustomText variant="h6" style={styles.versionCode}>
-        Version: {Application.nativeApplicationVersion}
-      </CustomText>
+      <View style={styles.versionCodeContainer}>
+        <CustomText variant="h6" style={styles.versionCodeText}>
+          Version: {Application.nativeApplicationVersion}
+        </CustomText>
+      </View>
       {/* Currency Selection Modal */}
       <CurrenciesModal
         visible={isModalVisible}
@@ -362,11 +364,13 @@ const styles = StyleSheet.create((theme, rt) => ({
     borderRadius: theme.border.md,
     marginTop: 30,
   },
-  versionCode: {
-    position: "absolute",
-    bottom: rt.insets.bottom + 10,
+  versionCodeText: {
     textAlign: "center",
-    alignSelf: "center",
     color: theme.Colors.gray[500],
+  },
+  versionCodeContainer: {
+    position: "absolute",
+    bottom: rt.insets.bottom + 3,
+    alignSelf: "center",
   },
 }));

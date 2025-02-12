@@ -72,7 +72,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "@sentry/react-native/expo",
         {
-          url: "https://sentry.io/",
           organization: "mohamedo-apps-desu",
           project: PROJECT_SLUG,
         },
