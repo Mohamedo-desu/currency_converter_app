@@ -327,7 +327,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   screen: {
     flex: 1,
     backgroundColor: theme.Colors.background,
-    paddingVertical: rt.insets.top + 15,
+    paddingTop: rt.insets.top + 15,
     paddingHorizontal: 20,
   },
   header: {
