@@ -224,6 +224,14 @@ const CurrencyConverterScreen = () => {
     [convertedAmount, toCurrency]
   );
 
+  const exchangeRateDisplay = useMemo(() => {
+    if (fromCurrency && toCurrency) {
+      const rate = exchangeRates[toCurrency.code] || 1;
+      return `1 ${fromCurrency.code} = ${rate} ${toCurrency.code}`;
+    }
+    return "";
+  }, [fromCurrency, toCurrency, exchangeRates]);
+
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -364,6 +372,17 @@ const CurrencyConverterScreen = () => {
         </CustomText>
       </TouchableOpacity>
 
+      <View style={styles.exchangeRateContainer}>
+        <CustomText variant="h6" style={styles.indicativeExchangeRate}>
+          Indicative Exchange Rate
+        </CustomText>
+        {exchangeRateDisplay && (
+          <CustomText variant="h5" fontFamily={Fonts.Medium}>
+            {exchangeRateDisplay}
+          </CustomText>
+        )}
+      </View>
+
       {/* Currency Selection Modal */}
       <CurrenciesModal
         visible={isModalVisible}
@@ -421,6 +440,13 @@ const styles = StyleSheet.create((theme, rt) => ({
     marginTop: 15,
     flexDirection: "row",
     alignItems: "center",
+  },
+  exchangeRateContainer: {
+    marginTop: 30,
+    gap: 10,
+  },
+  indicativeExchangeRate: {
+    color: theme.Colors.gray[400],
   },
   input: {
     flex: 1,
