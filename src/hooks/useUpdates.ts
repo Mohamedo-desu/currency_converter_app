@@ -9,11 +9,7 @@ export default function useUpdates() {
     if (isUpdateAvailable) {
       Updates.fetchUpdateAsync()
         .then(() => {
-          Alert.alert(
-            "Update Available",
-            "Reload the app to update to the latest version.",
-            [{ text: "OK" }]
-          );
+          Updates.reloadAsync();
         })
         .catch(() => {
           Alert.alert(
