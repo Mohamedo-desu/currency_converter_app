@@ -1,4 +1,3 @@
-import ToastConfig from "@/components/toast/ToastConfig";
 import useUpdates from "@/hooks/useUpdates";
 import CustomThemeProvider from "@/theme/CustomThemeProvider";
 import * as Sentry from "@sentry/react-native";
@@ -7,9 +6,7 @@ import { Slot, useNavigationContainerRef } from "expo-router";
 import * as Updates from "expo-updates";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
-import { KeyboardProvider } from "react-native-keyboard-controller";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { vexo } from "vexo-analytics";
 
 const manifest = Updates.manifest;
@@ -79,7 +76,6 @@ const RootLayout = () => {
   useUpdates();
 
   const ref = useNavigationContainerRef();
-  const { top } = useSafeAreaInsets();
 
   useEffect(() => {
     if (ref?.current) {
@@ -100,13 +96,9 @@ const RootLayout = () => {
   }, [ref]);
 
   return (
-    <>
-      <KeyboardProvider>
-        <InitialLayout />
-      </KeyboardProvider>
-
-      <Toast config={ToastConfig} position="top" topOffset={top + 15} />
-    </>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <InitialLayout />
+    </GestureHandlerRootView>
   );
 };
 

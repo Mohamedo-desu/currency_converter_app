@@ -98,11 +98,6 @@ const CurrencyConverterScreen = () => {
   }, []);
 
   // Fetch exchange rates when fromCurrency changes
-  useEffect(() => {
-    if (fromCurrency) {
-      fetchExchangeRates();
-    }
-  }, [fromCurrency, fetchExchangeRates]);
 
   // Fetch available currencies and set defaults using stored values if available
   const fetchCurrencies = useCallback(async () => {
@@ -175,6 +170,11 @@ const CurrencyConverterScreen = () => {
     }
   }, [fromCurrency]);
 
+  useEffect(() => {
+    if (fromCurrency) {
+      fetchExchangeRates();
+    }
+  }, [fromCurrency, fetchExchangeRates]);
   // Handle currency selection from modal
   const handleCurrencySelect = useCallback(
     (currency: Currency) => {
@@ -266,6 +266,7 @@ const CurrencyConverterScreen = () => {
                 setIsModalVisible(true);
               }}
               style={styles.headerCurrency}
+              activeOpacity={0.8}
             >
               {fromCurrency && (
                 <CountryFlag
@@ -316,6 +317,7 @@ const CurrencyConverterScreen = () => {
                 setIsModalVisible(true);
               }}
               style={styles.headerCurrency}
+              activeOpacity={0.8}
             >
               {toCurrency && (
                 <CountryFlag
@@ -348,7 +350,11 @@ const CurrencyConverterScreen = () => {
       </View>
 
       {/* Convert Button */}
-      <TouchableOpacity style={styles.button} onPress={handleConvert}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleConvert}
+        activeOpacity={0.8}
+      >
         <CustomText
           variant="h5"
           fontFamily={Fonts.Medium}

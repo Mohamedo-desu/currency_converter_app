@@ -82,14 +82,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       [
-        "expo-notifications",
-        {
-          icon: "",
-          color: "",
-          sounds: [],
-        },
-      ],
-      [
         "expo-font",
         {
           fonts: [

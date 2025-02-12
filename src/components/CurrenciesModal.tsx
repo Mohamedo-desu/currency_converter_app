@@ -1,15 +1,17 @@
 import CustomText from "@/components/CustomText";
 import { Fonts } from "@/constants/Fonts";
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   Modal,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import CountryFlag from "react-native-country-flag";
 import { RFValue } from "react-native-responsive-fontsize";
+import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from "react-native-unistyles";
 
 interface Currency {
@@ -31,6 +33,19 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
   currencies,
   onCurrenciesSelect,
 }) => {
+  // State for search term
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter the currencies based on the search term.
+  const filteredCurrencies = useMemo(() => {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return currencies.filter(
+      (currency) =>
+        currency.name.toLowerCase().includes(lowerSearchTerm) ||
+        currency.code.toLowerCase().includes(lowerSearchTerm)
+    );
+  }, [currencies, searchTerm]);
+
   // Memoized render item callback for FlatList
   const renderCurrencyItem = useCallback(
     ({ item }: { item: Currency }) => (
@@ -67,11 +82,21 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
       >
         <TouchableWithoutFeedback>
           <View style={styles.modalContainer}>
+            {/* Search Bar */}
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search currency"
+              placeholderTextColor="#999"
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+            />
+
             <FlatList
-              data={currencies}
+              data={filteredCurrencies}
               renderItem={renderCurrencyItem}
               keyExtractor={(item) => item.code}
               contentContainerStyle={styles.currenciesList}
+              keyboardShouldPersistTaps="handled"
             />
           </View>
         </TouchableWithoutFeedback>
@@ -85,17 +110,26 @@ export default memo(CurrenciesModal);
 const styles = StyleSheet.create((theme) => ({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.9)",
     justifyContent: "center",
     alignItems: "center",
   },
   modalContainer: {
-    backgroundColor: theme.Colors.background,
+    backgroundColor: theme.Colors.gray[200],
     borderRadius: theme.border.xs,
     width: "80%",
     padding: 20,
     elevation: 5,
     maxHeight: "70%",
+  },
+  searchInput: {
+    height: moderateScale(50),
+    borderColor: theme.Colors.gray[400],
+    borderWidth: 1,
+    borderRadius: theme.border.xs,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    color: theme.Colors.typography,
   },
   currenciesList: {
     gap: 15,
