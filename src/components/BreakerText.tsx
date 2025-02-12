@@ -1,22 +1,26 @@
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
 import { StyleSheet } from "react-native-unistyles";
 
-const BreakerText = () => {
+const BreakerText = ({ onPress }: { onPress: () => void }) => {
   return (
     <View style={styles.breakerContainer}>
       <View style={styles.horizontalLine} />
-      <View style={styles.icon}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={styles.icon}
+        activeOpacity={0.8}
+      >
         <MaterialIcons
           name="currency-exchange"
-          size={RFValue(25)}
+          size={RFValue(20)}
           color={Colors.white}
         />
-      </View>
+      </TouchableOpacity>
       <View style={styles.horizontalLine} />
     </View>
   );
@@ -31,7 +35,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: 10,
     overflow: "hidden",
     width: "100%",
-    marginVertical: 20,
+    marginVertical: 15,
     flexDirection: "row",
   },
   horizontalLine: {

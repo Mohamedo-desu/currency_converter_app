@@ -1,9 +1,9 @@
 import CustomText from "@/components/CustomText";
 import { Fonts } from "@/constants/Fonts";
-import React from "react";
+import React, { memo, useCallback } from "react";
 import {
+  FlatList,
   Modal,
-  ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -12,15 +12,17 @@ import CountryFlag from "react-native-country-flag";
 import { RFValue } from "react-native-responsive-fontsize";
 import { StyleSheet } from "react-native-unistyles";
 
+interface Currency {
+  code: string;
+  name: string;
+  flag: string;
+}
+
 interface CurrenciesModalProps {
   visible: boolean;
   onClose: () => void;
-  currencies: { code: string; name: string; flag: string }[];
-  onCurrenciesSelect: (currencies: {
-    code: string;
-    name: string;
-    flag: string;
-  }) => void;
+  currencies: Currency[];
+  onCurrenciesSelect: (currency: Currency) => void;
 }
 
 const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
@@ -29,6 +31,28 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
   currencies,
   onCurrenciesSelect,
 }) => {
+  // Memoized render item callback for FlatList
+  const renderCurrencyItem = useCallback(
+    ({ item }: { item: Currency }) => (
+      <TouchableOpacity
+        style={styles.currenciesOption}
+        onPress={() => onCurrenciesSelect(item)}
+        activeOpacity={0.8}
+      >
+        <CountryFlag
+          isoCode={item.flag}
+          size={RFValue(20)}
+          style={styles.flagIcon}
+        />
+        <CustomText fontFamily={Fonts.Regular} style={styles.currenciesText}>
+          {item.name} -{" "}
+          <CustomText style={styles.currenciesCode}>({item.code})</CustomText>
+        </CustomText>
+      </TouchableOpacity>
+    ),
+    [onCurrenciesSelect]
+  );
+
   return (
     <Modal
       visible={visible}
@@ -43,33 +67,12 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
       >
         <TouchableWithoutFeedback>
           <View style={styles.modalContainer}>
-            <ScrollView contentContainerStyle={styles.currenciesList}>
-              {currencies.map((currencies) => (
-                <TouchableOpacity
-                  key={currencies.code}
-                  style={styles.currenciesOption}
-                  onPress={() => onCurrenciesSelect(currencies)}
-                  activeOpacity={0.8}
-                >
-                  <CountryFlag
-                    isoCode={currencies.flag}
-                    size={RFValue(20)}
-                    style={styles.flagIcon}
-                  />
-                  {/* Display the flag */}
-                  <CustomText
-                    fontFamily={Fonts.Regular}
-                    style={styles.currenciesText}
-                  >
-                    {currencies.name}
-                    {" - "}
-                    <CustomText style={styles.currenciesCode}>
-                      ({currencies.code})
-                    </CustomText>
-                  </CustomText>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            <FlatList
+              data={currencies}
+              renderItem={renderCurrencyItem}
+              keyExtractor={(item) => item.code}
+              contentContainerStyle={styles.currenciesList}
+            />
           </View>
         </TouchableWithoutFeedback>
       </TouchableOpacity>
@@ -77,7 +80,7 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
   );
 };
 
-export default CurrenciesModal;
+export default memo(CurrenciesModal);
 
 const styles = StyleSheet.create((theme) => ({
   modalOverlay: {
