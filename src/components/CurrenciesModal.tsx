@@ -1,9 +1,12 @@
 import CustomText from "@/components/CustomText";
+import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@react-navigation/native";
 import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   Modal,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -12,7 +15,6 @@ import {
 import CountryFlag from "react-native-country-flag";
 import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
-import { StyleSheet } from "react-native-unistyles";
 
 interface Currency {
   code: string;
@@ -33,6 +35,8 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
   currencies,
   onCurrenciesSelect,
 }) => {
+  const { colors } = useTheme();
+
   // State for search term
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -81,10 +85,21 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
         activeOpacity={1}
       >
         <TouchableWithoutFeedback>
-          <View style={styles.modalContainer}>
+          <View
+            style={[
+              styles.modalContainer,
+              { backgroundColor: colors.gray[200] },
+            ]}
+          >
             {/* Search Bar */}
             <TextInput
-              style={styles.searchInput}
+              style={[
+                styles.searchInput,
+                {
+                  borderColor: colors.gray[400],
+                  color: colors.text,
+                },
+              ]}
               placeholder="Search currency"
               placeholderTextColor="#999"
               value={searchTerm}
@@ -107,7 +122,7 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
 
 export default memo(CurrenciesModal);
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.9)",
@@ -115,8 +130,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   modalContainer: {
-    backgroundColor: theme.Colors.gray[200],
-    borderRadius: theme.border.xs,
+    borderRadius: 10,
     width: "80%",
     padding: 20,
     elevation: 5,
@@ -124,18 +138,17 @@ const styles = StyleSheet.create((theme) => ({
   },
   searchInput: {
     height: moderateScale(50),
-    borderColor: theme.Colors.gray[400],
+
     borderWidth: 1,
-    borderRadius: theme.border.xs,
+    borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
-    color: theme.Colors.typography,
   },
   currenciesList: {
     gap: 15,
   },
   currenciesOption: {
-    paddingVertical: theme.margins.sm,
+    paddingVertical: 10,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -148,7 +161,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   currenciesCode: {
     fontSize: RFValue(14),
-    color: theme.Colors.primary,
+    color: Colors.primary,
   },
   flagIcon: {},
-}));
+});

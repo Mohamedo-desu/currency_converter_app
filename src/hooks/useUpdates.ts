@@ -8,9 +8,7 @@ export default function useUpdates() {
   useEffect(() => {
     if (isUpdateAvailable) {
       Updates.fetchUpdateAsync()
-        .then(() => {
-          Updates.reloadAsync();
-        })
+        .then(() => Updates.reloadAsync())
         .catch(() => {
           Alert.alert(
             "Update Error",

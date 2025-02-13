@@ -1,8 +1,8 @@
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@react-navigation/native";
 import React, { FC, ReactNode } from "react";
 import { Platform, Text, TextStyle } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { StyleSheet } from "react-native-unistyles";
 
 type Variant = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "h7";
 type PlatformType = "ios" | "android";
@@ -59,6 +59,8 @@ const CustomText: FC<CustomTextProps> = ({
 
   ...props
 }) => {
+  const { colors } = useTheme();
+
   let computedFontSize: number =
     Platform.OS === "android"
       ? RFValue(fontSize || 12)
@@ -77,9 +79,9 @@ const CustomText: FC<CustomTextProps> = ({
     <Text
       onLayout={onLayout}
       style={[
-        styles.text,
         {
           fontSize: computedFontSize,
+          color: colors.text,
         },
         fontFamilyStyle,
         style,
@@ -93,9 +95,3 @@ const CustomText: FC<CustomTextProps> = ({
 };
 
 export default CustomText;
-
-const styles = StyleSheet.create((theme) => ({
-  text: {
-    color: theme.Colors.typography,
-  },
-}));

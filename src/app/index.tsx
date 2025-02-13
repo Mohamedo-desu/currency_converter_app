@@ -7,6 +7,7 @@ import { Fonts } from "@/constants/Fonts";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
 import * as Application from "expo-application";
 import React, {
   useCallback,
@@ -15,10 +16,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale } from "react-native-size-matters";
-import { StyleSheet } from "react-native-unistyles";
 
 const API_URL = `https://v6.exchangerate-api.com/v6/${process.env.EXPO_PUBLIC_RATES_API_URL}/latest/`;
 
@@ -35,6 +36,7 @@ const formatNumber = (num: number): string =>
   });
 
 const CurrencyConverterScreen = () => {
+  const { colors } = useTheme();
   const { setTheme } = useContext(ThemeContext);
 
   // State management
@@ -225,8 +227,14 @@ const CurrencyConverterScreen = () => {
     return "";
   }, [fromCurrency, toCurrency, exchangeRates]);
 
+  const { top, bottom } = useSafeAreaInsets();
   return (
-    <View style={styles.screen}>
+    <View
+      style={[
+        styles.screen,
+        { backgroundColor: colors.background, paddingTop: top + 10 },
+      ]}
+    >
       <View style={styles.header}>
         <TouchableOpacity
           onPress={handleThemeToggle}
@@ -235,22 +243,26 @@ const CurrencyConverterScreen = () => {
         >
           <Ionicons
             name="color-palette"
-            size={RFValue(30)}
+            size={RFValue(24)}
             color={Colors.primary}
           />
         </TouchableOpacity>
       </View>
 
-      {/* <View style={styles.textContainer}>
+      <View style={styles.textContainer}>
         <CustomText variant="h1" fontFamily={Fonts.Bold}>
           Currency Converter
         </CustomText>
-        <CustomText variant="h6" fontFamily={Fonts.Medium}>
+        <CustomText
+          variant="h6"
+          fontFamily={Fonts.Medium}
+          style={{ color: colors.gray[400] }}
+        >
           Convert between any currencies
         </CustomText>
-      </View> */}
+      </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.gray[200] }]}>
         {/* From Currency Selection */}
         <CurrencySelector
           label={"Amount"}
@@ -297,7 +309,7 @@ const CurrencyConverterScreen = () => {
       </TouchableOpacity>
 
       <View style={styles.exchangeRateContainer}>
-        <CustomText variant="h6" style={styles.indicativeExchangeRate}>
+        <CustomText variant="h6" style={{ color: colors.gray[400] }}>
           Indicative Exchange Rate
         </CustomText>
         {exchangeRateDisplay && (
@@ -307,9 +319,12 @@ const CurrencyConverterScreen = () => {
         )}
       </View>
 
-      <View style={styles.versionCodeContainer}>
-        <CustomText variant="h6" style={styles.versionCodeText}>
-          Version: {Application.nativeApplicationVersion}
+      <View style={[styles.versionCodeContainer, { bottom: bottom + 10 }]}>
+        <CustomText
+          variant="h6"
+          style={[styles.versionCodeText, { color: colors.gray[500] }]}
+        >
+          v{Application.nativeApplicationVersion}
         </CustomText>
       </View>
       {/* Currency Selection Modal */}
@@ -325,11 +340,10 @@ const CurrencyConverterScreen = () => {
 
 export default CurrencyConverterScreen;
 
-const styles = StyleSheet.create((theme, rt) => ({
+const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: theme.Colors.background,
-    paddingTop: rt.insets.top + 15,
+
     paddingHorizontal: 20,
   },
   header: {
@@ -341,10 +355,9 @@ const styles = StyleSheet.create((theme, rt) => ({
     marginTop: 20,
   },
   card: {
-    backgroundColor: theme.Colors.gray[200],
     paddingVertical: moderateScale(15),
     padding: 15,
-    borderRadius: theme.border.md,
+    borderRadius: 15,
     marginTop: 30,
   },
 
@@ -352,25 +365,20 @@ const styles = StyleSheet.create((theme, rt) => ({
     marginTop: 30,
     gap: 10,
   },
-  indicativeExchangeRate: {
-    color: theme.Colors.gray[400],
-  },
-
   button: {
-    backgroundColor: theme.Colors.primary,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    borderRadius: theme.border.md,
+    borderRadius: 15,
     marginTop: 30,
   },
   versionCodeText: {
     textAlign: "center",
-    color: theme.Colors.gray[500],
   },
   versionCodeContainer: {
     position: "absolute",
-    bottom: rt.insets.bottom + 3,
+
     alignSelf: "center",
   },
-}));
+});

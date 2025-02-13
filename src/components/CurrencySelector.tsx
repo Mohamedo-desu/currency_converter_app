@@ -3,6 +3,7 @@ import { Fonts } from "@/constants/Fonts";
 import { AntDesign } from "@expo/vector-icons";
 import React, { FC } from "react";
 import {
+  StyleSheet,
   TextInput,
   TextInputProps,
   TouchableOpacity,
@@ -11,7 +12,8 @@ import {
 import CountryFlag from "react-native-country-flag";
 import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
-import { StyleSheet } from "react-native-unistyles";
+
+import { useTheme } from "@react-navigation/native";
 import CustomText from "./CustomText";
 
 const HEADER_ICON_SIZE = RFValue(12);
@@ -40,12 +42,12 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
   onPress,
   placeholder,
 }) => {
+  const { colors } = useTheme();
   return (
     <View style={styles.amountContainer}>
       <CustomText
-        variant="h5"
         fontFamily={Fonts.Medium}
-        style={styles.cardTitle}
+        style={[styles.label, { color: colors.gray[400] }]}
       >
         {label}
       </CustomText>
@@ -64,7 +66,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
           )}
           <CustomText
             fontFamily={Fonts.Medium}
-            style={styles.headerText}
+            style={{ color: colors.primary }}
             variant="h5"
           >
             {currency?.code || "Select"}
@@ -76,7 +78,10 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
           />
         </TouchableOpacity>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { color: colors.text, backgroundColor: colors.gray[300] },
+          ]}
           placeholder={placeholder}
           keyboardType="numeric"
           value={value}
@@ -91,20 +96,21 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
 
 export default CurrencySelector;
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: RFValue(17),
-    color: theme.Colors.typography,
-    backgroundColor: theme.Colors.gray[300],
     padding: 10,
     marginLeft: 15,
-    borderRadius: theme.border.xs,
+    borderRadius: 10,
+  },
+  label: {
+    fontSize: RFValue(14),
   },
   amountContainer: {},
   flagIcon: {
-    width: moderateScale(45),
-    height: moderateScale(45),
+    width: moderateScale(40),
+    height: moderateScale(40),
     borderRadius: moderateScale(25),
     overflow: "hidden",
     marginRight: 10,
@@ -114,15 +120,9 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: 5,
   },
-  headerText: {
-    color: theme.Colors.primary,
-  },
   headerCurrencyContainer: {
     marginTop: 15,
     flexDirection: "row",
     alignItems: "center",
   },
-  cardTitle: {
-    color: theme.Colors.gray[400],
-  },
-}));
+});

@@ -1,15 +1,18 @@
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
-import { StyleSheet } from "react-native-unistyles";
 
 const SwapButton = ({ onPress }: { onPress: () => void }) => {
+  const { colors } = useTheme();
   return (
     <View style={styles.breakerContainer}>
-      <View style={styles.horizontalLine} />
+      <View
+        style={[styles.horizontalLine, { backgroundColor: colors.gray[300] }]}
+      />
       <TouchableOpacity
         onPress={onPress}
         style={styles.icon}
@@ -21,14 +24,16 @@ const SwapButton = ({ onPress }: { onPress: () => void }) => {
           color={Colors.white}
         />
       </TouchableOpacity>
-      <View style={styles.horizontalLine} />
+      <View
+        style={[styles.horizontalLine, { backgroundColor: colors.gray[300] }]}
+      />
     </View>
   );
 };
 
 export default SwapButton;
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   breakerContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -41,12 +46,11 @@ const styles = StyleSheet.create((theme) => ({
   horizontalLine: {
     height: 1,
     width: "100%",
-    backgroundColor: theme.Colors.gray[300],
   },
 
   icon: {
-    backgroundColor: theme.Colors.primary,
+    backgroundColor: Colors.primary,
     borderRadius: moderateScale(50),
     padding: 10,
   },
-}));
+});
