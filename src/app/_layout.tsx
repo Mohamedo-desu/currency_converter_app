@@ -3,6 +3,7 @@ import CustomThemeProvider from "@/theme/CustomThemeProvider";
 import * as Sentry from "@sentry/react-native";
 import * as QuickActions from "expo-quick-actions";
 import { Slot, useNavigationContainerRef } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import * as Updates from "expo-updates";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
@@ -63,6 +64,11 @@ if (typeof updateGroup === "string") {
   // This will be `true` if the update is the one embedded in the build, and not one downloaded from the updates server.
   scope.setTag("expo-update-debug-url", "not applicable for embedded updates");
 }
+
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 
 const InitialLayout = () => {
   return (

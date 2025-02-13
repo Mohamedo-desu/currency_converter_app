@@ -8,8 +8,8 @@ const OWNER = "mohamedo-desu";
 const APP_NAME = "Convertly";
 const BUNDLE_IDENTIFIER = `com.mohamedodesu.${PROJECT_SLUG}`;
 const PACKAGE_NAME = `com.mohamedodesu.${PROJECT_SLUG}`;
-const ICON = "./assets/icons/iOS-Prod.png";
-const ADAPTIVE_ICON = "./assets/icons/Android-Prod.png";
+const ICON = "./assets/icons/ios-prod.png";
+const ADAPTIVE_ICON = "./assets/icons/android-prod.png";
 const SCHEME = PROJECT_SLUG;
 
 export default ({ config }: ConfigContext): ExpoConfig => {
@@ -33,6 +33,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       supportsTablet: true,
       bundleIdentifier: bundleIdentifier,
+      icon: {
+        dark: "./assets/icons/ios-dark.png",
+        light: "./assets/icons/ios-prod.png",
+        tinted: "./assets/icons/ios-tinted.png",
+      },
     },
     android: {
       adaptiveIcon: {
@@ -63,10 +68,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-splash-screen",
         {
-          image: "./assets/icons/Android-Prod.png",
+          image: "./assets/icons/splash-icon.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
+          dark: {
+            image: "./assets/icons/splash-icon.png",
+            backgroundColor: "#000000",
+          },
         },
       ],
       [
@@ -93,7 +102,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           androidIcons: {
             help_icon: {
-              foregroundImage: "",
+              foregroundImage: "./assets/icons/help.png",
               backgroundColor: "#069140",
             },
           },
@@ -126,8 +135,8 @@ export const getDynamicAppConfig = (
       name: `${APP_NAME} Preview`,
       bundleIdentifier: `${BUNDLE_IDENTIFIER}.preview`,
       packageName: `${PACKAGE_NAME}.preview`,
-      icon: "./assets/icons/iOS-Prev.png",
-      adaptiveIcon: "./assets/icons/Android-Prev.png",
+      icon: "./assets/icons/ios-prev.png",
+      adaptiveIcon: "./assets/icons/android-prev.png",
       scheme: `${SCHEME}-prev`,
     };
   }
@@ -136,8 +145,8 @@ export const getDynamicAppConfig = (
     name: `${APP_NAME} Development`,
     bundleIdentifier: `${BUNDLE_IDENTIFIER}.dev`,
     packageName: `${PACKAGE_NAME}.dev`,
-    icon: "./assets/icons/iOS-Dev.png",
-    adaptiveIcon: "./assets/icons/Android-Dev.png",
+    icon: "./assets/icons/ios-dev.png",
+    adaptiveIcon: "./assets/icons/android-dev.png",
     scheme: `${SCHEME}-dev`,
   };
 };

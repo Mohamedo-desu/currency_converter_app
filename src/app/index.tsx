@@ -228,7 +228,7 @@ const CurrencyConverterScreen = () => {
     return "";
   }, [fromCurrency, toCurrency, exchangeRates]);
 
-  const { top, bottom } = useSafeAreaInsets();
+  const { top } = useSafeAreaInsets();
   return (
     <View
       style={[
@@ -337,7 +337,6 @@ export default CurrencyConverterScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-
     paddingHorizontal: 20,
   },
   header: {
