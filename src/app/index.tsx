@@ -1,6 +1,7 @@
 import CurrenciesModal from "@/components/CurrenciesModal";
 import CurrencySelector from "@/components/CurrencySelector";
 import CustomText from "@/components/CustomText";
+import PrivacyTerms from "@/components/PrivacyTerms";
 import SwapButton from "@/components/SwapButton";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
@@ -8,7 +9,7 @@ import { getStoredValues, saveSecurely } from "@/store/storage";
 import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
-import * as Application from "expo-application";
+
 import React, {
   useCallback,
   useContext,
@@ -319,14 +320,7 @@ const CurrencyConverterScreen = () => {
         )}
       </View>
 
-      <View style={[styles.versionCodeContainer, { bottom: bottom + 10 }]}>
-        <CustomText
-          variant="h6"
-          style={[styles.versionCodeText, { color: colors.gray[500] }]}
-        >
-          v{Application.nativeApplicationVersion}
-        </CustomText>
-      </View>
+      <PrivacyTerms />
       {/* Currency Selection Modal */}
       <CurrenciesModal
         visible={isModalVisible}
@@ -372,13 +366,5 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 15,
     marginTop: 30,
-  },
-  versionCodeText: {
-    textAlign: "center",
-  },
-  versionCodeContainer: {
-    position: "absolute",
-
-    alignSelf: "center",
   },
 });
