@@ -1,4 +1,3 @@
-import useUpdates from "@/hooks/useUpdates";
 import CustomThemeProvider from "@/theme/CustomThemeProvider";
 import * as Sentry from "@sentry/react-native";
 import * as QuickActions from "expo-quick-actions";
@@ -66,7 +65,7 @@ if (typeof updateGroup === "string") {
 }
 
 SplashScreen.setOptions({
-  duration: 1000,
+  duration: 300,
   fade: true,
 });
 
@@ -79,8 +78,6 @@ const InitialLayout = () => {
 };
 
 const RootLayout = () => {
-  useUpdates();
-
   const ref = useNavigationContainerRef();
 
   useEffect(() => {

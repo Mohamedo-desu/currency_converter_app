@@ -5,6 +5,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { useQuickActionRouting } from "expo-quick-actions/router";
 import { StatusBar } from "expo-status-bar";
 import {
   createContext,
@@ -89,6 +90,8 @@ const CustomThemeProvider = ({ children }: PropsWithChildren) => {
     () => (selectedTheme === "dark" ? customDarkTheme : customLightTheme),
     [selectedTheme]
   );
+
+  useQuickActionRouting();
 
   return (
     <ThemeProvider value={currentNavigationTheme}>

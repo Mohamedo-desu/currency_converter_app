@@ -88,6 +88,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
           onChangeText={onChangeText}
           editable={editable}
           multiline
+          maxLength={30}
         />
       </View>
     </View>
