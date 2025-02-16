@@ -5,7 +5,7 @@ const PROJECT_SLUG = "convertly";
 const OWNER = "mohamedo-desu";
 
 // App production config
-const APP_NAME = "Convertly";
+const APP_NAME = "Convertly - Convert Currencies";
 const BUNDLE_IDENTIFIER = `com.mohamedodesu.${PROJECT_SLUG}`;
 const PACKAGE_NAME = `com.mohamedodesu.${PROJECT_SLUG}`;
 const ICON = "./assets/icons/ios-prod.png";
@@ -90,9 +90,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           fonts: [
             "./assets/fonts/Okra-Bold.ttf",
-            "./assets/fonts/Okra-ExtraBold.ttf",
             "./assets/fonts/Okra-Medium.ttf",
-            "./assets/fonts/Okra-MediumLight.ttf",
             "./assets/fonts/Okra-Regular.ttf",
           ],
         },

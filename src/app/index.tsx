@@ -169,7 +169,7 @@ const CurrencyConverterScreen = () => {
         Alert.alert("Error", "Failed to fetch available currencies.");
       }
     } catch (error) {
-      Alert.alert("Network Error", "Check your internet connection.");
+      //Alert.alert("Network Error", "Check your internet connection.");
     }
   }, []);
 
@@ -193,7 +193,7 @@ const CurrencyConverterScreen = () => {
         Alert.alert("Error", "Failed to fetch exchange rates.");
       }
     } catch (error) {
-      Alert.alert("Network Error", "Check your internet connection.");
+      //Alert.alert("Network Error", "Check your internet connection.");
     }
   }, [fromCurrency]);
 
