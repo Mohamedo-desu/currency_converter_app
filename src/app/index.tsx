@@ -47,6 +47,9 @@ const formatNumber = (num: number): string =>
     maximumFractionDigits: 2,
   });
 
+// One day in milliseconds
+const ONE_DAY = 24 * 60 * 60 * 1000;
+
 const CurrencyConverterScreen = () => {
   const { colors } = useTheme();
   const { setTheme } = useContext(ThemeContext);
@@ -64,54 +67,49 @@ const CurrencyConverterScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isSelectingFrom, setIsSelectingFrom] = useState<boolean>(true);
 
-  // Load stored data then fetch fresh currencies list
+  // Load stored data on mount
   useEffect(() => {
-    const loadStoredData = () => {
-      try {
-        const storedData = getStoredValues([
-          "currencies",
-          "exchangeRates",
-          "lastFromCurrency",
-          "lastToCurrency",
-          "lastAmount",
-        ]);
+    try {
+      const storedData = getStoredValues([
+        "currencies",
+        "exchangeRates",
+        "lastCurrenciesFetch",
+        "lastFromCurrency",
+        "lastToCurrency",
+        "lastAmount",
+      ]);
 
-        if (storedData.currencies) {
-          const parsedCurrencies: Currency[] = JSON.parse(
-            storedData.currencies
-          );
-          setCurrencies(parsedCurrencies);
-          setFromCurrency(
-            parsedCurrencies.find(
-              (c) => c.code === storedData.lastFromCurrency
-            ) ||
-              parsedCurrencies.find((c) => c.code === "USD") ||
-              null
-          );
-          setToCurrency(
-            parsedCurrencies.find(
-              (c) => c.code === storedData.lastToCurrency
-            ) ||
-              parsedCurrencies.find((c) => c.code === "KES") ||
-              null
-          );
-        }
-
-        if (storedData.exchangeRates) {
-          setExchangeRates(JSON.parse(storedData.exchangeRates));
-        }
-        if (storedData.lastAmount) {
-          setAmount(storedData.lastAmount);
-        }
-      } catch (error) {
-        console.error("Error loading stored data:", error);
+      // Load stored currencies if available
+      if (storedData.currencies) {
+        const parsedCurrencies: Currency[] = JSON.parse(storedData.currencies);
+        setCurrencies(parsedCurrencies);
+        setFromCurrency(
+          parsedCurrencies.find(
+            (c) => c.code === storedData.lastFromCurrency
+          ) ||
+            parsedCurrencies.find((c) => c.code === "USD") ||
+            null
+        );
+        setToCurrency(
+          parsedCurrencies.find((c) => c.code === storedData.lastToCurrency) ||
+            parsedCurrencies.find((c) => c.code === "KES") ||
+            null
+        );
       }
-    };
 
-    loadStoredData();
-    fetchCurrencies(); // always fetch a fresh list to update cache if online
+      // Load stored exchange rates
+      if (storedData.exchangeRates) {
+        setExchangeRates(JSON.parse(storedData.exchangeRates));
+      }
+
+      // Load last entered amount
+      if (storedData.lastAmount) {
+        setAmount(storedData.lastAmount);
+      }
+    } catch (error) {
+      console.error("Error loading stored data:", error);
+    }
   }, []);
-
   // Fetch all available currencies from the codes endpoint
   const fetchCurrencies = useCallback(async () => {
     try {
@@ -119,12 +117,12 @@ const CurrencyConverterScreen = () => {
       const data = await response.json();
 
       if (data.result === "success") {
-        // Map the supported_codes array into Currency objects
+        // Map supported_codes into Currency objects
         const availableCurrencies: Currency[] = data.supported_codes.map(
           ([code, name]: [string, string]) => ({
             code,
             name,
-            flag: code.slice(0, 2), // Adjust as needed (e.g., map to actual flag icons)
+            flag: code.slice(0, 2), // Adjust if you wish to use actual flag images
           })
         );
 
@@ -162,6 +160,19 @@ const CurrencyConverterScreen = () => {
     }
   }, []);
 
+  // Check if it's time to refresh currencies (once per day)
+  useEffect(() => {
+    const now = Date.now();
+    const storedData = getStoredValues(["lastCurrenciesFetch"]);
+    if (
+      !storedData.lastCurrenciesFetch ||
+      now - parseInt(storedData.lastCurrenciesFetch, 10) > ONE_DAY
+    ) {
+      fetchCurrencies();
+      saveSecurely([{ key: "lastCurrenciesFetch", value: now.toString() }]);
+    }
+  }, [fetchCurrencies]);
+
   // Fetch exchange rates for the selected "from" currency
   const fetchExchangeRates = useCallback(async () => {
     if (!fromCurrency) return;
@@ -184,10 +195,20 @@ const CurrencyConverterScreen = () => {
     }
   }, [fromCurrency]);
 
-  // Refresh exchange rates when fromCurrency changes
+  // Check if it's time to refresh exchange rates (once per day) whenever fromCurrency changes
   useEffect(() => {
     if (fromCurrency) {
-      fetchExchangeRates();
+      const now = Date.now();
+      const storedData = getStoredValues(["lastExchangeRatesFetch"]);
+      if (
+        !storedData.lastExchangeRatesFetch ||
+        now - parseInt(storedData.lastExchangeRatesFetch, 10) > ONE_DAY
+      ) {
+        fetchExchangeRates();
+        saveSecurely([
+          { key: "lastExchangeRatesFetch", value: now.toString() },
+        ]);
+      }
     }
   }, [fromCurrency, fetchExchangeRates]);
 
