@@ -87,6 +87,7 @@ const CustomText: FC<CustomTextProps> = ({
         style,
       ]}
       numberOfLines={numberOfLines !== undefined ? numberOfLines : undefined}
+      adjustsFontSizeToFit={true}
       {...props}
     >
       {children}
