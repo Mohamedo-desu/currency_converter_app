@@ -2,9 +2,9 @@ import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
 import { useTheme } from "@react-navigation/native";
+import { FlashList } from "@shopify/flash-list";
 import React, { memo, useCallback, useMemo, useState } from "react";
 import {
-  FlatList,
   Modal,
   StyleSheet,
   TextInput,
@@ -36,11 +36,9 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
   onCurrenciesSelect,
 }) => {
   const { colors } = useTheme();
-
-  // State for search term
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter the currencies based on the search term.
+  // Filter currencies based on the search term
   const filteredCurrencies = useMemo(() => {
     const lowerSearchTerm = searchTerm.toLowerCase();
     return currencies.filter(
@@ -50,7 +48,7 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
     );
   }, [currencies, searchTerm]);
 
-  // Memoized render item callback for FlatList
+  // Memoized render item callback for FlashList
   const renderCurrencyItem = useCallback(
     ({ item }: { item: Currency }) => (
       <TouchableOpacity
@@ -106,13 +104,17 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
               onChangeText={setSearchTerm}
             />
 
-            <FlatList
-              data={filteredCurrencies}
-              renderItem={renderCurrencyItem}
-              keyExtractor={(item) => item.code}
-              contentContainerStyle={styles.currenciesList}
-              keyboardShouldPersistTaps="handled"
-            />
+            {/* FlashList wrapped in a container with a defined height */}
+            <View style={styles.listContainer}>
+              <FlashList
+                data={filteredCurrencies}
+                renderItem={renderCurrencyItem}
+                keyExtractor={(item) => item.code}
+                contentContainerStyle={styles.currenciesList}
+                estimatedItemSize={50}
+                keyboardShouldPersistTaps="handled"
+              />
+            </View>
           </View>
         </TouchableWithoutFeedback>
       </TouchableOpacity>
@@ -135,25 +137,30 @@ const styles = StyleSheet.create({
     padding: 20,
     elevation: 5,
     maxHeight: "70%",
+    overflow: "hidden",
   },
   searchInput: {
     height: moderateScale(50),
-
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
   },
+  // contentContainerStyle uses only padding
   currenciesList: {
-    gap: 15,
+    paddingBottom: moderateScale(15),
+  },
+  // Container for FlashList with a defined height
+  listContainer: {
+    height: "100%",
   },
   currenciesOption: {
     paddingVertical: 10,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
     width: "100%",
     alignSelf: "center",
+    gap: 10,
   },
   currenciesText: {
     fontSize: RFValue(14),
