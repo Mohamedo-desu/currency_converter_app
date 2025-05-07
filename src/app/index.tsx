@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale } from "react-native-size-matters";
@@ -37,6 +38,8 @@ const formatNumber = (num: number): string =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+
+const AnimatedView = Animated.createAnimatedComponent(View);
 
 const CurrencyConverterScreen = () => {
   const { colors } = useTheme();
@@ -210,7 +213,10 @@ const CurrencyConverterScreen = () => {
       keyboardShouldPersistTaps="handled"
     >
       {/* Header with theme toggle */}
-      <View style={styles.header}>
+      <AnimatedView
+        entering={FadeInDown.delay(150).springify()}
+        style={styles.header}
+      >
         <TouchableOpacity
           onPress={() =>
             setTheme((prev: string) => (prev === "dark" ? "light" : "dark"))
@@ -224,10 +230,13 @@ const CurrencyConverterScreen = () => {
             color={Colors.primary}
           />
         </TouchableOpacity>
-      </View>
+      </AnimatedView>
 
       {/* Title and subtitle */}
-      <View style={styles.textContainer}>
+      <AnimatedView
+        entering={FadeInDown.delay(300).springify()}
+        style={styles.textContainer}
+      >
         <CustomText variant="h1" fontFamily={Fonts.Bold}>
           Currency Converter
         </CustomText>
@@ -238,10 +247,13 @@ const CurrencyConverterScreen = () => {
         >
           Convert between any currencies
         </CustomText>
-      </View>
+      </AnimatedView>
 
       {/* Card with currency selectors */}
-      <View style={[styles.card, { backgroundColor: colors.gray[200] }]}>
+      <AnimatedView
+        entering={FadeInDown.delay(450).springify()}
+        style={[styles.card, { backgroundColor: colors.card }]}
+      >
         <CurrencySelector
           label="Amount"
           onPress={() => {
@@ -267,9 +279,12 @@ const CurrencyConverterScreen = () => {
           value={convertedDisplay}
           editable={false}
         />
-      </View>
+      </AnimatedView>
 
-      <View style={styles.exchangeRateContainer}>
+      <AnimatedView
+        entering={FadeInDown.delay(600).springify()}
+        style={styles.exchangeRateContainer}
+      >
         <CustomText variant="h6" style={{ color: colors.gray[400] }}>
           Indicative Exchange Rate
         </CustomText>
@@ -278,7 +293,7 @@ const CurrencyConverterScreen = () => {
             {exchangeRateDisplay}
           </CustomText>
         )}
-      </View>
+      </AnimatedView>
 
       <PrivacyTerms />
 
@@ -302,7 +317,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 15,
   },
-
   header: {
     alignSelf: "flex-end",
   },
@@ -314,7 +328,7 @@ const styles = StyleSheet.create({
   card: {
     paddingVertical: moderateScale(15),
     padding: 15,
-    borderRadius: 15,
+    borderRadius: 5,
     marginTop: 30,
   },
   exchangeRateContainer: {

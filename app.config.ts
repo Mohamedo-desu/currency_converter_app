@@ -110,6 +110,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
     ],
     experiments: {
+      reactCompiler: true,
       typedRoutes: true,
       reactCanary: true,
       buildCacheProvider: "eas",

@@ -1,6 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import React, { FC } from "react";
 import {
   StyleSheet,
@@ -77,19 +77,34 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
             color={Colors.primary}
           />
         </TouchableOpacity>
-        <TextInput
-          style={[
-            styles.input,
-            { color: colors.text, backgroundColor: colors.gray[300] },
-          ]}
-          placeholder={placeholder}
-          keyboardType="numeric"
-          value={value}
-          onChangeText={onChangeText}
-          editable={editable}
-          multiline
-          maxLength={30}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={[
+              styles.input,
+              { color: colors.text, backgroundColor: colors.gray[200] },
+            ]}
+            placeholder={placeholder}
+            keyboardType="numeric"
+            cursorColor={colors.primary}
+            value={value}
+            onChangeText={onChangeText}
+            editable={editable}
+            maxLength={25}
+          />
+          {editable && value && (
+            <TouchableOpacity
+              onPress={() => onChangeText?.("")}
+              style={styles.clearButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name="close-circle"
+                size={RFValue(20)}
+                color={colors.gray[400]}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -100,13 +115,12 @@ export default CurrencySelector;
 const styles = StyleSheet.create({
   input: {
     flex: 1,
-    fontSize: RFValue(17),
+    fontSize: RFValue(16),
     padding: 10,
-    marginLeft: 15,
-    borderRadius: 10,
+    borderRadius: 5,
   },
   label: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
   },
   amountContainer: {},
   flagIcon: {
@@ -123,7 +137,14 @@ const styles = StyleSheet.create({
   },
   headerCurrencyContainer: {
     marginTop: 15,
+    gap: 15,
+  },
+  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  clearButton: {
+    position: "absolute",
+    right: 10,
   },
 });

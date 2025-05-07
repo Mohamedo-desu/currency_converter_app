@@ -1,21 +1,44 @@
 import { Colors } from "@/constants/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
-import React from "react";
+import React, { useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
 
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
+
 const SwapButton = ({ onPress }: { onPress: () => void }) => {
   const { colors } = useTheme();
+  const rotation = useSharedValue(0);
+
+  const handlePress = useCallback(() => {
+    rotation.value = withSequence(
+      withTiming(180, { duration: 300 }),
+      withTiming(360, { duration: 300 })
+    );
+    onPress();
+  }, [onPress]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
   return (
     <View style={styles.breakerContainer}>
       <View
         style={[styles.horizontalLine, { backgroundColor: colors.gray[300] }]}
       />
-      <TouchableOpacity
-        onPress={onPress}
-        style={styles.icon}
+      <AnimatedTouchableOpacity
+        onPress={handlePress}
+        style={[styles.icon, animatedStyle]}
         activeOpacity={0.8}
       >
         <MaterialIcons
@@ -23,7 +46,7 @@ const SwapButton = ({ onPress }: { onPress: () => void }) => {
           size={RFValue(20)}
           color={Colors.white}
         />
-      </TouchableOpacity>
+      </AnimatedTouchableOpacity>
       <View
         style={[styles.horizontalLine, { backgroundColor: colors.gray[300] }]}
       />

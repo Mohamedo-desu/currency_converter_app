@@ -24,6 +24,23 @@ interface ThemeContextType {
   setTheme: Dispatch<SetStateAction<Theme>>;
 }
 
+interface CustomThemeColors {
+  primary: string;
+  background: string;
+  card: string;
+  text: string;
+  border: string;
+  notification: string;
+  gray: {
+    500: string;
+    400: string;
+    300: string;
+    200: string;
+    100: string;
+    50: string;
+  };
+}
+
 export const ThemeContext = createContext<ThemeContextType>({
   theme: "dark",
   setTheme: () => {},
@@ -47,7 +64,7 @@ const customDarkTheme = {
       100: "#1B1B1B",
       50: "#1b1a1a",
     },
-  },
+  } as CustomThemeColors,
 };
 
 const customLightTheme = {
@@ -56,7 +73,7 @@ const customLightTheme = {
     ...DefaultTheme.colors,
     primary: Colors.primary,
     background: Colors.white,
-    card: Colors.darkGray[100],
+    card: Colors.lightGray[100],
     text: Colors.black,
     border: Colors.darkGray[200],
     notification: Colors.secondary,
@@ -68,7 +85,7 @@ const customLightTheme = {
       100: "#F5F5F5",
       50: "#fafafa",
     },
-  },
+  } as CustomThemeColors,
 };
 
 const CustomThemeProvider = ({ children }: PropsWithChildren) => {

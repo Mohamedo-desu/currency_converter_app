@@ -1,8 +1,9 @@
 import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { Ionicons } from "@expo/vector-icons";
+import { LegendList } from "@legendapp/list";
 import { useTheme } from "@react-navigation/native";
-import { FlashList } from "@shopify/flash-list";
 import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   Modal,
@@ -84,37 +85,45 @@ const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
       >
         <TouchableWithoutFeedback>
           <View
-            style={[
-              styles.modalContainer,
-              { backgroundColor: colors.gray[200] },
-            ]}
+            style={[styles.modalContainer, { backgroundColor: colors.card }]}
           >
             {/* Search Bar */}
-            <TextInput
-              style={[
-                styles.searchInput,
-                {
-                  borderColor: colors.gray[400],
-                  color: colors.text,
-                },
-              ]}
-              placeholder="Search currency"
-              placeholderTextColor="#999"
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-            />
-
-            {/* FlashList wrapped in a container with a defined height */}
-            <View style={styles.listContainer}>
-              <FlashList
-                data={filteredCurrencies}
-                renderItem={renderCurrencyItem}
-                keyExtractor={(item) => item.code}
-                contentContainerStyle={styles.currenciesList}
-                estimatedItemSize={50}
-                keyboardShouldPersistTaps="handled"
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={[
+                  styles.searchInput,
+                  {
+                    borderColor: colors.gray[200],
+                    color: colors.text,
+                  },
+                ]}
+                placeholder="Search currency"
+                placeholderTextColor="#999"
+                value={searchTerm}
+                onChangeText={setSearchTerm}
               />
+              {searchTerm && (
+                <TouchableOpacity
+                  onPress={() => setSearchTerm("")}
+                  style={styles.clearButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons
+                    name="close-circle"
+                    size={RFValue(20)}
+                    color={colors.gray[400]}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
+
+            <LegendList
+              data={filteredCurrencies}
+              renderItem={renderCurrencyItem}
+              keyExtractor={(item) => item.code}
+              contentContainerStyle={styles.currenciesList}
+              keyboardShouldPersistTaps="handled"
+            />
           </View>
         </TouchableWithoutFeedback>
       </TouchableOpacity>
@@ -139,20 +148,26 @@ const styles = StyleSheet.create({
     maxHeight: "70%",
     overflow: "hidden",
   },
+  searchContainer: {
+    position: "relative",
+    marginBottom: 15,
+  },
   searchInput: {
     height: moderateScale(50),
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
-    marginBottom: 15,
   },
-  // contentContainerStyle uses only padding
+  clearButton: {
+    position: "absolute",
+    right: 10,
+    top: "50%",
+    transform: [{ translateY: -RFValue(10) }],
+  },
+
   currenciesList: {
-    paddingBottom: moderateScale(15),
-  },
-  // Container for FlashList with a defined height
-  listContainer: {
-    height: "100%",
+    paddingBottom: 50,
+    flexGrow: 1,
   },
   currenciesOption: {
     paddingVertical: 10,

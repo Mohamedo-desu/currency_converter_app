@@ -7,6 +7,7 @@ import * as Updates from "expo-updates";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { enableFreeze } from "react-native-screens";
 import { vexo } from "vexo-analytics";
 
 const manifest = Updates.manifest;
@@ -68,6 +69,8 @@ SplashScreen.setOptions({
   duration: 300,
   fade: true,
 });
+
+enableFreeze(true);
 
 const InitialLayout = () => {
   return (
