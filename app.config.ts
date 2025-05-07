@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "2.0.0",
+    version: "3.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     userInterfaceStyle: "automatic",
@@ -46,6 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       package: packageName,
       softwareKeyboardLayoutMode: "pan",
+      edgeToEdgeEnabled: true,
     },
     updates: {
       url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
@@ -83,6 +84,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           organization: "mohamedo-apps-desu",
           project: PROJECT_SLUG,
+          url: "https://sentry.io",
         },
       ],
       [
@@ -109,6 +111,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ],
     experiments: {
       typedRoutes: true,
+      reactCanary: true,
+      buildCacheProvider: "eas",
     },
     owner: OWNER,
   };

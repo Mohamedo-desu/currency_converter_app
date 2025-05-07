@@ -7,13 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale } from "react-native-size-matters";
@@ -33,8 +27,9 @@ import {
   Currency,
   fetchCurrencies,
   fetchGlobalExchangeRates,
-  registerBackgroundFetch,
+  registerBackgroundTask,
 } from "@/services/currencyService";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 // Helper function to format numbers
 const formatNumber = (num: number): string =>
@@ -46,7 +41,7 @@ const formatNumber = (num: number): string =>
 const CurrencyConverterScreen = () => {
   const { colors } = useTheme();
   const { setTheme } = useContext(ThemeContext);
-  const { top } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets();
 
   // Local state
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -115,13 +110,9 @@ const CurrencyConverterScreen = () => {
     })();
   }, []);
 
-  // Register background fetch to update data when app is in background
+  // Register background task to update data when app is in background
   useEffect(() => {
-    registerBackgroundFetch();
-    // Optionally, unregister on unmount:
-    return () => {
-      // unregisterBackgroundFetch(); // Uncomment if you wish to unregister when unmounting.
-    };
+    registerBackgroundTask();
   }, []);
 
   // Conversion logic: convert amount from one currency to another using global rates.
@@ -208,13 +199,14 @@ const CurrencyConverterScreen = () => {
   }, [fromCurrency, toCurrency, exchangeRates]);
 
   return (
-    <ScrollView
-      style={[
-        styles.screen,
-        { backgroundColor: colors.background, paddingTop: top + 10 },
+    <KeyboardAwareScrollView
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingTop: top + 10, paddingBottom: bottom + 10 },
       ]}
-      contentContainerStyle={{ flexGrow: 1 }}
-      showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
       {/* Header with theme toggle */}
@@ -277,20 +269,6 @@ const CurrencyConverterScreen = () => {
         />
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleConvert}
-        activeOpacity={0.8}
-      >
-        <CustomText
-          variant="h5"
-          fontFamily={Fonts.Medium}
-          style={{ color: Colors.white }}
-        >
-          Convert
-        </CustomText>
-      </TouchableOpacity>
-
       <View style={styles.exchangeRateContainer}>
         <CustomText variant="h6" style={{ color: colors.gray[400] }}>
           Indicative Exchange Rate
@@ -310,17 +288,21 @@ const CurrencyConverterScreen = () => {
         onClose={() => setIsModalVisible(false)}
         onCurrenciesSelect={handleCurrencySelect}
       />
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 
 export default CurrencyConverterScreen;
 
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
-    paddingHorizontal: 20,
   },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 15,
+  },
+
   header: {
     alignSelf: "flex-end",
   },
@@ -338,13 +320,5 @@ const styles = StyleSheet.create({
   exchangeRateContainer: {
     marginTop: 30,
     gap: 10,
-  },
-  button: {
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-    borderRadius: 15,
-    marginTop: 30,
   },
 });

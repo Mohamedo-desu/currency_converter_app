@@ -1,5 +1,5 @@
 import { getStoredValues, saveSecurely } from "@/store/storage";
-import * as BackgroundFetch from "expo-background-fetch";
+import * as BackgroundTask from "expo-background-task";
 import * as TaskManager from "expo-task-manager";
 
 // Constants
@@ -95,42 +95,40 @@ export const updateDataIfStale = async (): Promise<void> => {
   }
 };
 
-// --- Background Fetch Task ---
+// --- Background Task ---
 
-const BACKGROUND_FETCH_TASK = "background-fetch-task";
+const BACKGROUND_TASK_NAME = "background-currency-update";
 
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
   try {
     await updateDataIfStale();
-    return BackgroundFetch.BackgroundFetchResult.NewData;
+    return true; // Task completed successfully
   } catch (error) {
-    console.error("Background fetch failed:", error);
-    return BackgroundFetch.BackgroundFetchResult.Failed;
+    console.error("Background task failed:", error);
+    return false; // Task failed
   }
 });
 
 /**
- * Register the background fetch task.
+ * Register the background task.
  */
-export const registerBackgroundFetch = async (): Promise<void> => {
+export const registerBackgroundTask = async (): Promise<void> => {
   try {
-    await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+    await BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
       minimumInterval: 15 * 60, // 15 minutes
-      stopOnTerminate: false,
-      startOnBoot: true,
     });
   } catch (error) {
-    console.error("Failed to register background fetch task", error);
+    console.error("Failed to register background task", error);
   }
 };
 
 /**
- * Unregister the background fetch task.
+ * Unregister the background task.
  */
-export const unregisterBackgroundFetch = async (): Promise<void> => {
+export const unregisterBackgroundTask = async (): Promise<void> => {
   try {
-    await BackgroundFetch.unregisterTaskAsync(BACKGROUND_FETCH_TASK);
+    await BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_NAME);
   } catch (error) {
-    console.error("Failed to unregister background fetch task", error);
+    console.error("Failed to unregister background task", error);
   }
 };

@@ -1,50 +1,134 @@
-# Welcome to your Expo app 👋
+# Convertly App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern currency converter application built with React Native and Expo, featuring real-time exchange rates, offline functionality, and a beautiful user interface. Convert between any currencies with ease, even without an internet connection.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Real-time Exchange Rates**: Get the latest exchange rates from the ExchangeRate-API
+- **Offline Support**:
+  - Background task updates every 15 minutes
+  - Cached exchange rates and currency data
+  - Full functionality without internet connection
+- **Smart Currency Management**:
+  - Automatic rate updates
+  - Currency data caching for 3 days
+  - Last used currencies remembered
+- **User Experience**:
+  - Dark/Light theme support
+  - Responsive design for all screen sizes
+  - Quick currency swap functionality
+  - Searchable currency list with flags
+- **Performance**:
+  - Fast MMKV storage for offline data
+  - Optimized list rendering with FlashList
+  - Smooth animations with Reanimated
+- **Error Tracking**: Sentry integration for monitoring and debugging
+- **Quick Actions**: Support for app shortcuts
+
+## Tech Stack
+
+### Frontend
+
+- **React Native** (v0.79.2) with **Expo** (v53.0.8)
+- **TypeScript** - Type-safe JavaScript
+- **Expo Router** - File-based navigation system
+- **React Native Reanimated** - Smooth animations
+- **React Native Gesture Handler** - Gesture management
+- **React Native MMKV** - Fast key-value storage for offline data
+- **FlashList** - High-performance currency list rendering
+- **Expo Updates** - Over-the-air updates
+- **Expo Background Task** - Background data updates
+- **Expo Task Manager** - Background task management
+
+### Development Tools
+
+- **Jest** - Testing framework
+- **ESLint & Prettier** - Code linting and formatting
+- **TypeScript** - Static type checking
+- **Sentry** - Error tracking and monitoring
+- **EAS** - Expo Application Services for builds
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- Bun package manager (recommended) or npm
+- Expo CLI
+- EAS CLI (for builds and updates)
+
+### Installation
+
+1. Clone the repository
 
    ```bash
-   npm install
+   git clone <repository-url>
+   cd convertly_app
    ```
 
-2. Start the app
+2. Install dependencies
 
    ```bash
-    npx expo start
+   bun install
    ```
 
-In the output, you'll find options to open the app in a
+3. Set up environment variables
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+   # Create a .env file with your API keys
+   EXPO_PUBLIC_RATES_API_URL=your_exchange_rate_api_key
+   EXPO_PUBLIC_VEXO_KEY=your_vexo_analytics_key
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+4. Start the development server
+   ```bash
+   bunx expo start
+   ```
 
-## Get a fresh project
+## Available Scripts
 
-When you're ready, run:
+- `bun run start` - Start the Expo development server
+- `bun run android` - Run on Android device/emulator
+- `bun run ios` - Run on iOS simulator
+- `bun run offline` - Start in offline mode
+- `bun run build:android` - Build Android app for preview
+- `bun run release:android` - Run in release mode on Android
+- `bun run release:ios` - Run in release mode on iOS
+- `bun run test` - Run tests
+- `bun run lint` - Lint the code
+- `bun run format` - Format the code
+- `bun run upgrade` - Upgrade Expo and fix dependencies
 
-```bash
-npm run reset-project
-```
+## Offline Functionality
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The app provides full offline support through:
 
-## Learn more
+- **Background Task**: Updates exchange rates every 15 minutes
+- **Data Caching**:
+  - Exchange rates cached for 3 days
+  - Currency list stored locally
+  - Last used currencies and amounts remembered
+- **MMKV Storage**: Fast and secure local storage
+- **Error Handling**: Graceful fallback to cached data
 
-To learn more about developing your project with Expo, look at the following resources:
+## Development
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+The project uses modern development practices:
 
-## Join the community
+- TypeScript for type safety
+- ESLint and Prettier for code quality
+- Jest for testing
+- Sentry for error tracking
+- EAS for builds and updates
 
-Join our community of developers creating universal apps.
+## Error Tracking
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The app uses Sentry for error tracking and monitoring:
+
+- Automatic error reporting
+- Performance monitoring
+- Source map uploading for better error tracking
+
+## License
+
+[MIT License](LICENSE)
