@@ -3,6 +3,7 @@ import { getStoredValues, saveSecurely } from "@/store/storage";
 import {
   DarkTheme,
   DefaultTheme,
+  Theme,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useQuickActionRouting } from "expo-quick-actions/router";
@@ -17,11 +18,11 @@ import {
 } from "react";
 import { useColorScheme } from "react-native";
 
-type Theme = "light" | "dark" | "system";
+type ThemeMode = "light" | "dark" | "system";
 
 interface ThemeContextType {
-  theme: Theme;
-  setTheme: Dispatch<SetStateAction<Theme>>;
+  theme: ThemeMode;
+  setTheme: Dispatch<SetStateAction<ThemeMode>>;
 }
 
 interface CustomThemeColors {
@@ -46,7 +47,7 @@ export const ThemeContext = createContext<ThemeContextType>({
   setTheme: () => {},
 });
 
-const customDarkTheme = {
+const customDarkTheme: Theme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
@@ -67,7 +68,7 @@ const customDarkTheme = {
   } as CustomThemeColors,
 };
 
-const customLightTheme = {
+const customLightTheme: Theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
@@ -89,14 +90,14 @@ const customLightTheme = {
 };
 
 const CustomThemeProvider = ({ children }: PropsWithChildren) => {
-  const [theme, setTheme] = useState<Theme>(
+  const [theme, setTheme] = useState<ThemeMode>(
     getStoredValues(["theme"]).theme || "dark"
   );
   const colorScheme = useColorScheme();
 
-  const selectedTheme: any = useMemo(() => {
+  const selectedTheme = useMemo(() => {
     const useSystemTheme = theme === "system";
-    const appliedTheme: any = useSystemTheme ? colorScheme : theme;
+    const appliedTheme = useSystemTheme ? colorScheme || "dark" : theme;
 
     saveSecurely([{ key: "theme", value: appliedTheme }]);
 

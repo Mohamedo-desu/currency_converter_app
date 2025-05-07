@@ -1,5 +1,4 @@
 import CustomText from "@/components/CustomText";
-import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
@@ -30,103 +29,135 @@ interface CurrenciesModalProps {
   onCurrenciesSelect: (currency: Currency) => void;
 }
 
-const CurrenciesModal: React.FC<CurrenciesModalProps> = ({
+const CurrenciesModal = ({
   visible,
   onClose,
   currencies,
   onCurrenciesSelect,
-}) => {
+}: CurrenciesModalProps) => {
   const { colors } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter currencies based on the search term
   const filteredCurrencies = useMemo(() => {
-    const lowerSearchTerm = searchTerm.toLowerCase();
+    if (!searchTerm) return currencies;
+    const term = searchTerm.toLowerCase();
     return currencies.filter(
       (currency) =>
-        currency.name.toLowerCase().includes(lowerSearchTerm) ||
-        currency.code.toLowerCase().includes(lowerSearchTerm)
+        currency.code.toLowerCase().includes(term) ||
+        currency.name.toLowerCase().includes(term)
     );
   }, [currencies, searchTerm]);
 
-  // Memoized render item callback for FlashList
-  const renderCurrencyItem = useCallback(
-    ({ item }: { item: Currency }) => (
-      <TouchableOpacity
-        style={styles.currenciesOption}
-        onPress={() => onCurrenciesSelect(item)}
-        activeOpacity={0.8}
-      >
-        <CountryFlag
-          isoCode={item.flag}
-          size={RFValue(20)}
-          style={styles.flagIcon}
-        />
-        <CustomText fontFamily={Fonts.Regular} style={styles.currenciesText}>
-          {item.name} -{" "}
-          <CustomText style={styles.currenciesCode}>({item.code})</CustomText>
-        </CustomText>
-      </TouchableOpacity>
-    ),
+  const handleCurrencySelect = useCallback(
+    (currency: Currency) => {
+      onCurrenciesSelect(currency);
+      setSearchTerm("");
+    },
     [onCurrenciesSelect]
   );
 
   return (
     <Modal
       visible={visible}
-      onDismiss={onClose}
       transparent
       animationType="fade"
+      onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        onPress={onClose}
-        activeOpacity={1}
-      >
-        <TouchableWithoutFeedback>
-          <View
-            style={[styles.modalContainer, { backgroundColor: colors.card }]}
-          >
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={[
-                  styles.searchInput,
-                  {
-                    borderColor: colors.gray[200],
-                    color: colors.text,
-                  },
-                ]}
-                placeholder="Search currency"
-                placeholderTextColor="#999"
-                value={searchTerm}
-                onChangeText={setSearchTerm}
-              />
-              {searchTerm && (
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback>
+            <View
+              style={[styles.modalContent, { backgroundColor: colors.card }]}
+            >
+              <View style={styles.header}>
+                <CustomText
+                  variant="h4"
+                  fontFamily={Fonts.Bold}
+                  style={{ color: colors.text }}
+                >
+                  Select Currency
+                </CustomText>
                 <TouchableOpacity
-                  onPress={() => setSearchTerm("")}
-                  style={styles.clearButton}
+                  onPress={onClose}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Ionicons
-                    name="close-circle"
-                    size={RFValue(20)}
-                    color={colors.gray[400]}
+                    name="close"
+                    size={RFValue(24)}
+                    color={colors.text}
                   />
                 </TouchableOpacity>
-              )}
-            </View>
+              </View>
 
-            <LegendList
-              data={filteredCurrencies}
-              renderItem={renderCurrencyItem}
-              keyExtractor={(item) => item.code}
-              contentContainerStyle={styles.currenciesList}
-              keyboardShouldPersistTaps="handled"
-            />
-          </View>
-        </TouchableWithoutFeedback>
-      </TouchableOpacity>
+              <View style={styles.searchContainer}>
+                <Ionicons
+                  name="search"
+                  size={RFValue(20)}
+                  color={colors.gray[400]}
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  value={searchTerm}
+                  onChangeText={setSearchTerm}
+                  placeholder="Search currency"
+                  style={[
+                    styles.searchInput,
+                    { color: colors.text, backgroundColor: colors.background },
+                  ]}
+                  placeholderTextColor={colors.gray[400]}
+                />
+                {searchTerm ? (
+                  <TouchableOpacity
+                    onPress={() => setSearchTerm("")}
+                    style={styles.clearButton}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Ionicons
+                      name="close-circle"
+                      size={RFValue(20)}
+                      color={colors.gray[400]}
+                    />
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+
+              <LegendList
+                data={filteredCurrencies}
+                renderItem={({ item }: { item: Currency }) => (
+                  <TouchableOpacity
+                    style={styles.currencyItem}
+                    onPress={() => handleCurrencySelect(item)}
+                  >
+                    <CountryFlag
+                      isoCode={item.flag}
+                      size={RFValue(20)}
+                      style={styles.flagIcon}
+                    />
+                    <View style={styles.currencyInfo}>
+                      <CustomText
+                        variant="h5"
+                        fontFamily={Fonts.Medium}
+                        style={{ color: colors.text }}
+                      >
+                        {item.code}
+                      </CustomText>
+                      <CustomText
+                        variant="h6"
+                        style={{ color: colors.gray[400] }}
+                      >
+                        {item.name}
+                      </CustomText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.code}
+                contentContainerStyle={styles.currenciesList}
+                keyboardShouldPersistTaps="handled"
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -136,54 +167,58 @@ export default memo(CurrenciesModal);
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.9)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContainer: {
+  modalContent: {
+    width: "90%",
+    maxHeight: "80%",
     borderRadius: 10,
-    width: "95%",
     padding: 20,
-    elevation: 5,
-    maxHeight: "70%",
-    overflow: "hidden",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
   searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
     position: "relative",
-    marginBottom: 15,
+  },
+  searchIcon: {
+    position: "absolute",
+    left: 10,
+    zIndex: 1,
   },
   searchInput: {
-    height: moderateScale(50),
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 10,
+    flex: 1,
+    height: moderateScale(45),
+    borderRadius: 5,
+    paddingHorizontal: 40,
+    fontSize: RFValue(16),
   },
   clearButton: {
     position: "absolute",
     right: 10,
-    top: "50%",
-    transform: [{ translateY: -RFValue(10) }],
+    zIndex: 1,
   },
-
   currenciesList: {
-    paddingBottom: 50,
-    flexGrow: 1,
+    paddingBottom: 20,
   },
-  currenciesOption: {
-    paddingVertical: 10,
+  currencyItem: {
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
-    alignSelf: "center",
-    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
-  currenciesText: {
-    fontSize: RFValue(14),
-    textAlign: "center",
+  flagIcon: {
+    marginRight: 10,
   },
-  currenciesCode: {
-    fontSize: RFValue(14),
-    color: Colors.primary,
+  currencyInfo: {
+    flex: 1,
   },
-  flagIcon: {},
 });
