@@ -108,6 +108,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
+      [
+        "react-native-edge-to-edge",
+        {
+          android: {
+            parentTheme: "Light",
+            enforceNavigationBarContrast: false,
+          },
+        },
+      ],
     ],
     experiments: {
       reactCompiler: true,
@@ -135,11 +144,11 @@ export const getDynamicAppConfig = (
 
   if (environment === "preview") {
     return {
-      name: `${APP_NAME} Preview`,
+      name: `${APP_NAME}`,
       bundleIdentifier: `${BUNDLE_IDENTIFIER}.preview`,
       packageName: `${PACKAGE_NAME}.preview`,
-      icon: "./assets/icons/ios-prev.png",
-      adaptiveIcon: "./assets/icons/android-prev.png",
+      icon: ICON,
+      adaptiveIcon: ADAPTIVE_ICON,
       scheme: `${SCHEME}-prev`,
     };
   }

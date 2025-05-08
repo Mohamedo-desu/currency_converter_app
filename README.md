@@ -31,6 +31,16 @@ A modern currency converter application built with React Native and Expo, featur
 - **Error Tracking**: Sentry integration for monitoring and debugging
 - **Quick Actions**: Support for app shortcuts
 
+## Screenshots
+
+<!-- Add your screenshots here from assets/screenshots directory -->
+
+| Home Screen (Light)                              | Home Screen (Dark)                             | Currency Modal                                           |
+| ------------------------------------------------ | ---------------------------------------------- | -------------------------------------------------------- |
+| ![Home Light](assets/screenshots/home-light.png) | ![Home Dark](assets/screenshots/home-dark.png) | ![Currency Modal](assets/screenshots/currenct-modal.png) |
+| Conversion History                               | Feedback                                       |                                                          |
+| ![History](assets/screenshots/history.png)       | ![Feedback](assets/screenshots/feedback.png)   |                                                          |
+
 ## Tech Stack
 
 ### Frontend

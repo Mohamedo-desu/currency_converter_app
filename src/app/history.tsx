@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LegendList } from "@legendapp/list";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -170,13 +170,28 @@ const HistoryScreen = () => {
               style={[styles.flag, styles.flagOverlap]}
             />
           </View>
-          <CustomText
-            variant="h6"
-            fontFamily={Fonts.Medium}
-            style={{ color: colors.text }}
-          >
-            {item.fromCurrency} → {item.toCurrency}
-          </CustomText>
+          <View style={styles.currencyColumn}>
+            <CustomText
+              variant="h6"
+              fontFamily={Fonts.Medium}
+              style={{ color: colors.text }}
+            >
+              {item.fromCurrency}
+            </CustomText>
+            <MaterialIcons
+              name="arrow-right-alt"
+              size={RFValue(12)}
+              color={colors.text}
+              style={{ marginHorizontal: 4 }}
+            />
+            <CustomText
+              variant="h6"
+              fontFamily={Fonts.Medium}
+              style={{ color: colors.text }}
+            >
+              {item.toCurrency}
+            </CustomText>
+          </View>
         </View>
         <CustomText variant="h6" style={{ color: colors.gray[400] }}>
           {formatDate(item.timestamp)}
@@ -187,7 +202,7 @@ const HistoryScreen = () => {
           {item.amount} {item.fromCurrency}
         </CustomText>
         <CustomText
-          variant="h6"
+          variant="h5"
           fontFamily={Fonts.Medium}
           style={{ color: Colors.primary }}
         >
@@ -355,9 +370,9 @@ const styles = StyleSheet.create({
     marginLeft: -10,
   },
   historyDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
   cleanupMessage: {
     flexDirection: "row",
@@ -366,5 +381,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     borderRadius: 8,
     marginBottom: 15,
+  },
+  currencyColumn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
   },
 });

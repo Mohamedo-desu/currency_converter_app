@@ -90,7 +90,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
             value={value}
             onChangeText={onChangeText}
             editable={editable}
-            maxLength={20}
+            maxLength={30}
           />
           {editable && value && (
             <TouchableOpacity

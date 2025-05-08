@@ -139,7 +139,7 @@ const CurrencyConverterScreen = () => {
    * Updates conversion history and stored values
    */
   const handleConvert = useCallback(() => {
-    if (!amount || isNaN(Number(amount))) {
+    if (!amount || isNaN(Number(amount.replace(/,/g, "")))) {
       setConvertedAmount("");
       return;
     }
@@ -159,8 +159,9 @@ const CurrencyConverterScreen = () => {
     }
 
     conversionTimeoutRef.current = setTimeout(() => {
+      const numericAmount = Number(amount.replace(/,/g, ""));
       const conversionRate = toRate / fromRate;
-      const rawConverted = Number(amount) * conversionRate;
+      const rawConverted = numericAmount * conversionRate;
       const formattedConverted = formatNumber(rawConverted);
       setConvertedAmount(formattedConverted);
 
@@ -273,6 +274,26 @@ const CurrencyConverterScreen = () => {
     return "";
   }, [fromCurrency, toCurrency, exchangeRates]);
 
+  const handleAmountChange = useCallback((input: string) => {
+    // Remove all non-numeric and non-decimal characters
+    const sanitized = input.replace(/[^\d.]/g, "");
+    // Only allow one decimal point
+    const parts = sanitized.split(".");
+    let value = parts[0];
+    if (parts.length > 1) {
+      value += "." + parts[1].slice(0, 2); // Limit to 2 decimal places
+    }
+    // Format if not empty and not just a decimal point
+    if (value && value !== ".") {
+      const num = Number(value);
+      if (!isNaN(num)) {
+        setAmount(formatNumber(num));
+        return;
+      }
+    }
+    setAmount(value);
+  }, []);
+
   return (
     <KeyboardAwareScrollView
       enableOnAndroid={true}
@@ -346,7 +367,7 @@ const CurrencyConverterScreen = () => {
           placeholder="Enter Amount"
           currency={fromCurrency}
           value={amount}
-          onChangeText={setAmount}
+          onChangeText={handleAmountChange}
         />
 
         <SwapButton onPress={swapCurrencies} />
