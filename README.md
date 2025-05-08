@@ -35,8 +35,8 @@ A modern currency converter application built with React Native and Expo, featur
 | Home Screen (Light)                              | Home Screen (Dark)                             | Currency Modal                                           |
 | ------------------------------------------------ | ---------------------------------------------- | -------------------------------------------------------- |
 | ![Home Light](assets/screenshots/home-light.png) | ![Home Dark](assets/screenshots/home-dark.png) | ![Currency Modal](assets/screenshots/currenct-modal.png) |
-| Conversion History                               | Feedback                                       |                                                          |
-| ![History](assets/screenshots/history.png)       | ![Feedback](assets/screenshots/feedback.png)   |                                                          |
+| Conversion History                               | Help Screen                                    |                                                          |
+| ![History](assets/screenshots/history.png)       | ![Help](assets/screenshots/help-screen.png)    |                                                          |
 
 ## Tech Stack
 
