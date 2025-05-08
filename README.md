@@ -13,15 +13,21 @@ A modern currency converter application built with React Native and Expo, featur
   - Automatic rate updates
   - Currency data caching for 3 days
   - Last used currencies remembered
+  - Intelligent currency flag display system
+  - Support for special currency codes (e.g., BTC, ETH)
 - **User Experience**:
   - Dark/Light theme support
   - Responsive design for all screen sizes
   - Quick currency swap functionality
   - Searchable currency list with flags
+  - Smooth currency selection animations
+  - History tracking of currency conversions
+  - Beautiful flag display with proper scaling
 - **Performance**:
   - Fast MMKV storage for offline data
   - Optimized list rendering with FlashList
   - Smooth animations with Reanimated
+  - Efficient currency data caching
 - **Error Tracking**: Sentry integration for monitoring and debugging
 - **Quick Actions**: Support for app shortcuts
 
@@ -39,6 +45,8 @@ A modern currency converter application built with React Native and Expo, featur
 - **Expo Updates** - Over-the-air updates
 - **Expo Background Task** - Background data updates
 - **Expo Task Manager** - Background task management
+- **React Native SVG** - SVG support for currency flags
+- **React Native Fast Image** - Optimized image loading
 
 ### Development Tools
 
@@ -128,6 +136,25 @@ The app uses Sentry for error tracking and monitoring:
 - Automatic error reporting
 - Performance monitoring
 - Source map uploading for better error tracking
+
+## Currency Handling
+
+The app provides sophisticated currency handling:
+
+- **Flag System**:
+  - Automatic flag generation from currency codes
+  - Support for special currency codes (crypto, etc.)
+  - Proper flag scaling and display
+  - Fallback handling for missing flags
+- **Currency Selection**:
+  - Quick currency swap functionality
+  - Searchable currency list with flags
+  - Last used currencies remembered
+  - Smooth selection animations
+- **History Tracking**:
+  - Conversion history with timestamps
+  - Easy access to previous conversions
+  - Automatic history cleanup
 
 ## License
 
