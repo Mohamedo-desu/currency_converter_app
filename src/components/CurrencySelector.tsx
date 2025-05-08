@@ -67,7 +67,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
           <CustomText
             fontFamily={Fonts.Medium}
             style={{ color: colors.primary }}
-            variant="h5"
+            variant="h6"
           >
             {currency?.code || "Select"}
           </CustomText>
@@ -84,12 +84,13 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
               { color: colors.text, backgroundColor: colors.gray[200] },
             ]}
             placeholder={placeholder}
+            placeholderTextColor={colors.gray[300]}
             keyboardType="numeric"
             cursorColor={colors.primary}
             value={value}
             onChangeText={onChangeText}
             editable={editable}
-            maxLength={25}
+            maxLength={20}
           />
           {editable && value && (
             <TouchableOpacity
@@ -124,8 +125,8 @@ const styles = StyleSheet.create({
   },
   amountContainer: {},
   flagIcon: {
-    width: moderateScale(40),
-    height: moderateScale(40),
+    width: moderateScale(30),
+    height: moderateScale(30),
     borderRadius: moderateScale(25),
     overflow: "hidden",
     marginRight: 10,

@@ -1,13 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -32,7 +34,11 @@ import {
 } from "@/services/currencyService";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-// Helper function to format numbers
+/**
+ * Formats a number to a string with 2 decimal places
+ * @param num - The number to format
+ * @returns Formatted string with 2 decimal places
+ */
 const formatNumber = (num: number): string =>
   num.toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -41,25 +47,33 @@ const formatNumber = (num: number): string =>
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
+// Debounce delay for conversion calculations (ms)
+const DEBOUNCE_DELAY = 500;
+
 const CurrencyConverterScreen = () => {
   const { colors } = useTheme();
   const { setTheme } = useContext(ThemeContext);
   const { top, bottom } = useSafeAreaInsets();
+  const router = useRouter();
 
-  // Local state
+  // State management for currencies and conversion
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [fromCurrency, setFromCurrency] = useState<Currency | null>(null);
   const [toCurrency, setToCurrency] = useState<Currency | null>(null);
   const [amount, setAmount] = useState<string>("");
   const [convertedAmount, setConvertedAmount] = useState<string>("");
-  // Global exchange rates are stored relative to a fixed base currency.
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>(
     {}
   );
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isSelectingFrom, setIsSelectingFrom] = useState<boolean>(true);
+  const conversionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
-  // Load stored data on mount
+  /**
+   * Loads previously stored currency preferences and exchange rates
+   */
   useEffect(() => {
     try {
       const storedData = getStoredValues([
@@ -99,7 +113,9 @@ const CurrencyConverterScreen = () => {
     }
   }, []);
 
-  // Fetch currencies and exchange rates on mount if needed
+  /**
+   * Fetches latest currency data and exchange rates on mount
+   */
   useEffect(() => {
     (async () => {
       const fetchedCurrencies = await fetchCurrencies();
@@ -113,38 +129,79 @@ const CurrencyConverterScreen = () => {
     })();
   }, []);
 
-  // Register background task to update data when app is in background
+  // Register background task for data updates
   useEffect(() => {
     registerBackgroundTask();
   }, []);
 
-  // Conversion logic: convert amount from one currency to another using global rates.
+  /**
+   * Performs currency conversion with debouncing
+   * Updates conversion history and stored values
+   */
   const handleConvert = useCallback(() => {
     if (!amount || isNaN(Number(amount))) {
-      Alert.alert("Invalid Input", "Please enter a valid amount.");
+      setConvertedAmount("");
       return;
     }
     if (!fromCurrency || !toCurrency) {
-      Alert.alert("Currency Error", "Please select both currencies.");
+      setConvertedAmount("");
       return;
     }
     const fromRate = exchangeRates[fromCurrency.code];
     const toRate = exchangeRates[toCurrency.code];
     if (!fromRate || !toRate) {
-      Alert.alert("Error", "Exchange rates unavailable.");
+      setConvertedAmount("");
       return;
     }
-    const conversionRate = toRate / fromRate;
-    const rawConverted = Number(amount) * conversionRate;
-    const formattedConverted = formatNumber(rawConverted);
-    setConvertedAmount(formattedConverted);
-    saveSecurely([
-      { key: "lastAmount", value: amount },
-      { key: "lastConvertedAmount", value: formattedConverted },
-    ]);
+
+    if (conversionTimeoutRef.current) {
+      clearTimeout(conversionTimeoutRef.current);
+    }
+
+    conversionTimeoutRef.current = setTimeout(() => {
+      const conversionRate = toRate / fromRate;
+      const rawConverted = Number(amount) * conversionRate;
+      const formattedConverted = formatNumber(rawConverted);
+      setConvertedAmount(formattedConverted);
+
+      // Update conversion history
+      const storedHistory = getStoredValues(["conversionHistory"]);
+      const history = storedHistory.conversionHistory
+        ? JSON.parse(storedHistory.conversionHistory)
+        : [];
+
+      const newHistoryItem = {
+        fromCurrency: fromCurrency.code,
+        toCurrency: toCurrency.code,
+        fromFlag: fromCurrency.flag,
+        toFlag: toCurrency.flag,
+        amount: amount,
+        convertedAmount: formattedConverted,
+        timestamp: Date.now(),
+      };
+
+      const updatedHistory = [newHistoryItem, ...history].slice(0, 50);
+
+      saveSecurely([
+        { key: "lastAmount", value: amount },
+        { key: "lastConvertedAmount", value: formattedConverted },
+        { key: "conversionHistory", value: JSON.stringify(updatedHistory) },
+      ]);
+    }, DEBOUNCE_DELAY);
   }, [amount, fromCurrency, toCurrency, exchangeRates]);
 
-  // Auto-update conversion on dependency changes.
+  // Cleanup timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (conversionTimeoutRef.current) {
+        clearTimeout(conversionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * Triggers conversion when dependencies change
+   */
   useEffect(() => {
     if (
       amount &&
@@ -153,9 +210,15 @@ const CurrencyConverterScreen = () => {
       Object.keys(exchangeRates).length > 0
     ) {
       handleConvert();
+    } else {
+      setConvertedAmount("");
     }
   }, [amount, fromCurrency, toCurrency, exchangeRates, handleConvert]);
 
+  /**
+   * Handles currency selection from modal
+   * @param currency - Selected currency object
+   */
   const handleCurrencySelect = useCallback(
     (currency: Currency) => {
       if (isSelectingFrom) {
@@ -170,6 +233,9 @@ const CurrencyConverterScreen = () => {
     [isSelectingFrom]
   );
 
+  /**
+   * Swaps source and target currencies
+   */
   const swapCurrencies = useCallback(() => {
     if (!fromCurrency || !toCurrency) return;
     const newFrom = toCurrency;
@@ -182,11 +248,17 @@ const CurrencyConverterScreen = () => {
     ]);
   }, [fromCurrency, toCurrency]);
 
+  /**
+   * Memoized display string for converted amount
+   */
   const convertedDisplay = useMemo(
     () => (convertedAmount ? `${convertedAmount} ${toCurrency?.code}` : ""),
     [convertedAmount, toCurrency]
   );
 
+  /**
+   * Memoized display string for current exchange rate
+   */
   const exchangeRateDisplay = useMemo(() => {
     if (fromCurrency && toCurrency) {
       const fromRate = exchangeRates[fromCurrency.code];
@@ -212,7 +284,7 @@ const CurrencyConverterScreen = () => {
       ]}
       keyboardShouldPersistTaps="handled"
     >
-      {/* Header with theme toggle */}
+      {/* Theme toggle and settings header */}
       <AnimatedView
         entering={FadeInDown.delay(150).springify()}
         style={styles.header}
@@ -225,14 +297,25 @@ const CurrencyConverterScreen = () => {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Ionicons
-            name="color-palette"
-            size={RFValue(24)}
+            name="color-palette-outline"
+            size={RFValue(22)}
+            color={Colors.primary}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          activeOpacity={0.8}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={RFValue(20)}
             color={Colors.primary}
           />
         </TouchableOpacity>
       </AnimatedView>
 
-      {/* Title and subtitle */}
+      {/* App title and description */}
       <AnimatedView
         entering={FadeInDown.delay(300).springify()}
         style={styles.textContainer}
@@ -249,7 +332,7 @@ const CurrencyConverterScreen = () => {
         </CustomText>
       </AnimatedView>
 
-      {/* Card with currency selectors */}
+      {/* Currency conversion card */}
       <AnimatedView
         entering={FadeInDown.delay(450).springify()}
         style={[styles.card, { backgroundColor: colors.card }]}
@@ -281,6 +364,7 @@ const CurrencyConverterScreen = () => {
         />
       </AnimatedView>
 
+      {/* Exchange rate display */}
       <AnimatedView
         entering={FadeInDown.delay(600).springify()}
         style={styles.exchangeRateContainer}
@@ -297,6 +381,7 @@ const CurrencyConverterScreen = () => {
 
       <PrivacyTerms />
 
+      {/* Currency selection modal */}
       <CurrenciesModal
         visible={isModalVisible}
         currencies={currencies}
@@ -318,7 +403,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   header: {
-    alignSelf: "flex-end",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   textContainer: {
     alignItems: "center",
