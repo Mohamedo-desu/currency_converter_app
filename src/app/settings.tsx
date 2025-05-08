@@ -2,13 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { styles } from "@/styles/screens/SettingsScreen.styles";
 
 const SettingsScreen = () => {
   const { colors } = useTheme();
@@ -69,42 +70,9 @@ const SettingsScreen = () => {
         {renderSettingOption("time-outline", "History", () =>
           router.push("/history")
         )}
-        {renderSettingOption("chatbubble-outline", "Feedback", () =>
-          router.push("/feedback")
-        )}
       </View>
     </View>
   );
 };
 
 export default SettingsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingBottom: 20,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingTop: 20,
-    gap: 15,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 15,
-    borderRadius: 10,
-  },
-  optionLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-});

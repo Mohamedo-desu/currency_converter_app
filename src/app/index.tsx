@@ -9,11 +9,10 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { moderateScale } from "react-native-size-matters";
 
 import CurrenciesModal from "@/components/CurrenciesModal";
 import CurrencySelector from "@/components/CurrencySelector";
@@ -32,6 +31,7 @@ import {
   fetchGlobalExchangeRates,
   registerBackgroundTask,
 } from "@/services/currencyService";
+import { styles } from "@/styles/screens/CurrencyConverterScreen.styles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 /**
@@ -400,6 +400,25 @@ const CurrencyConverterScreen = () => {
         )}
       </AnimatedView>
 
+      {/* Help Link */}
+      <AnimatedView
+        entering={FadeInDown.delay(800).springify()}
+        style={styles.helpLinkContainer}
+      >
+        <TouchableOpacity
+          onPress={() => router.push("/help")}
+          activeOpacity={0.8}
+        >
+          <CustomText
+            variant="h6"
+            fontFamily={Fonts.Medium}
+            style={{ color: Colors.primary, textDecorationLine: "underline" }}
+          >
+            Need Help? Contact Support
+          </CustomText>
+        </TouchableOpacity>
+      </AnimatedView>
+
       <PrivacyTerms />
 
       {/* Currency selection modal */}
@@ -414,33 +433,3 @@ const CurrencyConverterScreen = () => {
 };
 
 export default CurrencyConverterScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 15,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  textContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  card: {
-    paddingVertical: moderateScale(15),
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 30,
-  },
-  exchangeRateContainer: {
-    marginTop: 30,
-    gap: 10,
-  },
-});

@@ -5,7 +5,7 @@ const PROJECT_SLUG = "convertly";
 const OWNER = "mohamedo-desu";
 
 // App production config
-const APP_NAME = "Convertly - Convert Currencies";
+const APP_NAME = "Currency Converter";
 const BUNDLE_IDENTIFIER = `com.mohamedodesu.${PROJECT_SLUG}`;
 const PACKAGE_NAME = `com.mohamedodesu.${PROJECT_SLUG}`;
 const ICON = "./assets/icons/ios-prod.png";
@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "3.0.0",
+    version: "3.5.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     userInterfaceStyle: "automatic",

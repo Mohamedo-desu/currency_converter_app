@@ -1,7 +1,7 @@
 {
   "name": "convertly_app",
   "main": "expo-router/entry",
-  "version": "3.0.0",
+  "version": "3.5.0",
   "scripts": {
     "start": "expo start",
     "build:android": "eas build --platform android --profile preview",
