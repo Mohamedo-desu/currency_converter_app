@@ -1,13 +1,15 @@
 {
   "name": "convertly_app",
   "main": "expo-router/entry",
-  "version": "3.5.0",
+  "version": "4.0.0",
   "scripts": {
     "start": "expo start",
     "build:android": "eas build --platform android --profile preview",
     "offline": "expo start --offline",
     "publish:expo": "eas update --branch preview && npx sentry-expo-upload-sourcemaps dist",
     "publish:sentry": "bunx sentry-expo-upload-sourcemaps dist",
+    "build:web": "npx expo export --platform web",
+    "release:web": "eas deploy --prod",
     "upgrade": "bun install expo@latest && bunx expo install --fix",
     "android": "bunx expo run:android --device",
     "release:android": "bunx expo run:android --device --variant Release",
@@ -15,14 +17,16 @@
     "test": "jest --watchAll",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "analyze:web": "source-map-explorer \"dist/_expo/static/js/web/*.js\" \"dist/_expo/static/js/web/*.js.map\" --only-mapped --no-border-checks",
+    "analyze:ios": "source-map-explorer \"dist/_expo/static/js/ios/*.js\" \"dist/_expo/static/js/ios/*.js.map\" --only-mapped --no-border-checks",
+    "analyze:android": "source-map-explorer \"dist/_expo/static/js/android/*.js\" \"dist/_expo/static/js/android/*.js.map\" --only-mapped --no-border-checks"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "@legendapp/list": "^1.0.10",
     "@react-navigation/native": "^7.1.6",
     "@sentry/react-native": "~6.10.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
@@ -41,15 +45,13 @@
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-country-flag": "^2.0.2",
-    "react-native-gesture-handler": "~2.24.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-mmkv": "^3.2.0",
-    "react-native-reanimated": "~3.17.5",
-    "react-native-responsive-fontsize": "^0.5.1",
+    "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
-    "react-native-size-matters": "^0.4.2",
-    "vexo-analytics": "^1.4.9"
+    "react-native-web": "^0.20.0",
+    "source-map-explorer": "^2.5.3"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",

@@ -1,6 +1,4 @@
-import { StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { moderateScale } from "react-native-size-matters";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   modalOverlay: {
@@ -8,6 +6,11 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    ...(Platform.OS === "web" && {
+      maxWidth: 500,
+      marginHorizontal: "auto",
+      width: "100%",
+    }),
   },
   modalContent: {
     width: "90%",
@@ -34,10 +37,10 @@ export const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: moderateScale(45),
+    height: 45,
     borderRadius: 5,
     paddingHorizontal: 40,
-    fontSize: RFValue(16),
+    fontSize: 16,
   },
   clearButton: {
     position: "absolute",

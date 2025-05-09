@@ -1,9 +1,14 @@
 import { Colors } from "@/constants/Colors";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    ...(Platform.OS === "web" && {
+      maxWidth: 500,
+      marginHorizontal: "auto",
+      width: "100%",
+    }),
   },
   scrollContent: {
     flexGrow: 1,

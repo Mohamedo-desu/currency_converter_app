@@ -1,6 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   footer: {
@@ -10,6 +9,10 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignContent: "center",
+    ...(Platform.OS === "web" && {
+      maxWidth: 800,
+      marginHorizontal: "auto",
+    }),
   },
   footerTextContainer: {
     flexDirection: "row",
@@ -21,11 +24,22 @@ export const styles = StyleSheet.create({
   },
   footerText: {
     textDecorationLine: "underline",
-    fontSize: RFValue(10),
+    fontSize: 10,
     color: Colors.primary,
   },
   versionCodeText: {
     textAlign: "center",
-    marginBottom: 15,
+    marginTop: 10,
+    fontSize: 11,
+    ...(Platform.OS === "web" && {
+      fontSize: 12,
+    }),
+  },
+  helpLinkContainer: {
+    marginBottom: 5,
+  },
+  helpLink: {
+    textDecorationLine: "underline",
+    fontSize: 12,
   },
 });

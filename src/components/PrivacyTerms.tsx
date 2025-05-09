@@ -1,14 +1,26 @@
+import { Colors } from "@/constants/Colors";
+import { Fonts } from "@/constants/Fonts";
 import { styles } from "@/styles/components/PrivacyTerms.styles";
 import { useTheme } from "@react-navigation/native";
 import * as Application from "expo-application";
+import Constants from "expo-constants";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Linking, TouchableOpacity, View } from "react-native";
+import { Linking, Platform, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomText from "./CustomText";
 
 const PrivacyTerms = () => {
   const { colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
+  const router = useRouter();
+
+  // pull version from native or web manifest
+  const nativeVersion = Application.nativeApplicationVersion;
+  const webVersion =
+    // Expo SDK ≥47
+    Constants.manifest?.version ?? Constants.expoConfig?.version;
+  const version = Platform.OS === "web" ? webVersion : nativeVersion;
 
   const openPrivacyPolicy = () => {
     const url =
@@ -20,22 +32,41 @@ const PrivacyTerms = () => {
 
   return (
     <View style={[styles.footer, { bottom: bottom + 10 }]}>
+      {/* Help Link */}
+      <View style={styles.helpLinkContainer}>
+        <TouchableOpacity
+          onPress={() => router.push("/help")}
+          activeOpacity={0.8}
+        >
+          <CustomText
+            variant="h6"
+            fontFamily={Fonts.Medium}
+            style={[styles.helpLink, { color: Colors.primary }]}
+          >
+            Need Help? Contact Support
+          </CustomText>
+        </TouchableOpacity>
+      </View>
+
+      {/* Privacy Policy and Terms */}
+      <View style={styles.footerTextContainer}>
+        <TouchableOpacity onPress={openPrivacyPolicy} activeOpacity={0.8}>
+          <CustomText style={styles.footerText}>Privacy Policy</CustomText>
+        </TouchableOpacity>
+        <CustomText style={{ color: colors.gray[400] }}>•</CustomText>
+        <TouchableOpacity onPress={openPrivacyPolicy} activeOpacity={0.8}>
+          <CustomText style={styles.footerText}>Terms of Service</CustomText>
+        </TouchableOpacity>
+      </View>
+
+      {/* Version Code */}
       <CustomText
         variant="h6"
-        style={[styles.versionCodeText, { color: colors.gray[500] }]}
+        fontFamily={Fonts.Medium}
+        style={[styles.versionCodeText, { color: colors.gray[400] }]}
       >
-        v{Application.nativeApplicationVersion}
+        v{version}
       </CustomText>
-
-      <CustomText>By using, you agree to our</CustomText>
-      <TouchableOpacity
-        hitSlop={10}
-        activeOpacity={0.8}
-        style={styles.footerTextContainer}
-        onPress={openPrivacyPolicy}
-      >
-        <CustomText style={styles.footerText}>Privacy Policy</CustomText>
-      </TouchableOpacity>
     </View>
   );
 };

@@ -6,7 +6,13 @@ import { styles } from "@/styles/screens/HelpScreen.styles";
 import { useTheme } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import React, { useEffect, useState } from "react";
-import { Alert, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -27,11 +33,20 @@ const HelpScreen = () => {
   const { top, bottom } = useSafeAreaInsets();
 
   // State to hold report type, user details, and the report text
-  const [selectedType, setSelectedType] = useState(reportTypes[0]); // Default to "Bug Report"
-  const [userName, setUserName] = useState(""); // User's name
-  const [userEmail, setUserEmail] = useState(""); // User's email
-  const [reportText, setReportText] = useState(""); // Report description
+  const [selectedType, setSelectedType] = useState(reportTypes[0]);
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [reportText, setReportText] = useState("");
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+
+  // Helper to show alerts differently on web vs native
+  const showAlert = (title: string, message: string) => {
+    if (Platform.OS === "web") {
+      window.alert(`${title}: ${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
 
   // Load feedbacks from local storage
   useEffect(() => {
@@ -44,44 +59,38 @@ const HelpScreen = () => {
   // Save feedback locally
   const saveFeedbackLocally = (feedback: Feedback) => {
     const stored = getStoredValues(["userFeedbacks"]);
-    const feedbacks: Feedback[] = stored.userFeedbacks
+    const existing: Feedback[] = stored.userFeedbacks
       ? JSON.parse(stored.userFeedbacks)
       : [];
-    const updated = [feedback, ...feedbacks];
+    const updated = [feedback, ...existing];
     saveSecurely([{ key: "userFeedbacks", value: JSON.stringify(updated) }]);
     setFeedbacks(updated);
   };
 
   // Handle form submission for the report
   const handleSubmit = () => {
-    // Validate that the user has entered their name
+    // Validate inputs
     if (userName.trim().length === 0) {
-      Alert.alert("Error", "Please enter your name.");
+      showAlert("Error", "Please enter your name.");
       return;
     }
-    // Validate that the user has entered their email address
     if (userEmail.trim().length === 0) {
-      Alert.alert("Error", "Please enter your email address.");
+      showAlert("Error", "Please enter your email address.");
       return;
     }
-    // Validate that the email format is correct (simple regex check)
     if (!/\S+@\S+\.\S+/.test(userEmail)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      showAlert("Error", "Please enter a valid email address.");
       return;
     }
-    // Validate that the user has entered a report description
     if (reportText.trim().length === 0) {
-      Alert.alert("Error", "Please enter a description for your report.");
+      showAlert("Error", "Please enter a description for your report.");
       return;
     }
 
-    // Capture a Sentry event to generate an actual event ID.
-    // The message includes the report type, user info, and description.
+    // Capture Sentry event & feedback
     const eventId = Sentry.captureMessage(
       `[${selectedType}] Report from ${userName} <${userEmail}>: ${reportText}`
     );
-
-    // Build the user feedback object with the captured event ID
     Sentry.captureFeedback({
       name: userName,
       email: userEmail,
@@ -89,7 +98,7 @@ const HelpScreen = () => {
       associatedEventId: eventId,
     });
 
-    // Save feedback locally for user reference
+    // Save locally
     saveFeedbackLocally({
       type: selectedType,
       name: userName,
@@ -98,13 +107,13 @@ const HelpScreen = () => {
       timestamp: Date.now(),
     });
 
-    // Notify the user that their report was submitted
-    Alert.alert(
+    // Notify user
+    showAlert(
       "Report Submitted",
       `Thank you, ${userName}! Your ${selectedType.toLowerCase()} has been submitted.`
     );
 
-    // Clear the input fields after submission
+    // Clear inputs
     setUserName("");
     setUserEmail("");
     setReportText("");
@@ -112,8 +121,8 @@ const HelpScreen = () => {
 
   return (
     <KeyboardAwareScrollView
-      enableOnAndroid={true}
-      enableAutomaticScroll={true}
+      enableOnAndroid
+      enableAutomaticScroll
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={[
         styles.scrollContent,
@@ -144,9 +153,7 @@ const HelpScreen = () => {
             onPress={() => setSelectedType(type)}
           >
             <CustomText
-              style={{
-                color: selectedType === type ? "#fff" : colors.text,
-              }}
+              style={{ color: selectedType === type ? "#fff" : colors.text }}
             >
               {type}
             </CustomText>
@@ -154,7 +161,7 @@ const HelpScreen = () => {
         ))}
       </View>
 
-      {/* User Name Input */}
+      {/* Inputs */}
       <TextInput
         style={[
           styles.textInputSmall,
@@ -164,10 +171,7 @@ const HelpScreen = () => {
         placeholderTextColor={colors.gray[500]}
         value={userName}
         onChangeText={setUserName}
-        autoCorrect={false}
       />
-
-      {/* User Email Input */}
       <TextInput
         style={[
           styles.textInputSmall,
@@ -179,10 +183,7 @@ const HelpScreen = () => {
         onChangeText={setUserEmail}
         keyboardType="email-address"
         autoCapitalize="none"
-        autoCorrect={false}
       />
-
-      {/* Report Description Input */}
       <TextInput
         style={[
           styles.textInput,
@@ -195,7 +196,6 @@ const HelpScreen = () => {
         multiline
         textAlignVertical="top"
         maxLength={500}
-        textBreakStrategy="highQuality"
       />
 
       {/* Submit Button */}

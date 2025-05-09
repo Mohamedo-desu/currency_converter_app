@@ -1,9 +1,13 @@
-import { StyleSheet } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    ...(Platform.OS === "web" && {
+      maxWidth: 500,
+      marginHorizontal: "auto",
+      width: "100%",
+    }),
   },
   header: {
     flexDirection: "row",
@@ -47,9 +51,9 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   flag: {
-    width: moderateScale(25),
-    height: moderateScale(25),
-    borderRadius: moderateScale(25),
+    width: 25,
+    height: 25,
+    borderRadius: 25,
   },
   flagContainer: {
     flexDirection: "row",

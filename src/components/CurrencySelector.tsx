@@ -9,13 +9,12 @@ import {
   View,
 } from "react-native";
 import CountryFlag from "react-native-country-flag";
-import { RFValue } from "react-native-responsive-fontsize";
 
 import { styles } from "@/styles/components/CurrencySelector.styles";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "./CustomText";
 
-const HEADER_ICON_SIZE = RFValue(12);
+const HEADER_ICON_SIZE = 12;
 
 interface Currency {
   code: string;
@@ -99,7 +98,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
             >
               <Ionicons
                 name="close-circle"
-                size={RFValue(20)}
+                size={20}
                 color={colors.gray[400]}
               />
             </TouchableOpacity>

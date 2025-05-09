@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "3.5.0",
+    version: "4.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     userInterfaceStyle: "automatic",
@@ -62,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png",
+      favicon: "./assets/icons/ios-prod.png",
     },
     plugins: [
       "expo-router",

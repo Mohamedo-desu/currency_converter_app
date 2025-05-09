@@ -1,6 +1,5 @@
 import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
-import { moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
   breakerContainer: {
@@ -19,7 +18,7 @@ export const styles = StyleSheet.create({
 
   icon: {
     backgroundColor: Colors.primary,
-    borderRadius: moderateScale(50),
+    borderRadius: 50,
     padding: 10,
   },
 });

@@ -1,3 +1,12 @@
+import CurrenciesModal from "@/components/CurrenciesModal";
+import CurrencySelector from "@/components/CurrencySelector";
+import CustomText from "@/components/CustomText";
+import PrivacyTerms from "@/components/PrivacyTerms";
+import SwapButton from "@/components/SwapButton";
+import { Colors } from "@/constants/Colors";
+import { Fonts } from "@/constants/Fonts";
+import { getStoredValues, saveSecurely } from "@/store/storage";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -10,19 +19,7 @@ import React, {
   useState,
 } from "react";
 import { TouchableOpacity, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-import CurrenciesModal from "@/components/CurrenciesModal";
-import CurrencySelector from "@/components/CurrencySelector";
-import CustomText from "@/components/CustomText";
-import PrivacyTerms from "@/components/PrivacyTerms";
-import SwapButton from "@/components/SwapButton";
-import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
-import { getStoredValues, saveSecurely } from "@/store/storage";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 
 // Import reusable service functions
 import {
@@ -44,8 +41,6 @@ const formatNumber = (num: number): string =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-
-const AnimatedView = Animated.createAnimatedComponent(View);
 
 // Debounce delay for conversion calculations (ms)
 const DEBOUNCE_DELAY = 500;
@@ -306,10 +301,7 @@ const CurrencyConverterScreen = () => {
       keyboardShouldPersistTaps="handled"
     >
       {/* Theme toggle and settings header */}
-      <AnimatedView
-        entering={FadeInDown.delay(150).springify()}
-        style={styles.header}
-      >
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() =>
             setTheme((prev: string) => (prev === "dark" ? "light" : "dark"))
@@ -319,7 +311,7 @@ const CurrencyConverterScreen = () => {
         >
           <Ionicons
             name="color-palette-outline"
-            size={RFValue(22)}
+            size={22}
             color={Colors.primary}
           />
         </TouchableOpacity>
@@ -328,19 +320,12 @@ const CurrencyConverterScreen = () => {
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons
-            name="settings-outline"
-            size={RFValue(20)}
-            color={Colors.primary}
-          />
+          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
         </TouchableOpacity>
-      </AnimatedView>
+      </View>
 
       {/* App title and description */}
-      <AnimatedView
-        entering={FadeInDown.delay(300).springify()}
-        style={styles.textContainer}
-      >
+      <View style={styles.textContainer}>
         <CustomText variant="h1" fontFamily={Fonts.Bold}>
           Currency Converter
         </CustomText>
@@ -351,13 +336,10 @@ const CurrencyConverterScreen = () => {
         >
           Convert between any currencies
         </CustomText>
-      </AnimatedView>
+      </View>
 
       {/* Currency conversion card */}
-      <AnimatedView
-        entering={FadeInDown.delay(450).springify()}
-        style={[styles.card, { backgroundColor: colors.card }]}
-      >
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <CurrencySelector
           label="Amount"
           onPress={() => {
@@ -383,13 +365,10 @@ const CurrencyConverterScreen = () => {
           value={convertedDisplay}
           editable={false}
         />
-      </AnimatedView>
+      </View>
 
       {/* Exchange rate display */}
-      <AnimatedView
-        entering={FadeInDown.delay(600).springify()}
-        style={styles.exchangeRateContainer}
-      >
+      <View style={styles.exchangeRateContainer}>
         <CustomText variant="h6" style={{ color: colors.gray[400] }}>
           Indicative Exchange Rate
         </CustomText>
@@ -398,26 +377,7 @@ const CurrencyConverterScreen = () => {
             {exchangeRateDisplay}
           </CustomText>
         )}
-      </AnimatedView>
-
-      {/* Help Link */}
-      <AnimatedView
-        entering={FadeInDown.delay(800).springify()}
-        style={styles.helpLinkContainer}
-      >
-        <TouchableOpacity
-          onPress={() => router.push("/help")}
-          activeOpacity={0.8}
-        >
-          <CustomText
-            variant="h6"
-            fontFamily={Fonts.Medium}
-            style={{ color: Colors.primary, textDecorationLine: "underline" }}
-          >
-            Need Help? Contact Support
-          </CustomText>
-        </TouchableOpacity>
-      </AnimatedView>
+      </View>
 
       <PrivacyTerms />
 

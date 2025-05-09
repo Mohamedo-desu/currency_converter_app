@@ -1,16 +1,15 @@
 import CustomThemeProvider from "@/theme/CustomThemeProvider";
 import { handleExpoUpdateMetadata } from "@/utils/expoUpdateMetadata";
 import * as Sentry from "@sentry/react-native";
+import * as Font from "expo-font";
 import * as QuickActions from "expo-quick-actions";
 import { Slot, useNavigationContainerRef } from "expo-router";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { enableFreeze } from "react-native-screens";
 import sentryConfig from "sentry.config";
-import { vexo } from "vexo-analytics";
 
-vexo(process.env.EXPO_PUBLIC_VEXO_KEY!);
+// vexo(process.env.EXPO_PUBLIC_VEXO_KEY!);
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay: true,
@@ -22,6 +21,17 @@ handleExpoUpdateMetadata();
 enableFreeze(true);
 
 const InitialLayout = () => {
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      // Load fonts for web
+      Font.loadAsync({
+        "Okra-Bold": require("@/assets/fonts/Okra-Bold.ttf"),
+        "Okra-Medium": require("@/assets/fonts/Okra-Medium.ttf"),
+        "Okra-Regular": require("@/assets/fonts/Okra-Regular.ttf"),
+      });
+    }
+  }, []);
+
   return (
     <CustomThemeProvider>
       <Slot />
@@ -50,11 +60,7 @@ const RootLayout = () => {
     ]);
   }, [ref]);
 
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <InitialLayout />
-    </GestureHandlerRootView>
-  );
+  return <InitialLayout />;
 };
 
 export default Sentry.wrap(RootLayout);

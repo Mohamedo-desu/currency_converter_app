@@ -10,7 +10,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { RFValue } from "react-native-responsive-fontsize";
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -48,7 +47,7 @@ const SwapButton = ({ onPress }: { onPress: () => void }) => {
       >
         <MaterialIcons
           name="currency-exchange"
-          size={RFValue(15)}
+          size={15}
           color={Colors.white}
         />
       </AnimatedTouchableOpacity>

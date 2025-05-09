@@ -1,22 +1,28 @@
-import { StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { moderateScale } from "react-native-size-matters";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   input: {
     flex: 1,
-    fontSize: RFValue(16),
+    fontSize: 16,
     padding: 10,
     borderRadius: 5,
+    ...(Platform.OS === "web" && {
+      minWidth: 200,
+    }),
   },
   label: {
-    fontSize: RFValue(13),
+    fontSize: 13,
   },
-  amountContainer: {},
+  amountContainer: {
+    ...(Platform.OS === "web" && {
+      maxWidth: 600,
+      width: "100%",
+    }),
+  },
   flagIcon: {
-    width: moderateScale(30),
-    height: moderateScale(30),
-    borderRadius: moderateScale(25),
+    width: 30,
+    height: 30,
+    borderRadius: 25,
     overflow: "hidden",
     marginRight: 10,
   },
@@ -28,10 +34,16 @@ export const styles = StyleSheet.create({
   headerCurrencyContainer: {
     marginTop: 15,
     gap: 15,
+    ...(Platform.OS === "web" && {
+      width: "100%",
+    }),
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    ...(Platform.OS === "web" && {
+      width: "100%",
+    }),
   },
   clearButton: {
     position: "absolute",

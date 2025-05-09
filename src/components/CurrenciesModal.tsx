@@ -2,10 +2,10 @@ import CustomText from "@/components/CustomText";
 import { Fonts } from "@/constants/Fonts";
 import { styles } from "@/styles/components/CurrenciesModal.styles";
 import { Ionicons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
 import { useTheme } from "@react-navigation/native";
-import React, { memo, useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  FlatList,
   Modal,
   TextInput,
   TouchableOpacity,
@@ -13,7 +13,6 @@ import {
   View,
 } from "react-native";
 import CountryFlag from "react-native-country-flag";
-import { RFValue } from "react-native-responsive-fontsize";
 
 interface Currency {
   code: string;
@@ -80,18 +79,14 @@ const CurrenciesModal = ({
                   onPress={onClose}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Ionicons
-                    name="close"
-                    size={RFValue(24)}
-                    color={colors.text}
-                  />
+                  <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.searchContainer}>
                 <Ionicons
                   name="search"
-                  size={RFValue(20)}
+                  size={20}
                   color={colors.gray[400]}
                   style={styles.searchIcon}
                 />
@@ -113,14 +108,14 @@ const CurrenciesModal = ({
                   >
                     <Ionicons
                       name="close-circle"
-                      size={RFValue(20)}
+                      size={20}
                       color={colors.gray[400]}
                     />
                   </TouchableOpacity>
                 ) : null}
               </View>
 
-              <LegendList
+              <FlatList
                 data={filteredCurrencies}
                 renderItem={({ item }: { item: Currency }) => (
                   <TouchableOpacity
@@ -129,7 +124,7 @@ const CurrenciesModal = ({
                   >
                     <CountryFlag
                       isoCode={item.flag}
-                      size={RFValue(20)}
+                      size={20}
                       style={styles.flagIcon}
                     />
                     <View style={styles.currencyInfo}>
@@ -161,4 +156,4 @@ const CurrenciesModal = ({
   );
 };
 
-export default memo(CurrenciesModal);
+export default CurrenciesModal;

@@ -1,15 +1,13 @@
+import CustomText from "@/components/CustomText";
+import { Colors } from "@/constants/Colors";
+import { Fonts } from "@/constants/Fonts";
+import { styles } from "@/styles/screens/SettingsScreen.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-import CustomText from "@/components/CustomText";
-import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
-import { styles } from "@/styles/screens/SettingsScreen.styles";
 
 const SettingsScreen = () => {
   const { colors } = useTheme();
@@ -27,7 +25,7 @@ const SettingsScreen = () => {
       activeOpacity={0.8}
     >
       <View style={styles.optionLeft}>
-        <Ionicons name={icon} size={RFValue(20)} color={Colors.primary} />
+        <Ionicons name={icon} size={20} color={Colors.primary} />
         <CustomText
           variant="h5"
           fontFamily={Fonts.Medium}
@@ -36,11 +34,7 @@ const SettingsScreen = () => {
           {title}
         </CustomText>
       </View>
-      <Ionicons
-        name="chevron-forward"
-        size={RFValue(20)}
-        color={colors.gray[400]}
-      />
+      <Ionicons name="chevron-forward" size={20} color={colors.gray[400]} />
     </TouchableOpacity>
   );
 
@@ -53,16 +47,12 @@ const SettingsScreen = () => {
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons
-            name="arrow-back"
-            size={RFValue(24)}
-            color={Colors.primary}
-          />
+          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
         </TouchableOpacity>
         <CustomText variant="h4" fontFamily={Fonts.Bold}>
           Settings
         </CustomText>
-        <View style={{ width: RFValue(24) }} />
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Settings Content */}

@@ -1,15 +1,3 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { LegendList } from "@legendapp/list";
-import { useTheme } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, TouchableOpacity, View } from "react-native";
-import CountryFlag from "react-native-country-flag";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { RFValue } from "react-native-responsive-fontsize";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { moderateScale } from "react-native-size-matters";
-
 import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
@@ -19,6 +7,21 @@ import {
   saveSecurely,
 } from "@/store/storage";
 import { styles } from "@/styles/screens/HistoryScreen.styles";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Platform,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import CountryFlag from "react-native-country-flag";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
  * Represents a single currency conversion record in the history
@@ -35,7 +38,7 @@ interface ConversionHistory {
 
 // Time constant for history retention (3 days in milliseconds)
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-const FLAG_SIZE = moderateScale(20);
+const FLAG_SIZE = 20;
 
 const HistoryScreen = () => {
   const { colors } = useTheme();
@@ -87,7 +90,7 @@ const HistoryScreen = () => {
       }
     } catch (error) {
       console.error("Error cleaning up history:", error);
-      Alert.alert("Error", "Failed to clean up history. Please try again.");
+      showError("Error", "Failed to clean up history. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -96,38 +99,56 @@ const HistoryScreen = () => {
   /**
    * Handles the clear history action with confirmation dialog
    */
-  const handleClearHistory = () => {
-    Alert.alert(
-      "Clear History",
-      "Are you sure you want to clear all conversion history?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Clear",
-          style: "destructive",
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              deleteStoredValues(["conversionHistory"]);
-              setHistory([]);
-              setShowCleanupMessage(true);
-              setTimeout(() => setShowCleanupMessage(false), 3000);
-            } catch (error) {
-              console.error("Error clearing history:", error);
-              Alert.alert(
-                "Error",
-                "Failed to clear history. Please try again."
-              );
-            } finally {
-              setIsLoading(false);
-            }
+
+  const showError = (title: string, message: string) => {
+    if (Platform.OS === "web") {
+      // browser alert only shows the message
+      window.alert(`${title}: ${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
+
+  const doClear = async () => {
+    setIsLoading(true);
+    try {
+      deleteStoredValues(["conversionHistory"]);
+      setHistory([]);
+      setShowCleanupMessage(true);
+      setTimeout(() => setShowCleanupMessage(false), 3000);
+    } catch (error) {
+      console.error("Error clearing history:", error);
+      showError("Error", "Failed to clear history. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearHistory = async () => {
+    if (Platform.OS === "web") {
+      const confirmed = window.confirm(
+        "Are you sure you want to clear all conversion history?"
+      );
+      if (confirmed) {
+        await doClear();
+      }
+    } else {
+      Alert.alert(
+        "Clear History",
+        "Are you sure you want to clear all conversion history?",
+        [
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: doClear,
           },
-        },
-      ]
-    );
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+        ]
+      );
+    }
   };
 
   // Initialize history on component mount
@@ -175,7 +196,7 @@ const HistoryScreen = () => {
             </CustomText>
             <MaterialIcons
               name="arrow-right-alt"
-              size={RFValue(12)}
+              size={12}
               color={colors.text}
               style={{ marginHorizontal: 4 }}
             />
@@ -221,11 +242,7 @@ const HistoryScreen = () => {
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons
-            name="arrow-back"
-            size={RFValue(24)}
-            color={Colors.primary}
-          />
+          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
         </TouchableOpacity>
         <CustomText variant="h4" fontFamily={Fonts.Bold}>
           History
@@ -236,11 +253,7 @@ const HistoryScreen = () => {
             activeOpacity={0.8}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons
-              name="trash-outline"
-              size={RFValue(24)}
-              color={Colors.primary}
-            />
+            <Ionicons name="trash-outline" size={24} color={Colors.primary} />
           </TouchableOpacity>
         )}
       </View>
@@ -252,11 +265,7 @@ const HistoryScreen = () => {
           exiting={FadeOut}
           style={[styles.cleanupMessage, { backgroundColor: colors.card }]}
         >
-          <Ionicons
-            name="checkmark-circle"
-            size={RFValue(20)}
-            color={Colors.primary}
-          />
+          <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
           <CustomText
             variant="h6"
             style={{ color: colors.text, marginLeft: 8 }}
@@ -274,11 +283,7 @@ const HistoryScreen = () => {
           </View>
         ) : history.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons
-              name="time-outline"
-              size={RFValue(40)}
-              color={colors.gray[400]}
-            />
+            <Ionicons name="time-outline" size={40} color={colors.gray[400]} />
             <CustomText
               variant="h5"
               style={{
@@ -291,13 +296,13 @@ const HistoryScreen = () => {
             </CustomText>
           </View>
         ) : (
-          <LegendList
+          <FlatList
             data={history}
             renderItem={renderHistoryItem}
-            estimatedItemSize={moderateScale(100)}
             contentContainerStyle={styles.historyList}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item.timestamp.toString()}
+            removeClippedSubviews
           />
         )}
       </View>

@@ -1,9 +1,13 @@
-import { StyleSheet } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    ...(Platform.OS === "web" && {
+      maxWidth: 500,
+      marginHorizontal: "auto",
+      width: "100%",
+    }),
   },
   scrollContent: {
     flexGrow: 1,
@@ -20,18 +24,18 @@ export const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    paddingVertical: moderateScale(15),
+    paddingVertical: 15,
     padding: 15,
     borderRadius: 5,
     marginTop: 30,
+    ...(Platform.OS === "web" && {
+      maxWidth: 500,
+      marginHorizontal: "auto",
+      width: "100%",
+    }),
   },
   exchangeRateContainer: {
     marginTop: 30,
     gap: 10,
-  },
-  helpLinkContainer: {
-    alignItems: "center",
-    marginTop: 60,
-    marginBottom: 10,
   },
 });
