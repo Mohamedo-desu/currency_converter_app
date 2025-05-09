@@ -6,8 +6,6 @@ import {
   Theme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useQuickActionRouting } from "expo-quick-actions/router";
-import { StatusBar } from "expo-status-bar";
 import {
   createContext,
   Dispatch,
@@ -17,6 +15,7 @@ import {
   useState,
 } from "react";
 import { useColorScheme } from "react-native";
+import { SystemBars } from "react-native-edge-to-edge";
 
 type ThemeMode = "light" | "dark" | "system";
 
@@ -109,14 +108,15 @@ const CustomThemeProvider = ({ children }: PropsWithChildren) => {
     [selectedTheme]
   );
 
-  useQuickActionRouting();
+  // useQuickActionRouting();
 
   return (
     <ThemeProvider value={currentNavigationTheme}>
       <ThemeContext.Provider value={{ theme, setTheme }}>
         {children}
       </ThemeContext.Provider>
-      <StatusBar style={selectedTheme === "dark" ? "light" : "dark"} />
+      {/* <StatusBar style={selectedTheme === "dark" ? "light" : "dark"} /> */}
+      <SystemBars style={selectedTheme === "dark" ? "light" : "dark"} />
     </ThemeProvider>
   );
 };

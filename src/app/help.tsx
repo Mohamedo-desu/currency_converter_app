@@ -4,7 +4,6 @@ import { Fonts } from "@/constants/Fonts";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
 import { useTheme } from "@react-navigation/native";
-import * as Sentry from "@sentry/react-native";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -87,16 +86,16 @@ const HelpScreen = () => {
       return;
     }
 
-    // Capture Sentry event & feedback
-    const eventId = Sentry.captureMessage(
-      `[${selectedType}] Report from ${userName} <${userEmail}>: ${reportText}`
-    );
-    Sentry.captureFeedback({
-      name: userName,
-      email: userEmail,
-      message: `Report Type: ${selectedType}\n\n${reportText}`,
-      associatedEventId: eventId,
-    });
+    // // Capture Sentry event & feedback
+    // const eventId = Sentry.captureMessage(
+    //   `[${selectedType}] Report from ${userName} <${userEmail}>: ${reportText}`
+    // );
+    // Sentry.captureFeedback({
+    //   name: userName,
+    //   email: userEmail,
+    //   message: `Report Type: ${selectedType}\n\n${reportText}`,
+    //   associatedEventId: eventId,
+    // });
 
     // Save locally
     saveFeedbackLocally({

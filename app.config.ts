@@ -26,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: "4.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
-    userInterfaceStyle: "automatic",
+    // userInterfaceStyle: "automatic",
     newArchEnabled: true,
     icon: icon,
     scheme: scheme,
@@ -79,14 +79,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
-      [
-        "@sentry/react-native/expo",
-        {
-          organization: "mohamedo-apps-desu",
-          project: PROJECT_SLUG,
-          url: "https://sentry.io",
-        },
-      ],
+      // [
+      //   "@sentry/react-native/expo",
+      //   {
+      //     organization: "mohamedo-apps-desu",
+      //     project: PROJECT_SLUG,
+      //     url: "https://sentry.io",
+      //   },
+      // ],
       [
         "expo-font",
         {
@@ -97,17 +97,17 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ],
         },
       ],
-      [
-        "expo-quick-actions",
-        {
-          androidIcons: {
-            help_icon: {
-              foregroundImage: "./assets/icons/help.png",
-              backgroundColor: "#069140",
-            },
-          },
-        },
-      ],
+      // [
+      //   "expo-quick-actions",
+      //   {
+      //     androidIcons: {
+      //       help_icon: {
+      //         foregroundImage: "./assets/icons/help.png",
+      //         backgroundColor: "#069140",
+      //       },
+      //     },
+      //   },
+      // ],
       [
         "react-native-edge-to-edge",
         {
@@ -119,7 +119,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
     ],
     experiments: {
-      reactCompiler: true,
+      //reactCompiler: true,
       typedRoutes: true,
       reactCanary: true,
       buildCacheProvider: "eas",

@@ -20,7 +20,6 @@ import {
   View,
 } from "react-native";
 import CountryFlag from "react-native-country-flag";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
@@ -167,11 +166,7 @@ const HistoryScreen = () => {
    * Renders a single history item with currency flags and conversion details
    */
   const renderHistoryItem = ({ item }: { item: ConversionHistory }) => (
-    <Animated.View
-      entering={FadeIn}
-      exiting={FadeOut}
-      style={[styles.historyItem, { backgroundColor: colors.card }]}
-    >
+    <View style={[styles.historyItem, { backgroundColor: colors.card }]}>
       <View style={styles.historyHeader}>
         <View style={styles.currencyPair}>
           <View style={styles.flagContainer}>
@@ -225,7 +220,7 @@ const HistoryScreen = () => {
           {item.convertedAmount} {item.toCurrency}
         </CustomText>
       </View>
-    </Animated.View>
+    </View>
   );
 
   return (
@@ -260,11 +255,7 @@ const HistoryScreen = () => {
 
       {/* Success message for history cleanup */}
       {showCleanupMessage && (
-        <Animated.View
-          entering={FadeIn}
-          exiting={FadeOut}
-          style={[styles.cleanupMessage, { backgroundColor: colors.card }]}
-        >
+        <View style={[styles.cleanupMessage, { backgroundColor: colors.card }]}>
           <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
           <CustomText
             variant="h6"
@@ -272,7 +263,7 @@ const HistoryScreen = () => {
           >
             History cleaned up successfully
           </CustomText>
-        </Animated.View>
+        </View>
       )}
 
       {/* Main content area with loading state, empty state, or history list */}

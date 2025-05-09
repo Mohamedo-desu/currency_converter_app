@@ -1,22 +1,18 @@
 import CustomThemeProvider from "@/theme/CustomThemeProvider";
-import { handleExpoUpdateMetadata } from "@/utils/expoUpdateMetadata";
-import * as Sentry from "@sentry/react-native";
 import * as Font from "expo-font";
-import * as QuickActions from "expo-quick-actions";
-import { Slot, useNavigationContainerRef } from "expo-router";
+import { Slot } from "expo-router";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
 import { enableFreeze } from "react-native-screens";
-import sentryConfig from "sentry.config";
 
 // vexo(process.env.EXPO_PUBLIC_VEXO_KEY!);
 
-const navigationIntegration = Sentry.reactNavigationIntegration({
-  enableTimeToInitialDisplay: true,
-});
+// const navigationIntegration = Sentry.reactNavigationIntegration({
+//   enableTimeToInitialDisplay: true,
+// });
 
-Sentry.init(sentryConfig);
-handleExpoUpdateMetadata();
+// Sentry.init(sentryConfig);
+// handleExpoUpdateMetadata();
 
 enableFreeze(true);
 
@@ -40,27 +36,28 @@ const InitialLayout = () => {
 };
 
 const RootLayout = () => {
-  const ref = useNavigationContainerRef();
+  // const ref = useNavigationContainerRef();
 
-  useEffect(() => {
-    if (ref?.current) {
-      navigationIntegration.registerNavigationContainer(ref);
-    }
-    QuickActions.setItems([
-      {
-        title: "Wait! Don't delete me!",
-        subtitle: "We're here to help",
-        icon:
-          Platform.OS === "ios"
-            ? "symbol:person.crop.circle.badge.questionmark"
-            : "help_icon",
-        id: "0",
-        params: { href: "/help" },
-      },
-    ]);
-  }, [ref]);
+  // useEffect(() => {
+  //   if (ref?.current) {
+  //     navigationIntegration.registerNavigationContainer(ref);
+  //   }
+  //   QuickActions.setItems([
+  //     {
+  //       title: "Wait! Don't delete me!",
+  //       subtitle: "We're here to help",
+  //       icon:
+  //         Platform.OS === "ios"
+  //           ? "symbol:person.crop.circle.badge.questionmark"
+  //           : "help_icon",
+  //       id: "0",
+  //       params: { href: "/help" },
+  //     },
+  //   ]);
+  // }, [ref]);
 
   return <InitialLayout />;
 };
 
-export default Sentry.wrap(RootLayout);
+// export default Sentry.wrap(RootLayout);
+export default RootLayout;

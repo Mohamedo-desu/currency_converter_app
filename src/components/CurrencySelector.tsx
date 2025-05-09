@@ -1,6 +1,8 @@
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { styles } from "@/styles/components/CurrencySelector.styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
 import React, { FC } from "react";
 import {
   TextInput,
@@ -9,9 +11,6 @@ import {
   View,
 } from "react-native";
 import CountryFlag from "react-native-country-flag";
-
-import { styles } from "@/styles/components/CurrencySelector.styles";
-import { useTheme } from "@react-navigation/native";
 import CustomText from "./CustomText";
 
 const HEADER_ICON_SIZE = 12;

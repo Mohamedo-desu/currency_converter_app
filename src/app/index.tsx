@@ -32,14 +32,14 @@ import { styles } from "@/styles/screens/CurrencyConverterScreen.styles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 /**
- * Formats a number to a string with 2 decimal places
+ * Formats a number to a string with 3 decimal places
  * @param num - The number to format
- * @returns Formatted string with 2 decimal places
+ * @returns Formatted string with 3 decimal places
  */
 const formatNumber = (num: number): string =>
   num.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
   });
 
 // Debounce delay for conversion calculations (ms)
@@ -157,6 +157,7 @@ const CurrencyConverterScreen = () => {
       const numericAmount = Number(amount.replace(/,/g, ""));
       const conversionRate = toRate / fromRate;
       const rawConverted = numericAmount * conversionRate;
+      const formattedAmount = formatNumber(numericAmount);
       const formattedConverted = formatNumber(rawConverted);
       setConvertedAmount(formattedConverted);
 
@@ -171,7 +172,7 @@ const CurrencyConverterScreen = () => {
         toCurrency: toCurrency.code,
         fromFlag: fromCurrency.flag,
         toFlag: toCurrency.flag,
-        amount: amount,
+        amount: formattedAmount,
         convertedAmount: formattedConverted,
         timestamp: Date.now(),
       };
@@ -261,7 +262,7 @@ const CurrencyConverterScreen = () => {
       const toRate = exchangeRates[toCurrency.code];
       if (fromRate && toRate) {
         const conversionRate = toRate / fromRate;
-        return `1 ${fromCurrency.code} = ${conversionRate.toFixed(2)} ${
+        return `1 ${fromCurrency.code} = ${conversionRate.toFixed(3)} ${
           toCurrency.code
         }`;
       }
@@ -270,23 +271,7 @@ const CurrencyConverterScreen = () => {
   }, [fromCurrency, toCurrency, exchangeRates]);
 
   const handleAmountChange = useCallback((input: string) => {
-    // Remove all non-numeric and non-decimal characters
-    const sanitized = input.replace(/[^\d.]/g, "");
-    // Only allow one decimal point
-    const parts = sanitized.split(".");
-    let value = parts[0];
-    if (parts.length > 1) {
-      value += "." + parts[1].slice(0, 2); // Limit to 2 decimal places
-    }
-    // Format if not empty and not just a decimal point
-    if (value && value !== ".") {
-      const num = Number(value);
-      if (!isNaN(num)) {
-        setAmount(formatNumber(num));
-        return;
-      }
-    }
-    setAmount(value);
+    setAmount(input);
   }, []);
 
   return (
@@ -356,7 +341,7 @@ const CurrencyConverterScreen = () => {
 
         <CurrencySelector
           label="Converted Amount"
-          placeholder="0.00"
+          placeholder="0.000"
           onPress={() => {
             setIsSelectingFrom(false);
             setIsModalVisible(true);
