@@ -1,9 +1,9 @@
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
 import { styles } from "@/styles/components/CurrencySelector.styles";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import {
   TextInput,
   TextInputProps,
@@ -39,7 +39,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
   onPress,
   placeholder,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useContext(ThemeContext);
   return (
     <View style={styles.amountContainer}>
       <CustomText

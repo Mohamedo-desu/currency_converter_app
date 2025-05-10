@@ -1,9 +1,8 @@
 import { styles } from "@/styles/components/AuthHeader.styles";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { AuthHeaderProps, IconProps } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 const Icon: FC<IconProps> = ({ onPress, color }) => (
@@ -21,14 +20,13 @@ const AuthHeader: FC<AuthHeaderProps> = ({
   title,
   description,
   showBackButton = true,
+  Navigate,
 }) => {
-  const router = useRouter();
-
-  const { colors } = useTheme();
+  const { colors } = useContext(ThemeContext);
   return (
     <View>
       {showBackButton && (
-        <Icon onPress={() => router.back()} color={colors.text} />
+        <Icon onPress={() => Navigate("Converter")} color={colors.text} />
       )}
 
       {title && (

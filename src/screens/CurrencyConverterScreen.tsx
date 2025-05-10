@@ -8,8 +8,6 @@ import { Fonts } from "@/constants/Fonts";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import { useRouter } from "expo-router";
 import React, {
   useCallback,
   useContext,
@@ -29,6 +27,7 @@ import {
   registerBackgroundTask,
 } from "@/services/currencyService";
 import { styles } from "@/styles/screens/CurrencyConverterScreen.styles";
+import { Navigate } from "@/types/AuthHeader.types";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 /**
@@ -45,11 +44,9 @@ const formatNumber = (num: number): string =>
 // Debounce delay for conversion calculations (ms)
 const DEBOUNCE_DELAY = 500;
 
-const CurrencyConverterScreen = () => {
-  const { colors } = useTheme();
-  const { setTheme } = useContext(ThemeContext);
+const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
+  const { colors, setTheme } = useContext(ThemeContext);
   const { top, bottom } = useSafeAreaInsets();
-  const router = useRouter();
 
   // State management for currencies and conversion
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -301,7 +298,7 @@ const CurrencyConverterScreen = () => {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push("/settings")}
+          onPress={() => navigate("Settings")}
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -364,7 +361,7 @@ const CurrencyConverterScreen = () => {
         )}
       </View>
 
-      <PrivacyTerms />
+      <PrivacyTerms navigate={navigate} />
 
       {/* Currency selection modal */}
       <CurrenciesModal

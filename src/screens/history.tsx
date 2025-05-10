@@ -7,10 +7,11 @@ import {
   saveSecurely,
 } from "@/store/storage";
 import { styles } from "@/styles/screens/HistoryScreen.styles";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
+import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -39,9 +40,8 @@ interface ConversionHistory {
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const FLAG_SIZE = 20;
 
-const HistoryScreen = () => {
-  const { colors } = useTheme();
-  const router = useRouter();
+const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
+  const { colors } = useContext(ThemeContext);
   const { top, bottom } = useSafeAreaInsets();
   const [history, setHistory] = useState<ConversionHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -233,7 +233,7 @@ const HistoryScreen = () => {
       {/* Navigation header with back button and clear history option */}
       <View style={[styles.header, { paddingTop: top + 10 }]}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => navigate("Settings")}
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >

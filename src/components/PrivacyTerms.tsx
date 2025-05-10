@@ -1,19 +1,20 @@
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
 import { styles } from "@/styles/components/PrivacyTerms.styles";
-import { useTheme } from "@react-navigation/native";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
 import * as Application from "expo-application";
 import Constants from "expo-constants";
-import { useRouter } from "expo-router";
-import React from "react";
+import React, { useContext } from "react";
 import { Linking, Platform, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomText from "./CustomText";
 
-const PrivacyTerms = () => {
-  const { colors } = useTheme();
+type Screen = "Converter" | "Settings" | "History" | "Help";
+type Navigate = (screen: Screen) => void;
+
+const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
+  const { colors } = useContext(ThemeContext);
   const { bottom } = useSafeAreaInsets();
-  const router = useRouter();
 
   // pull version from native or web manifest
   const nativeVersion = Application.nativeApplicationVersion;
@@ -34,10 +35,7 @@ const PrivacyTerms = () => {
     <View style={[styles.footer, { bottom: bottom + 10 }]}>
       {/* Help Link */}
       <View style={styles.helpLinkContainer}>
-        <TouchableOpacity
-          onPress={() => router.push("/help")}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity onPress={() => navigate("Help")} activeOpacity={0.8}>
           <CustomText
             variant="h6"
             fontFamily={Fonts.Medium}

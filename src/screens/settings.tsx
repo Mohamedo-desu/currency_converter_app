@@ -2,16 +2,15 @@ import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
 import { styles } from "@/styles/screens/SettingsScreen.styles";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
+import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React from "react";
+import React, { useContext } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SettingsScreen = () => {
-  const { colors } = useTheme();
-  const router = useRouter();
+const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
+  const { colors } = useContext(ThemeContext);
   const { top } = useSafeAreaInsets();
 
   const renderSettingOption = (
@@ -43,7 +42,7 @@ const SettingsScreen = () => {
       {/* Header */}
       <View style={[styles.header, { paddingTop: top + 10 }]}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => navigate("Converter")}
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -58,7 +57,7 @@ const SettingsScreen = () => {
       {/* Settings Content */}
       <View style={styles.content}>
         {renderSettingOption("time-outline", "History", () =>
-          router.push("/history")
+          navigate("History")
         )}
       </View>
     </View>

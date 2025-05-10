@@ -1,6 +1,7 @@
 import { Fonts } from "@/constants/Fonts";
-import { useTheme } from "@react-navigation/native";
-import React, { FC, ReactNode } from "react";
+import { ThemeContext } from "@/theme/CustomThemeProvider";
+
+import React, { FC, ReactNode, useContext } from "react";
 import { Platform, Text, TextStyle } from "react-native";
 
 type Variant = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "h7";
@@ -64,7 +65,7 @@ const CustomText: FC<CustomTextProps> = ({
   onLayout,
   ...props
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useContext(ThemeContext);
   const platform = Platform.OS as PlatformType;
 
   let computedFontSize: number = fontSize || 12;
