@@ -19,16 +19,13 @@ A modern currency converter application built with React Native and Expo, featur
   - Responsive design for all screen sizes
   - Quick currency swap functionality
   - Searchable currency list with flags
-  - Smooth currency selection animations
   - History tracking of currency conversions
   - Beautiful flag display with proper scaling
+  - Custom Okra font family for enhanced typography
 - **Performance**:
   - Fast MMKV storage for offline data
-  - Optimized list rendering with LegendList
-  - Smooth animations with Reanimated
   - Efficient currency data caching
-- **Error Tracking**: Sentry integration for monitoring and debugging
-- **Quick Actions**: Support for app shortcuts
+  - New React Native Architecture enabled
 
 ## Screenshots
 
@@ -42,25 +39,30 @@ A modern currency converter application built with React Native and Expo, featur
 
 ### Frontend
 
-- **React Native** with **Expo**
+- **React Native** with **Expo** (v53.0.9)
 - **TypeScript** - Type-safe JavaScript
-- **Expo Router** - File-based navigation system
-- **React Native Reanimated** - Smooth animations
-- **React Native Gesture Handler** - Gesture management
+- **React Native Screens** - Native navigation container
+- **React Native Safe Area Context** - Safe area handling
 - **React Native MMKV** - Fast key-value storage for offline data
-- **LegendList** - High-performance currency list rendering
 - **Expo Updates** - Over-the-air updates
 - **Expo Background Task** - Background data updates
 - **Expo Task Manager** - Background task management
 - **React Native Country Flag** - Currency flag display
-- **React Native Fast Image** - Optimized image loading
+- **React Native Keyboard Aware Scroll View** - Keyboard handling
+- **Expo Build Properties** - Enhanced build configuration
+- **Expo Vector Icons** - Icon system
+- **Expo Font** - Custom font loading
+- **Expo Splash Screen** - Splash screen management
+- **Expo Constants** - App constants and configuration
+- **Expo Application** - App information and utilities
 
 ### Development Tools
 
-- **ESLint & Prettier** - Code linting and formatting
 - **TypeScript** - Static type checking
-- **Sentry** - Error tracking and monitoring
 - **EAS** - Expo Application Services for builds
+- **Bun** - Fast JavaScript runtime and package manager
+- **Jest** - Testing framework
+- **Source Map Explorer** - Bundle analysis
 
 ## Getting Started
 
@@ -89,7 +91,7 @@ A modern currency converter application built with React Native and Expo, featur
 3. Set up environment variables
 
    ```bash
-   # Create a .env file with your API keys
+   # Create a .env.local file with your API keys
    EXPO_PUBLIC_RATES_API_URL=your_exchange_rate_api_key
    ```
 
@@ -103,6 +105,33 @@ A modern currency converter application built with React Native and Expo, featur
 - `bun run start` - Start the Expo development server
 - `bun run android` - Run on Android device/emulator
 - `bun run ios` - Run on iOS simulator
+- `bun run build:android` - Build Android preview version
+- `bun run build:web` - Build web version
+- `bun run publish:expo` - Publish OTA updates
+- `bun run release:web` - Deploy web version
+- `bun run release:android` - Build Android release version
+- `bun run release:ios` - Build iOS release version
+- `bun run test` - Run tests
+- `bun run lint` - Run linting
+- `bun run format` - Format code
+- `bun run analyze:web` - Analyze web bundle
+- `bun run analyze:ios` - Analyze iOS bundle
+- `bun run analyze:android` - Analyze Android bundle
+
+## Environment Configuration
+
+The app supports three environments:
+
+- **Development**: Development builds with debug features
+- **Preview**: Pre-release builds for testing
+- **Production**: Production builds for app stores
+
+Each environment has its own:
+
+- Bundle identifier
+- Package name
+- App icon
+- URL scheme
 
 ## Offline Functionality
 
@@ -121,18 +150,10 @@ The app provides full offline support through:
 The project uses modern development practices:
 
 - TypeScript for type safety
-- ESLint and Prettier for code quality
 - Jest for testing
-- Sentry for error tracking
 - EAS for builds and updates
-
-## Error Tracking
-
-The app uses Sentry for error tracking and monitoring:
-
-- Automatic error reporting
-- Performance monitoring
-- Source map uploading for better error tracking
+- New React Native Architecture
+- EAS Build Cache Provider for faster builds
 
 ## Currency Handling
 
@@ -147,7 +168,6 @@ The app provides sophisticated currency handling:
   - Quick currency swap functionality
   - Searchable currency list with flags
   - Last used currencies remembered
-  - Smooth selection animations
 - **History Tracking**:
   - Conversion history with timestamps
   - Easy access to previous conversions
