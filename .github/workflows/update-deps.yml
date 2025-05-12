@@ -4,11 +4,18 @@ on:
     - cron: "0 0 1 * *" # Run at 00:00 on the first day of every month
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-deps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
       - uses: expo/expo-github-action@v7
         with:
           expo-version: latest
@@ -20,7 +27,13 @@ jobs:
         run: bun install
       - name: Update Expo packages
         run: bunx expo install --fix
+      - name: Check for changes
+        id: git-check
+        run: |
+          git add .
+          git diff --staged --quiet || echo "changes=true" >> $GITHUB_OUTPUT
       - name: Create Pull Request
+        if: steps.git-check.outputs.changes == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,3 +49,4 @@ jobs:
           branch: "chore/update-dependencies"
           base: "master"
           labels: "dependencies, automated pr"
+          delete-branch: true
