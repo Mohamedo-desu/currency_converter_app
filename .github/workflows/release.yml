@@ -20,10 +20,10 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Build Preview Version
-        run: eas build --platform all --profile preview --non-interactive
+        run: eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       - name: Build Production Version
-        run: eas build --platform all --profile production --non-interactive
+        run: eas build --platform android --profile production --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
