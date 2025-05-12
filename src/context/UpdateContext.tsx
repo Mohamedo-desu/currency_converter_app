@@ -1,3 +1,4 @@
+import { getStoredValues, saveSecurely } from "@/store/storage";
 import * as Updates from "expo-updates";
 import React, {
   createContext,
@@ -60,7 +61,10 @@ export const UpdateProvider: React.FC<{ children: React.ReactNode }> = ({
   // State
   const [isChecking, setIsChecking] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const [lastChecked, setLastChecked] = useState<Date | null>(() => {
+    const stored = getStoredValues(["lastUpdateCheck"]);
+    return stored.lastUpdateCheck ? new Date(stored.lastUpdateCheck) : null;
+  });
   const lastCheckTime = useRef<number>(0);
 
   // Update handling
@@ -99,7 +103,11 @@ export const UpdateProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setIsChecking(true);
       const update = await Updates.checkForUpdateAsync();
-      setLastChecked(new Date());
+      const currentTime = new Date();
+      setLastChecked(currentTime);
+      saveSecurely([
+        { key: "lastUpdateCheck", value: currentTime.toISOString() },
+      ]);
 
       if (update.isAvailable) {
         showAlert(
