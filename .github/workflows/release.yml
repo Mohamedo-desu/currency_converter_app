@@ -11,6 +11,10 @@ jobs:
       - uses: expo/expo-github-action@v7
         with:
           expo-version: latest
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
       - name: Install dependencies
         run: bun install
       - name: Build Preview Version
