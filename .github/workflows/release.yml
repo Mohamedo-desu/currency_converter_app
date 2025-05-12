@@ -3,6 +3,11 @@ on:
   push:
     tags:
       - "v*.*.*"
+
+# Add permissions block at the workflow level
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,6 +36,8 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
