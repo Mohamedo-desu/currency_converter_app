@@ -14,12 +14,14 @@
       "autoIncrement": true,
       "distribution": "internal",
       "environment": "preview",
-      "channel": "preview"
+      "channel": "preview",
+      "android": { "image": "latest" }
     },
     "production": {
       "autoIncrement": true,
       "environment": "production",
-      "channel": "production"
+      "channel": "production",
+      "android": { "image": "latest" }
     }
   },
   "submit": {

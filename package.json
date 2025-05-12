@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "expo": "53.0.9",
     "expo-application": "~6.1.4",
     "expo-background-task": "^0.2.6",
     "expo-build-properties": "~0.14.6",
@@ -43,7 +42,8 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
     "react-native-web": "^0.20.0",
-    "source-map-explorer": "^2.5.3"
+    "source-map-explorer": "^2.5.3",
+    "expo": "~53.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",

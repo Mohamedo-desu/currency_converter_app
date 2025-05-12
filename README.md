@@ -1,6 +1,6 @@
 # Currency Converter
 
-A modern currency converter application built with React Native and Expo, featuring real-time exchange rates, offline functionality, and a beautiful user interface. Convert between any currencies with ease, even without an internet connection.
+A modern currency converter application built with React Native, featuring real-time exchange rates, offline functionality, and a beautiful user interface. Convert between any currencies with ease, even without an internet connection.
 
 ## Features
 
@@ -39,18 +39,20 @@ A modern currency converter application built with React Native and Expo, featur
 
 ### Frontend
 
-- **React Native** with **Expo** (v53.0.9)
+- **React Native** (v0.79.2)
 - **TypeScript** - Type-safe JavaScript
 - **React Native Screens** - Native navigation container
 - **React Native Safe Area Context** - Safe area handling
 - **React Native MMKV** - Fast key-value storage for offline data
+- **React Native Country Flag** - Currency flag display
+- **React Native Keyboard Aware Scroll View** - Keyboard handling
+- **React Native Web** - Web platform support
+
+### Selected Expo Packages
+
 - **Expo Updates** - Over-the-air updates
 - **Expo Background Task** - Background data updates
 - **Expo Task Manager** - Background task management
-- **React Native Country Flag** - Currency flag display
-- **React Native Keyboard Aware Scroll View** - Keyboard handling
-- **Expo Build Properties** - Enhanced build configuration
-- **Expo Vector Icons** - Icon system
 - **Expo Font** - Custom font loading
 - **Expo Splash Screen** - Splash screen management
 - **Expo Constants** - App constants and configuration
@@ -70,8 +72,9 @@ A modern currency converter application built with React Native and Expo, featur
 
 - Node.js
 - Bun package manager (recommended) or npm
-- Expo CLI
-- EAS CLI (for builds and updates)
+- Android Studio (for Android development)
+- Xcode (for iOS development, macOS only)
+- CocoaPods (for iOS development, macOS only)
 
 ### Installation
 
@@ -95,14 +98,20 @@ A modern currency converter application built with React Native and Expo, featur
    EXPO_PUBLIC_RATES_API_URL=your_exchange_rate_api_key
    ```
 
-4. Start the development server
+4. Install iOS dependencies (macOS only)
+
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+5. Start the development server
    ```bash
    bunx expo start
    ```
 
 ## Available Scripts
 
-- `bun run start` - Start the Expo development server
+- `bun run start` - Start the development server
 - `bun run android` - Run on Android device/emulator
 - `bun run ios` - Run on iOS simulator
 - `bun run build:android` - Build Android preview version
@@ -112,7 +121,6 @@ A modern currency converter application built with React Native and Expo, featur
 - `bun run release:android` - Build Android release version
 - `bun run release:ios` - Build iOS release version
 - `bun run test` - Run tests
-- `bun run lint` - Run linting
 - `bun run format` - Format code
 - `bun run analyze:web` - Analyze web bundle
 - `bun run analyze:ios` - Analyze iOS bundle
