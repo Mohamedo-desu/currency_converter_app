@@ -30,7 +30,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get install -y jq
       - name: Trigger EAS Build
-        run: eas build --platform android --profile ${{ matrix.profile }} --non-interactive
+        run: eas build --platform android --profile ${{ matrix.profile }} --non-interactive --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
