@@ -1,0 +1,38 @@
+name: Update Dependencies
+on:
+  schedule:
+    - cron: "0 0 1 * *" # Run at 00:00 on the first day of every month
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Update Expo packages
+        run: bunx expo install --fix
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update dependencies"
+          title: "chore: update dependencies"
+          body: |
+            Automated dependency updates:
+
+            - Updated Expo packages to match SDK version
+            - Updated other dependencies
+
+            Please review the changes and test the app before merging.
+          branch: "chore/update-dependencies"
+          base: "master"
+          labels: "dependencies, automated pr"

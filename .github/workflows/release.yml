@@ -22,7 +22,32 @@ jobs:
         run: bun install
       - name: Install EAS CLI
         run: npm install -g eas-cli
-      - name: Build Android
+      - name: Install jq
+        run: sudo apt-get install -y jq
+      - name: Trigger EAS Build
         run: eas build --platform android --profile ${{ matrix.profile }} --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get tag version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          generate_release_notes: true
+          body: |
+            ## What's Changed
+            This release includes all changes since the last version.
+
+            ## Full Changelog
+            [View the complete changelog](https://github.com/Mohamedo-desu/currency-converter-app/commits/${{ steps.get_version.outputs.VERSION }})
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
