@@ -15,13 +15,19 @@ A modern currency converter application built with React Native, featuring real-
   - Last used currencies remembered
   - Intelligent currency flag display system
 - **User Experience**:
-  - Dark/Light theme support
+  - Dark/Light theme support with system preference detection
   - Responsive design for all screen sizes
   - Quick currency swap functionality
   - Searchable currency list with flags
   - History tracking of currency conversions
   - Beautiful flag display with proper scaling
   - Custom Okra font family for enhanced typography
+- **Over-the-Air Updates**:
+  - Automatic update checks
+  - Version comparison and display
+  - Update history tracking
+  - Development mode detection
+  - User-friendly update notifications
 - **Performance**:
   - Fast MMKV storage for offline data
   - Efficient currency data caching
@@ -29,11 +35,11 @@ A modern currency converter application built with React Native, featuring real-
 
 ## Screenshots
 
-| Home Screen (Light)                              | Home Screen (Dark)                             | Currency Modal                                           |
-| ------------------------------------------------ | ---------------------------------------------- | -------------------------------------------------------- |
-| ![Home Light](assets/screenshots/home-light.png) | ![Home Dark](assets/screenshots/home-dark.png) | ![Currency Modal](assets/screenshots/currenct-modal.png) |
-| Conversion History                               | Help Screen                                    |                                                          |
-| ![History](assets/screenshots/history.png)       | ![Help](assets/screenshots/help-screen.png)    |                                                          |
+| Home Screen (Light)                              | Settings Screen                              | Currency Modal                         |
+| ------------------------------------------------ | -------------------------------------------- | -------------------------------------- |
+| ![Home Light](assets/screenshots/home-light.png) | ![Settings](assets/screenshots/settings.png) | ![Modal](assets/screenshots/modal.png) |
+| Conversion History                               | Help Screen                                  |                                        |
+| ![History](assets/screenshots/history.png)       | ![Help](assets/screenshots/help.png)         |                                        |
 
 ## Tech Stack
 
@@ -50,13 +56,14 @@ A modern currency converter application built with React Native, featuring real-
 
 ### Selected Expo Packages
 
-- **Expo Updates** - Over-the-air updates
+- **Expo Updates** - Over-the-air updates with version tracking
 - **Expo Background Task** - Background data updates
 - **Expo Task Manager** - Background task management
 - **Expo Font** - Custom font loading
 - **Expo Splash Screen** - Splash screen management
 - **Expo Constants** - App constants and configuration
 - **Expo Application** - App information and utilities
+- **Expo Appearance** - System theme detection
 
 ### Development Tools
 
@@ -116,7 +123,7 @@ A modern currency converter application built with React Native, featuring real-
 - `bun run ios` - Run on iOS simulator
 - `bun run build:android` - Build Android preview version
 - `bun run build:web` - Build web version
-- `bun run publish:expo` - Publish OTA updates
+- `bun run publish:preview` - Publish OTA updates to preview channel
 - `bun run release:web` - Deploy web version
 - `bun run release:android` - Build Android release version
 - `bun run release:ios` - Build iOS release version
@@ -128,11 +135,10 @@ A modern currency converter application built with React Native, featuring real-
 
 ## Environment Configuration
 
-The app supports three environments:
+The app supports two environments:
 
 - **Development**: Development builds with debug features
-- **Preview**: Pre-release builds for testing
-- **Production**: Production builds for app stores
+- **Preview**: Pre-release builds for testing and OTA updates
 
 Each environment has its own:
 
@@ -140,6 +146,41 @@ Each environment has its own:
 - Package name
 - App icon
 - URL scheme
+- Update channel
+
+## Update System
+
+The app includes a sophisticated update system:
+
+- **Automatic Updates**:
+  - Background update checks
+  - Version comparison
+  - Update notifications
+  - Last checked time tracking
+- **Update Channels**:
+  - Preview channel for testing
+  - Development mode detection
+  - Update history storage
+- **User Interface**:
+  - Clear version display
+  - Update status indicators
+  - Last checked time display
+  - Update progress tracking
+
+## Theme System
+
+The app features a comprehensive theme system:
+
+- **Theme Support**:
+  - Light and dark themes
+  - System preference detection
+  - Manual theme override
+  - Smooth theme transitions
+- **Theme Context**:
+  - Centralized theme management
+  - Type-safe theme values
+  - Consistent color palette
+  - Dynamic theme switching
 
 ## Offline Functionality
 
