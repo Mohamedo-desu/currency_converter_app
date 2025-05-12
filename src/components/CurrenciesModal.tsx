@@ -1,9 +1,9 @@
 import CustomText from "@/components/CustomText";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/CurrenciesModal.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useContext, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -33,7 +33,7 @@ const CurrenciesModal = ({
   currencies,
   onCurrenciesSelect,
 }: CurrenciesModalProps) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredCurrencies = useMemo(() => {

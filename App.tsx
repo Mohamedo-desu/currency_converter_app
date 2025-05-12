@@ -1,5 +1,20 @@
 // App.tsx
+import { ThemeProvider } from "@/context/ThemeContext";
+import { UpdateProvider } from "@/context/UpdateContext";
 import RootLayout from "@/screens/RootLayout";
 import { registerRootComponent } from "expo";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-registerRootComponent(RootLayout);
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <UpdateProvider>
+          <RootLayout />
+        </UpdateProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
+
+registerRootComponent(App);

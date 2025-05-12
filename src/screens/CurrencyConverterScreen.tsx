@@ -5,18 +5,17 @@ import PrivacyTerms from "@/components/PrivacyTerms";
 import SwapButton from "@/components/SwapButton";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@/context/ThemeContext";
 import { getStoredValues, saveSecurely } from "@/store/storage";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
 import React, {
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Alert, Platform, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Import reusable service functions
@@ -45,7 +44,7 @@ const formatNumber = (num: number): string =>
 const DEBOUNCE_DELAY = 500;
 
 const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
-  const { colors, setTheme } = useContext(ThemeContext);
+  const { colors, toggleTheme } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
 
   // State management for currencies and conversion
@@ -267,9 +266,68 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
     return "";
   }, [fromCurrency, toCurrency, exchangeRates]);
 
-  const handleAmountChange = useCallback((input: string) => {
-    setAmount(input);
-  }, []);
+  const showAlert = (title: string, message: string, onPress?: () => void) => {
+    if (Platform.OS === "web") {
+      window.alert(`${title}: ${message}`);
+      if (onPress) onPress();
+    } else {
+      Alert.alert(title, message, [
+        {
+          text: "OK",
+          onPress,
+        },
+      ]);
+    }
+  };
+
+  const handleAmountChange = useCallback(
+    (input: string) => {
+      // Check if currencies are selected
+      if (!fromCurrency || !toCurrency) {
+        showAlert(
+          "Select Currencies",
+          "Please select both source and target currencies before entering an amount.",
+          () => {
+            // Open currency selection modal
+            setIsSelectingFrom(!fromCurrency);
+            setIsModalVisible(true);
+          }
+        );
+        return;
+      }
+
+      // Remove any non-numeric characters except decimal point
+      let sanitizedInput = input.replace(/[^0-9.]/g, "");
+
+      // Prevent multiple decimal points
+      const decimalCount = (sanitizedInput.match(/\./g) || []).length;
+      if (decimalCount > 1) {
+        // Keep only the first decimal point
+        const parts = sanitizedInput.split(".");
+        sanitizedInput = parts[0] + "." + parts.slice(1).join("");
+      }
+
+      // Limit to 3 decimal places
+      if (sanitizedInput.includes(".")) {
+        const [whole, decimal] = sanitizedInput.split(".");
+        if (decimal && decimal.length > 3) {
+          sanitizedInput = `${whole}.${decimal.slice(0, 3)}`;
+        }
+      }
+
+      // Prevent leading zeros unless it's a decimal number
+      if (
+        sanitizedInput.startsWith("0") &&
+        sanitizedInput.length > 1 &&
+        !sanitizedInput.startsWith("0.")
+      ) {
+        sanitizedInput = sanitizedInput.slice(1);
+      }
+
+      setAmount(sanitizedInput);
+    },
+    [fromCurrency, toCurrency]
+  );
 
   return (
     <KeyboardAwareScrollView
@@ -285,9 +343,7 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
       {/* Theme toggle and settings header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() =>
-            setTheme((prev: string) => (prev === "dark" ? "light" : "dark"))
-          }
+          onPress={toggleTheme}
           activeOpacity={0.8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >

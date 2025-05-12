@@ -1,12 +1,12 @@
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/SwapButton.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useContext } from "react";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
 const SwapButton = ({ onPress }: { onPress: () => void }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
 
   return (
     <View style={styles.breakerContainer}>

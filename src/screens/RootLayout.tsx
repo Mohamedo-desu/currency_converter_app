@@ -1,11 +1,9 @@
 // RootLayout.tsx
 import { getStoredValues, saveSecurely } from "@/store/storage";
-import CustomThemeProvider from "@/theme/CustomThemeProvider";
 import { Screen } from "@/types/AuthHeader.types";
 import * as Font from "expo-font";
 import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import CurrencyConverterScreen from "./CurrencyConverterScreen";
 import HelpScreen from "./help";
 import HistoryScreen from "./history";
@@ -55,9 +53,5 @@ export default function RootLayout() {
     }
   }, []);
 
-  return (
-    <CustomThemeProvider>
-      <SafeAreaProvider>{renderScreen()}</SafeAreaProvider>
-    </CustomThemeProvider>
-  );
+  return renderScreen();
 }

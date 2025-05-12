@@ -1,8 +1,8 @@
+import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/AuthHeader.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { AuthHeaderProps, IconProps } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
-import React, { FC, useContext } from "react";
+import React, { FC } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 const Icon: FC<IconProps> = ({ onPress, color }) => (
@@ -22,7 +22,7 @@ const AuthHeader: FC<AuthHeaderProps> = ({
   showBackButton = true,
   Navigate,
 }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
   return (
     <View>
       {showBackButton && (

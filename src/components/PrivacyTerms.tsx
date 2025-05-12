@@ -1,10 +1,10 @@
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/PrivacyTerms.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import * as Application from "expo-application";
 import Constants from "expo-constants";
-import React, { useContext } from "react";
+import React from "react";
 import { Linking, Platform, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomText from "./CustomText";
@@ -13,7 +13,7 @@ type Screen = "Converter" | "Settings" | "History" | "Help";
 type Navigate = (screen: Screen) => void;
 
 const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
 
   // pull version from native or web manifest

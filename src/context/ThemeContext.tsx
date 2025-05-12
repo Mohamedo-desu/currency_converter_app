@@ -5,12 +5,15 @@ import React, {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
+  useCallback,
+  useContext,
   useMemo,
   useState,
 } from "react";
 import { useColorScheme } from "react-native";
 import { SystemBars } from "react-native-edge-to-edge";
 
+// Types
 type ThemeMode = "light" | "dark" | "system";
 
 interface CustomThemeColors {
@@ -34,8 +37,10 @@ interface ThemeContextType {
   theme: ThemeMode;
   setTheme: Dispatch<SetStateAction<ThemeMode>>;
   colors: CustomThemeColors;
+  toggleTheme: () => void;
 }
 
+// Context
 export const ThemeContext = createContext<ThemeContextType>({
   theme: "dark",
   setTheme: () => {},
@@ -55,8 +60,10 @@ export const ThemeContext = createContext<ThemeContextType>({
       50: "#1b1a1a",
     },
   },
+  toggleTheme: () => {},
 });
 
+// Theme definitions
 const customDarkTheme: CustomThemeColors = {
   primary: Colors.primary,
   background: Colors.black,
@@ -91,12 +98,24 @@ const customLightTheme: CustomThemeColors = {
   },
 };
 
-const CustomThemeProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+// Provider Component
+export const ThemeProvider: React.FC<PropsWithChildren<{}>> = ({
+  children,
+}) => {
   // Load saved theme or default to 'dark'
   const [theme, setTheme] = useState<ThemeMode>(
     getStoredValues(["theme"]).theme || "dark"
   );
   const systemScheme = useColorScheme();
+
+  // Toggle between light and dark themes
+  const toggleTheme = useCallback(() => {
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === "light" ? "dark" : "light";
+      saveSecurely([{ key: "theme", value: newTheme }]);
+      return newTheme;
+    });
+  }, []);
 
   // Resolve actual theme (light/dark) based on user choice or system setting
   const resolvedTheme = useMemo<ThemeMode>(() => {
@@ -114,7 +133,7 @@ const CustomThemeProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
   return (
     <>
-      <ThemeContext.Provider value={{ theme, setTheme, colors }}>
+      <ThemeContext.Provider value={{ theme, setTheme, colors, toggleTheme }}>
         {children}
       </ThemeContext.Provider>
       <SystemBars style={resolvedTheme === "dark" ? "light" : "dark"} />
@@ -122,4 +141,11 @@ const CustomThemeProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   );
 };
 
-export default CustomThemeProvider;
+// Hook
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+};

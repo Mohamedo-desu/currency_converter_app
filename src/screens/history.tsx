@@ -1,17 +1,17 @@
 import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@/context/ThemeContext";
 import {
   deleteStoredValues,
   getStoredValues,
   saveSecurely,
 } from "@/store/storage";
 import { styles } from "@/styles/screens/HistoryScreen.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -41,7 +41,7 @@ const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const FLAG_SIZE = 20;
 
 const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
   const [history, setHistory] = useState<ConversionHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);

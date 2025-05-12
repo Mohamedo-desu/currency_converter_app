@@ -1,20 +1,21 @@
 import CustomText from "@/components/CustomText";
+import UpdateSection from "@/components/UpdateSection";
 import { Colors } from "@/constants/Colors";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/screens/SettingsScreen.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useContext } from "react";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
   const { top } = useSafeAreaInsets();
 
   const renderSettingOption = (
-    icon: string,
+    icon: keyof typeof Ionicons.glyphMap,
     title: string,
     onPress: () => void
   ) => (
@@ -40,7 +41,7 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: top + 10 }]}>
+      <View style={[styles.header, { paddingTop: top }]}>
         <TouchableOpacity
           onPress={() => navigate("Converter")}
           activeOpacity={0.8}
@@ -48,7 +49,11 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
         >
           <Ionicons name="arrow-back" size={24} color={Colors.primary} />
         </TouchableOpacity>
-        <CustomText variant="h4" fontFamily={Fonts.Bold}>
+        <CustomText
+          variant="h4"
+          fontFamily={Fonts.Bold}
+          style={{ color: colors.text }}
+        >
           Settings
         </CustomText>
         <View style={{ width: 24 }} />
@@ -56,9 +61,11 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
 
       {/* Settings Content */}
       <View style={styles.content}>
-        {renderSettingOption("time-outline", "History", () =>
-          navigate("History")
+        {renderSettingOption("help-circle", "Help & Support", () =>
+          navigate("Help")
         )}
+        {renderSettingOption("time", "History", () => navigate("History"))}
+        <UpdateSection />
       </View>
     </View>
   );

@@ -1,12 +1,12 @@
 import AuthHeader from "@/components/AuthHeader";
 import CustomText from "@/components/CustomText";
 import { Fonts } from "@/constants/Fonts";
+import { useTheme } from "@/context/ThemeContext";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
-import { ThemeContext } from "@/theme/CustomThemeProvider";
 import { Navigate } from "@/types/AuthHeader.types";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Platform,
@@ -30,7 +30,7 @@ interface Feedback {
 }
 
 const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
 
   // State to hold report type, user details, and the report text
