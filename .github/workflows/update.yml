@@ -1,7 +1,7 @@
 name: OTA Update
 on:
   push:
-    branches: [master]
+    branches: [preview]
   workflow_dispatch: # Allow manual triggering
 
 jobs:
