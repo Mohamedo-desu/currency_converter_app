@@ -152,6 +152,8 @@ const CurrenciesModal = ({
                 keyExtractor={(item) => item.code}
                 contentContainerStyle={styles.currenciesList}
                 keyboardShouldPersistTaps="handled"
+                indicatorStyle="black"
+                showsVerticalScrollIndicator={true}
               />
             </View>
           </TouchableWithoutFeedback>

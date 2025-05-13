@@ -93,7 +93,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
-      //"./plugins/customize.js",
+      "./plugins/scrollbar-color.js",
+      "./plugins/customize.js",
     ],
     experiments: {
       reactCanary: true,
