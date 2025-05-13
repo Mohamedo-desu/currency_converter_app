@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+# Add permissions block at the workflow level
+permissions:
+  contents: write
+
 jobs:
   version-check:
     runs-on: ubuntu-latest
@@ -62,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        profile: [preview, production]
+        profile: [preview]
     steps:
       - name: Debug update condition
         run: |
@@ -92,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        profile: [preview, production]
+        profile: [preview]
     steps:
       - name: Debug build condition
         run: |
@@ -111,7 +115,34 @@ jobs:
         run: bun install
       - name: Install EAS CLI
         run: npm install -g eas-cli
+      - name: Install jq
+        run: sudo apt-get install -y jq
       - name: Trigger EAS Build
         run: eas build --platform android --profile ${{ matrix.profile }} --non-interactive --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  release:
+    needs: [version-check, update, build]
+    runs-on: ubuntu-latest
+    if: always() && (needs.update.result == 'success' || needs.build.result == 'success')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get tag version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          generate_release_notes: true
+          body: |
+            ## What's Changed
+            This release includes all changes since the last version.
+
+            ## Full Changelog
+            [View the complete changelog](https://github.com/Mohamedo-desu/currency-converter-app/commits/${{ steps.get_version.outputs.VERSION }})
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
