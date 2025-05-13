@@ -106,7 +106,7 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
         fontWeight="medium"
         style={[
           styles.label,
-          { color: colors.gray[300], marginTop: Spacing.margin.sm },
+          { color: colors.gray[400], marginTop: Spacing.margin.sm },
         ]}
       >
         {currency

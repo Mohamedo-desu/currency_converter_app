@@ -14,6 +14,7 @@ A modern currency converter application built with React Native, featuring real-
   - Currency data caching for 3 days
   - Last used currencies remembered
   - Intelligent currency flag display system
+  - Comprehensive currency symbols and flags
 - **User Experience**:
   - Dark/Light theme support with system preference detection
   - Responsive design for all screen sizes
@@ -21,7 +22,8 @@ A modern currency converter application built with React Native, featuring real-
   - Searchable currency list with flags
   - History tracking of currency conversions
   - Beautiful flag display with proper scaling
-  - Custom Okra font family for enhanced typography
+  - Input validation and formatting
+  - Clear conversion history
 - **Over-the-Air Updates**:
   - Automatic update checks
   - Version comparison and display
@@ -32,20 +34,24 @@ A modern currency converter application built with React Native, featuring real-
   - Fast MMKV storage for offline data
   - Efficient currency data caching
   - New React Native Architecture enabled
+  - Debounced conversion calculations
+  - Optimized background tasks
 
 ## Screenshots
 
-| Home Screen (Light)                              | Settings Screen                              | Currency Modal                         |
-| ------------------------------------------------ | -------------------------------------------- | -------------------------------------- |
-| ![Home Light](assets/screenshots/home-light.png) | ![Settings](assets/screenshots/settings.png) | ![Modal](assets/screenshots/modal.png) |
-| Conversion History                               | Help Screen                                  |                                        |
-| ![History](assets/screenshots/history.png)       | ![Help](assets/screenshots/help.png)         |                                        |
+| Main Interface                                            | Currency Selection & States                                         | History & Help                             |
+| --------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------ |
+| ![Initial](assets/screenshots/init.png)                   | ![Modal](assets/screenshots/modal.png)                              | ![History](assets/screenshots/history.png) |
+| ![No Currency](assets/screenshots/nocurrencyselected.png) | ![No Currency Dark](assets/screenshots/nocurrencyselectedwhite.png) | ![Help](assets/screenshots/help.png)       |
+| ![No History](assets/screenshots/nohistory.png)           | ![Help Submitted](assets/screenshots/helpsubmitted.png)             |                                            |
 
 ## Tech Stack
 
 ### Frontend
 
 - **React Native** (v0.79.2)
+- **React** (v19.0.0)
+- **Expo** (v53.0.9)
 - **TypeScript** - Type-safe JavaScript
 - **React Native Screens** - Native navigation container
 - **React Native Safe Area Context** - Safe area handling
@@ -54,12 +60,19 @@ A modern currency converter application built with React Native, featuring real-
 - **React Native Keyboard Aware Scroll View** - Keyboard handling
 - **React Native Web** - Web platform support
 
+### Backend
+
+- **Node.js** - Runtime environment
+- **Express** - Web framework
+- **MongoDB** - Database for version tracking and feedback collection
+- **CORS** - Cross-origin resource sharing
+- **dotenv** - Environment configuration
+
 ### Selected Expo Packages
 
 - **Expo Updates** - Over-the-air updates with version tracking
 - **Expo Background Task** - Background data updates
 - **Expo Task Manager** - Background task management
-- **Expo Font** - Custom font loading
 - **Expo Splash Screen** - Splash screen management
 - **Expo Constants** - App constants and configuration
 - **Expo Application** - App information and utilities
@@ -72,6 +85,7 @@ A modern currency converter application built with React Native, featuring real-
 - **Bun** - Fast JavaScript runtime and package manager
 - **Jest** - Testing framework
 - **Source Map Explorer** - Bundle analysis
+- **Nodemon** - Backend development server
 
 ## Getting Started
 
@@ -82,6 +96,7 @@ A modern currency converter application built with React Native, featuring real-
 - Android Studio (for Android development)
 - Xcode (for iOS development, macOS only)
 - CocoaPods (for iOS development, macOS only)
+- MongoDB (for backend)
 
 ### Installation
 
@@ -92,53 +107,76 @@ A modern currency converter application built with React Native, featuring real-
    cd currency_converter
    ```
 
-2. Install dependencies
+2. Install frontend dependencies
 
    ```bash
    bun install
    ```
 
-3. Set up environment variables
+3. Install backend dependencies
+
+   ```bash
+   cd backend
+   npm install
+   cd ..
+   ```
+
+4. Set up environment variables
 
    ```bash
    # Create a .env.local file with your API keys
    EXPO_PUBLIC_RATES_API_URL=your_exchange_rate_api_key
    ```
 
-4. Install iOS dependencies (macOS only)
+5. Install iOS dependencies (macOS only)
 
    ```bash
    cd ios && pod install && cd ..
    ```
 
-5. Start the development server
+6. Start the development servers
+
    ```bash
+   # Terminal 1 - Frontend
    bunx expo start
+
+   # Terminal 2 - Backend
+   cd backend && npm run dev
    ```
 
 ## Available Scripts
+
+### Frontend
 
 - `bun run start` - Start the development server
 - `bun run android` - Run on Android device/emulator
 - `bun run ios` - Run on iOS simulator
 - `bun run build:android` - Build Android preview version
 - `bun run build:web` - Build web version
-- `bun run publish:preview` - Publish OTA updates to preview channel
+- `bun run publish:expo` - Publish OTA updates to preview channel
 - `bun run release:web` - Deploy web version
 - `bun run release:android` - Build Android release version
 - `bun run release:ios` - Build iOS release version
 - `bun run test` - Run tests
 - `bun run format` - Format code
+- `bun run lint` - Run linting
 - `bun run analyze:web` - Analyze web bundle
 - `bun run analyze:ios` - Analyze iOS bundle
 - `bun run analyze:android` - Analyze Android bundle
+- `bun run upgrade` - Upgrade Expo and fix dependencies
+
+### Backend
+
+- `npm start` - Start the production server
+- `npm run dev` - Start the development server with hot reload
 
 ## Environment Configuration
 
-The app supports two environments:
+The app supports multiple environments:
 
 - **Development**: Development builds with debug features
 - **Preview**: Pre-release builds for testing and OTA updates
+- **Production**: Production builds with optimized settings
 
 Each environment has its own:
 
@@ -147,6 +185,7 @@ Each environment has its own:
 - App icon
 - URL scheme
 - Update channel
+- API endpoints
 
 ## Update System
 
@@ -203,6 +242,8 @@ The project uses modern development practices:
 - EAS for builds and updates
 - New React Native Architecture
 - EAS Build Cache Provider for faster builds
+- MongoDB for data persistence
+- Express for API endpoints
 
 ## Currency Handling
 
@@ -221,6 +262,11 @@ The app provides sophisticated currency handling:
   - Conversion history with timestamps
   - Easy access to previous conversions
   - Automatic history cleanup
+- **Input Validation**:
+  - Numeric input validation
+  - Decimal place handling
+  - Currency symbol display
+  - Proper formatting
 
 ## License
 
