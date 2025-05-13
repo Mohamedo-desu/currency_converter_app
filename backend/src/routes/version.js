@@ -10,7 +10,13 @@ router.get("/latest", async (req, res) => {
     });
 
     if (!latestVersion) {
-      return res.status(404).json({ message: "No active version found" });
+      // Return a more informative response when no version is found
+      return res.status(404).json({
+        message: "No active version found",
+        error: "NO_VERSION",
+        details:
+          "The version database is empty or no version is marked as active",
+      });
     }
 
     res.json(latestVersion);

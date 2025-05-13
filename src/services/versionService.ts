@@ -24,7 +24,11 @@ export const fetchVersionInfo = async (): Promise<VersionInfo | null> => {
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.error("Response not OK:", response.status, response.statusText); // Debug log
+      if (response.status === 404) {
+        console.log("No version found in backend, using local version");
+        return null;
+      }
+      console.error("Response not OK:", response.status, response.statusText);
       throw new Error(
         `Failed to fetch version info: ${response.status} ${response.statusText}`
       );
@@ -40,6 +44,7 @@ export const fetchVersionInfo = async (): Promise<VersionInfo | null> => {
       if (data.version === nativeVersion) {
         return data;
       }
+      console.log("Major version mismatch, using local version");
       return null;
     }
 
@@ -47,6 +52,7 @@ export const fetchVersionInfo = async (): Promise<VersionInfo | null> => {
     return data;
   } catch (error) {
     console.error("Error fetching version info:", error);
-    throw error;
+    // Return null instead of throwing to allow fallback to local version
+    return null;
   }
 };
