@@ -35,6 +35,17 @@ router.post("/", async (req, res) => {
         .json({ message: "Invalid version format. Use x.y.z format" });
     }
 
+    // Check if version already exists
+    const existingVersion = await AppVersion.findOne({ version });
+    if (existingVersion) {
+      // Update existing version
+      existingVersion.type = type;
+      existingVersion.releaseNotes = releaseNotes;
+      existingVersion.isActive = true;
+      await existingVersion.save();
+      return res.json(existingVersion);
+    }
+
     // Deactivate all previous versions
     await AppVersion.updateMany({}, { isActive: false });
 
