@@ -8,6 +8,8 @@ on:
 jobs:
   version-check:
     runs-on: ubuntu-latest
+    outputs:
+      type: ${{ steps.previous_tag.outputs.type }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -39,6 +41,10 @@ jobs:
             fi
           fi
 
+      - name: Debug version type
+        run: |
+          echo "Version type: ${{ steps.previous_tag.outputs.type }}"
+
       - name: Update backend version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
@@ -58,6 +64,11 @@ jobs:
       matrix:
         profile: [preview, production]
     steps:
+      - name: Debug update condition
+        run: |
+          echo "Version type from previous job: ${{ needs.version-check.outputs.type }}"
+          echo "Update job condition: ${{ needs.version-check.outputs.type == 'minor' || needs.version-check.outputs.type == 'patch' }}"
+
       - uses: actions/checkout@v4
       - uses: expo/expo-github-action@v7
         with:
@@ -83,6 +94,11 @@ jobs:
       matrix:
         profile: [preview, production]
     steps:
+      - name: Debug build condition
+        run: |
+          echo "Version type from previous job: ${{ needs.version-check.outputs.type }}"
+          echo "Build job condition: ${{ needs.version-check.outputs.type == 'major' }}"
+
       - uses: actions/checkout@v4
       - uses: expo/expo-github-action@v7
         with:
