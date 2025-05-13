@@ -2,12 +2,21 @@ import AuthHeader from "@/components/AuthHeader";
 import CustomText from "@/components/CustomText";
 import { Fonts } from "@/constants/Fonts";
 import { useTheme } from "@/context/ThemeContext";
+import {
+  Feedback,
+  FeedbackType,
+  getDeviceInfo,
+  submitFeedback,
+} from "@/services/feedbackService";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
 import { Navigate } from "@/types/AuthHeader.types";
+import * as Application from "expo-application";
+import Constants from "expo-constants";
 
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   TextInput,
@@ -18,27 +27,29 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Define the different report types that users can choose from
-const reportTypes = ["Bug Report", "Feedback", "Other"];
-
-// Define a type for feedback
-interface Feedback {
-  type: string;
-  name: string;
-  email: string;
-  text: string;
-  timestamp: number;
-}
+const reportTypes: FeedbackType[] = ["Bug Report", "Feedback", "Other"];
 
 const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
   const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
 
   // State to hold report type, user details, and the report text
-  const [selectedType, setSelectedType] = useState(reportTypes[0]);
+  const [selectedType, setSelectedType] = useState<FeedbackType>(
+    reportTypes[0]
+  );
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [reportText, setReportText] = useState("");
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get app version
+  const nativeVersion = Application.nativeApplicationVersion;
+  const webVersion =
+    Platform.OS === "web"
+      ? Constants.manifest?.version || Constants.expoConfig?.version || "1.0.0"
+      : "1.0.0";
+  const version = Platform.OS === "web" ? webVersion : nativeVersion;
 
   // Helper to show alerts differently on web vs native
   const showAlert = (title: string, message: string) => {
@@ -69,7 +80,7 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
   };
 
   // Handle form submission for the report
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate inputs
     if (userName.trim().length === 0) {
       showAlert("Error", "Please enter your name.");
@@ -88,36 +99,53 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
       return;
     }
 
-    // // Capture Sentry event & feedback
-    // const eventId = Sentry.captureMessage(
-    //   `[${selectedType}] Report from ${userName} <${userEmail}>: ${reportText}`
-    // );
-    // Sentry.captureFeedback({
-    //   name: userName,
-    //   email: userEmail,
-    //   message: `Report Type: ${selectedType}\n\n${reportText}`,
-    //   associatedEventId: eventId,
-    // });
+    setIsSubmitting(true);
 
-    // Save locally
-    saveFeedbackLocally({
-      type: selectedType,
-      name: userName,
-      email: userEmail,
-      text: reportText,
-      timestamp: Date.now(),
-    });
+    try {
+      // Create feedback object
+      const feedback: Feedback = {
+        type: selectedType,
+        name: userName,
+        email: userEmail,
+        text: reportText,
+        timestamp: Date.now(),
+        platform: Platform.OS,
+        version,
+        deviceInfo: getDeviceInfo(),
+      };
 
-    // Notify user
-    showAlert(
-      "Report Submitted",
-      `Thank you, ${userName}! Your ${selectedType.toLowerCase()} has been submitted.`
-    );
+      // Submit feedback remotely
+      const success = await submitFeedback(feedback);
 
-    // Clear inputs
-    setUserName("");
-    setUserEmail("");
-    setReportText("");
+      if (success) {
+        // Save locally only if remote submission was successful
+        saveFeedbackLocally(feedback);
+
+        // Notify user
+        showAlert(
+          "Report Submitted",
+          `Thank you, ${userName}! Your ${selectedType.toLowerCase()} has been submitted.`
+        );
+
+        // Clear inputs
+        setUserName("");
+        setUserEmail("");
+        setReportText("");
+      } else {
+        showAlert(
+          "Submission Failed",
+          "Your feedback could not be submitted. Please try again later."
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      showAlert(
+        "Error",
+        "An error occurred while submitting your feedback. Please try again later."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -202,17 +230,26 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
 
       {/* Submit Button */}
       <TouchableOpacity
-        style={[styles.submitButton, { backgroundColor: colors.primary }]}
+        style={[
+          styles.submitButton,
+          { backgroundColor: colors.primary },
+          isSubmitting && { opacity: 0.7 },
+        ]}
         onPress={handleSubmit}
         activeOpacity={0.8}
+        disabled={isSubmitting}
       >
-        <CustomText
-          variant="h6"
-          fontFamily={Fonts.Medium}
-          style={styles.submitButtonText}
-        >
-          Submit Report
-        </CustomText>
+        {isSubmitting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <CustomText
+            variant="h6"
+            fontFamily={Fonts.Medium}
+            style={styles.submitButtonText}
+          >
+            Submit Report
+          </CustomText>
+        )}
       </TouchableOpacity>
 
       {/* Feedback List */}

@@ -1,7 +1,7 @@
 {
   "name": "convertly_app",
   "main": "App.tsx",
-  "version": "3.0.0",
+  "version": "1.0.0",
   "scripts": {
     "start": "expo start",
     "build:android": "eas build --platform android --profile preview",
