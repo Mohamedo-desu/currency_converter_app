@@ -27,6 +27,8 @@ router.post("/", async (req, res) => {
   try {
     const { version, type, releaseNotes } = req.body;
 
+    console.log(req.body);
+
     // Validate version format (x.y.z)
     const versionRegex = /^\d+\.\d+\.\d+$/;
     if (!versionRegex.test(version)) {

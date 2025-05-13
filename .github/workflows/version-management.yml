@@ -6,49 +6,33 @@ on:
       - "v*"
 
 jobs:
-  process-version:
+  version-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
+          fetch-depth: 0
 
       - name: Get previous tag
         id: previous_tag
         run: |
           # Get all tags sorted by version
-          TAGS=$(git tag -l "v*" --sort=-v:refname)
-          CURRENT_TAG=${GITHUB_REF#refs/tags/v}
+          PREV_TAG=$(git tag --sort=-v:refname | sed -n '2p')
+          echo "Previous tag: $PREV_TAG"
+          echo "previous_tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
-          # Find the previous tag
-          PREVIOUS_TAG=""
-          for tag in $TAGS; do
-            if [ "$tag" != "v$CURRENT_TAG" ]; then
-              PREVIOUS_TAG=${tag#v}
-              break
-            fi
-          done
-
-          if [ -z "$PREVIOUS_TAG" ]; then
-            echo "This is the first version"
+          # Determine version type
+          if [[ -z "$PREV_TAG" ]]; then
             echo "type=major" >> $GITHUB_OUTPUT
           else
-            echo "Previous tag: $PREVIOUS_TAG"
-            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            CURRENT_VERSION=${GITHUB_REF#refs/tags/v}
+            PREV_VERSION=${PREV_TAG#v}
+            IFS='.' read -r -a CURRENT <<< "$CURRENT_VERSION"
+            IFS='.' read -r -a PREV <<< "$PREV_VERSION"
             
-            # Split versions into components
-            CURRENT_MAJOR=$(echo $CURRENT_TAG | cut -d. -f1)
-            CURRENT_MINOR=$(echo $CURRENT_TAG | cut -d. -f2)
-            CURRENT_PATCH=$(echo $CURRENT_TAG | cut -d. -f3)
-            
-            PREV_MAJOR=$(echo $PREVIOUS_TAG | cut -d. -f1)
-            PREV_MINOR=$(echo $PREVIOUS_TAG | cut -d. -f2)
-            PREV_PATCH=$(echo $PREVIOUS_TAG | cut -d. -f3)
-            
-            # Determine version type
-            if [ "$CURRENT_MAJOR" -gt "$PREV_MAJOR" ]; then
+            if [[ "${CURRENT[0]}" -gt "${PREV[0]}" ]]; then
               echo "type=major" >> $GITHUB_OUTPUT
-            elif [ "$CURRENT_MINOR" -gt "$PREV_MINOR" ]; then
+            elif [[ "${CURRENT[1]}" -gt "${PREV[1]}" ]]; then
               echo "type=minor" >> $GITHUB_OUTPUT
             else
               echo "type=patch" >> $GITHUB_OUTPUT
@@ -57,17 +41,36 @@ jobs:
 
       - name: Update backend version
         run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
           curl -X POST ${{ secrets.BACKEND_URL }}/api/version \
             -H "Content-Type: application/json" \
-            -d '{
-              "version": "${GITHUB_REF#refs/tags/v}",
-              "type": "${{ steps.previous_tag.outputs.type }}",
-              "releaseNotes": "Version ${GITHUB_REF#refs/tags/v}"
-            }'
+            -d "{
+              \"version\": \"$VERSION\",
+              \"type\": \"${{ steps.previous_tag.outputs.type }}\",
+              \"releaseNotes\": \"Version $VERSION\"
+            }"
+
+      - name: Trigger update
+        if: steps.previous_tag.outputs.type != 'major'
+        run: |
+          curl -X POST ${{ secrets.BACKEND_URL }}/api/trigger-update \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"version\": \"${GITHUB_REF#refs/tags/v}\"
+            }"
+
+      - name: Trigger build
+        if: steps.previous_tag.outputs.type == 'major'
+        run: |
+          curl -X POST ${{ secrets.BACKEND_URL }}/api/trigger-build \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"version\": \"${GITHUB_REF#refs/tags/v}\"
+            }"
 
   update:
-    needs: process-version
-    if: needs.process-version.outputs.type == 'minor' || needs.process-version.outputs.type == 'patch'
+    needs: version-check
+    if: needs.version-check.outputs.type == 'minor' || needs.version-check.outputs.type == 'patch'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -91,8 +94,8 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   build:
-    needs: process-version
-    if: needs.process-version.outputs.type == 'major'
+    needs: version-check
+    if: needs.version-check.outputs.type == 'major'
     runs-on: ubuntu-latest
     strategy:
       matrix:
