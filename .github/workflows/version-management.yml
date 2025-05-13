@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       type: ${{ steps.previous_tag.outputs.type }}
+      version: ${{ steps.update_backend.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -50,8 +51,10 @@ jobs:
           echo "Version type: ${{ steps.previous_tag.outputs.type }}"
 
       - name: Update backend version
+        id: update_backend
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           curl -X POST ${{ secrets.BACKEND_URL }}/api/version \
             -H "Content-Type: application/json" \
             -d "{
@@ -86,7 +89,7 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Create OTA Update
-        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive
+        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -146,3 +149,14 @@ jobs:
             [View the complete changelog](https://github.com/Mohamedo-desu/currency-converter-app/commits/${{ steps.get_version.outputs.VERSION }})
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  rollback:
+    needs: [version-check, update, build]
+    if: always() && (needs.update.result == 'failure' || needs.build.result == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete failed version from backend
+        run: |
+          VERSION=${{ needs.version-check.outputs.version }}
+          echo "Deleting failed version $VERSION from backend"
+          curl -X DELETE ${{ secrets.BACKEND_URL }}/api/version/$VERSION

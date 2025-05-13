@@ -56,4 +56,46 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Delete version (protected route - should be called by GitHub Actions)
+router.delete("/:version", async (req, res) => {
+  try {
+    const { version } = req.params;
+
+    // Validate version format (x.y.z)
+    const versionRegex = /^\d+\.\d+\.\d+$/;
+    if (!versionRegex.test(version)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid version format. Use x.y.z format" });
+    }
+
+    // Find the version to delete
+    const versionToDelete = await AppVersion.findOne({ version });
+    if (!versionToDelete) {
+      return res.status(404).json({ message: "Version not found" });
+    }
+
+    // If this was the active version, reactivate the previous version
+    if (versionToDelete.isActive) {
+      const previousVersion = await AppVersion.findOne({ isActive: false })
+        .sort({ createdAt: -1 })
+        .limit(1);
+
+      if (previousVersion) {
+        previousVersion.isActive = true;
+        await previousVersion.save();
+      }
+    }
+
+    // Delete the version
+    await AppVersion.deleteOne({ version });
+    res.json({ message: "Version deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting version:", error);
+    res
+      .status(500)
+      .json({ message: "Error deleting version", error: error.message });
+  }
+});
+
 module.exports = router;
