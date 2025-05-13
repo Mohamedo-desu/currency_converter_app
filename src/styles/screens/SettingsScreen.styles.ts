@@ -1,3 +1,4 @@
+import { Spacing } from "@/constants/Spacing";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -13,21 +14,21 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingHorizontal: Spacing.screenPadding,
+    paddingBottom: Spacing.lg,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 15,
-    paddingTop: 20,
-    gap: 15,
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: Spacing.lg,
+    gap: Spacing.md,
   },
   option: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 15,
-    borderRadius: 10,
+    padding: Spacing.cardPadding,
+    borderRadius: Spacing.borderRadius.lg,
   },
   optionLeft: {
     flexDirection: "row",

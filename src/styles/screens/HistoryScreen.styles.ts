@@ -1,3 +1,4 @@
+import { Spacing } from "@/constants/Spacing";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -13,12 +14,24 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingBottom: 10,
+    paddingHorizontal: Spacing.md,
+    paddingBottom: 8,
+  },
+  headerLeft: {
+    flex: 1,
+    alignItems: "flex-start",
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: "center",
+  },
+  headerRight: {
+    flex: 1,
+    alignItems: "flex-end",
   },
   content: {
     flex: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: Spacing.screenPadding,
   },
   loadingContainer: {
     flex: 1,
@@ -31,14 +44,14 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   historyList: {
-    paddingTop: 10,
-    paddingBottom: 40,
-    gap: 15,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xl,
+    gap: Spacing.md,
   },
   historyItem: {
-    padding: 15,
-    borderRadius: 10,
-    gap: 10,
+    padding: Spacing.cardPadding,
+    borderRadius: Spacing.borderRadius.lg,
+    gap: Spacing.sm,
   },
   historyHeader: {
     flexDirection: "row",
@@ -48,19 +61,19 @@ export const styles = StyleSheet.create({
   currencyPair: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: Spacing.sm,
   },
   flag: {
     width: 25,
     height: 25,
-    borderRadius: 25,
+    borderRadius: Spacing.borderRadius.round,
   },
   flagContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   flagOverlap: {
-    marginLeft: -10,
+    marginLeft: -Spacing.sm,
   },
   historyDetails: {
     flexDirection: "column",
@@ -70,15 +83,15 @@ export const styles = StyleSheet.create({
   cleanupMessage: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    marginHorizontal: 15,
-    borderRadius: 8,
-    marginBottom: 15,
+    padding: Spacing.sm,
+    marginHorizontal: Spacing.screenPadding,
+    borderRadius: Spacing.borderRadius.md,
+    marginBottom: Spacing.md,
   },
   currencyColumn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 8,
+    marginLeft: Spacing.sm,
   },
 });

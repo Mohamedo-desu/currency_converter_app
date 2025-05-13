@@ -1,6 +1,6 @@
 import AuthHeader from "@/components/AuthHeader";
 import CustomText from "@/components/CustomText";
-import { Fonts } from "@/constants/Fonts";
+import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import {
   Feedback,
@@ -28,6 +28,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Define the different report types that users can choose from
 const reportTypes: FeedbackType[] = ["Bug Report", "Feedback", "Other"];
+
+// GitHub-style label colors for each type
+const labelColors = {
+  "Bug Report": {
+    background: "#d73a4a",
+    text: "#ffffff",
+  },
+  Feedback: {
+    background: "#0366d6",
+    text: "#ffffff",
+  },
+  Other: {
+    background: "#6f42c1",
+    text: "#ffffff",
+  },
+} as const;
 
 const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
   const { colors } = useTheme();
@@ -171,19 +187,30 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
         {reportTypes.map((type) => (
           <TouchableOpacity
             key={type}
+            activeOpacity={0.8}
             style={[
               styles.reportTypeButton,
               {
-                borderColor:
-                  selectedType === type ? colors.primary : colors.gray[400],
                 backgroundColor:
-                  selectedType === type ? colors.primary : "transparent",
+                  selectedType === type
+                    ? labelColors[type].background
+                    : `${labelColors[type].background}20`,
+                borderColor:
+                  selectedType === type
+                    ? labelColors[type].background
+                    : `${labelColors[type].background}40`,
               },
             ]}
             onPress={() => setSelectedType(type)}
           >
             <CustomText
-              style={{ color: selectedType === type ? "#fff" : colors.text }}
+              style={{
+                color:
+                  selectedType === type
+                    ? labelColors[type].text
+                    : labelColors[type].background,
+                fontWeight: selectedType === type ? "600" : "500",
+              }}
             >
               {type}
             </CustomText>
@@ -191,42 +218,44 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
         ))}
       </View>
 
+      <View style={[styles.formContainer, { backgroundColor: colors.card }]}>
+        <TextInput
+          style={[
+            styles.textInputSmall,
+            { color: colors.text, backgroundColor: colors.gray[200] },
+          ]}
+          placeholder="Your Name"
+          placeholderTextColor={colors.gray[500]}
+          value={userName}
+          onChangeText={setUserName}
+        />
+        <TextInput
+          style={[
+            styles.textInputSmall,
+            { color: colors.text, backgroundColor: colors.gray[200] },
+          ]}
+          placeholder="Your Email"
+          placeholderTextColor={colors.gray[500]}
+          value={userEmail}
+          onChangeText={setUserEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={[
+            styles.textInput,
+            { color: colors.text, backgroundColor: colors.gray[200] },
+          ]}
+          placeholder="Describe your issue or feedback here..."
+          placeholderTextColor={colors.gray[500]}
+          value={reportText}
+          onChangeText={setReportText}
+          multiline
+          textAlignVertical="top"
+          maxLength={500}
+        />
+      </View>
       {/* Inputs */}
-      <TextInput
-        style={[
-          styles.textInputSmall,
-          { color: colors.text, borderColor: colors.gray[200] },
-        ]}
-        placeholder="Your Name"
-        placeholderTextColor={colors.gray[500]}
-        value={userName}
-        onChangeText={setUserName}
-      />
-      <TextInput
-        style={[
-          styles.textInputSmall,
-          { color: colors.text, borderColor: colors.gray[200] },
-        ]}
-        placeholder="Your Email"
-        placeholderTextColor={colors.gray[500]}
-        value={userEmail}
-        onChangeText={setUserEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={[
-          styles.textInput,
-          { color: colors.text, borderColor: colors.gray[200] },
-        ]}
-        placeholder="Describe your issue or feedback here..."
-        placeholderTextColor={colors.gray[500]}
-        value={reportText}
-        onChangeText={setReportText}
-        multiline
-        textAlignVertical="top"
-        maxLength={500}
-      />
 
       {/* Submit Button */}
       <TouchableOpacity
@@ -244,7 +273,7 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
         ) : (
           <CustomText
             variant="h6"
-            fontFamily={Fonts.Medium}
+            fontWeight="medium"
             style={styles.submitButtonText}
           >
             Submit Report
@@ -258,13 +287,17 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
       >
         <CustomText
           variant="h5"
-          fontFamily={Fonts.Bold}
+          fontWeight="medium"
           style={{ marginBottom: 10 }}
         >
           Your Submitted Feedback
         </CustomText>
         {feedbacks.length === 0 ? (
-          <CustomText style={{ color: colors.gray[400] }}>
+          <CustomText
+            variant="h6"
+            fontWeight="medium"
+            style={{ color: colors.gray[400] }}
+          >
             No feedback submitted yet.
           </CustomText>
         ) : (
@@ -273,26 +306,46 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
               key={idx}
               style={[styles.feedbackCard, { backgroundColor: colors.card }]}
             >
+              <View style={styles.feedbackHeader}>
+                <View
+                  style={[
+                    styles.feedbackTypeLabel,
+                    {
+                      backgroundColor: `${labelColors[fb.type].background}20`,
+                      borderColor: `${labelColors[fb.type].background}40`,
+                    },
+                  ]}
+                >
+                  <CustomText
+                    style={{
+                      color: labelColors[fb.type].background,
+                    }}
+                    variant="h6"
+                    fontWeight="medium"
+                  >
+                    {fb.type}
+                  </CustomText>
+                </View>
+                <CustomText variant="h7" style={{ color: colors.gray[400] }}>
+                  {new Date(fb.timestamp).toLocaleString()}
+                </CustomText>
+              </View>
               <CustomText
                 variant="h6"
-                fontFamily={Fonts.Medium}
-                style={styles.feedbackCardTitle}
+                fontWeight="medium"
+                style={{ marginTop: Spacing.sm }}
               >
-                {fb.type}
+                {fb.text}
               </CustomText>
-              <CustomText style={styles.feedbackCardText}>{fb.text}</CustomText>
               <CustomText
-                style={[styles.feedbackCardMeta, { color: colors.gray[400] }]}
+                variant="tiny"
+                fontWeight="medium"
+                style={{
+                  color: colors.gray[400],
+                  marginTop: Spacing.margin.sm,
+                }}
               >
                 {fb.name} • {fb.email}
-              </CustomText>
-              <CustomText
-                style={[
-                  styles.feedbackCardTimestamp,
-                  { color: colors.gray[400] },
-                ]}
-              >
-                {new Date(fb.timestamp).toLocaleString()}
               </CustomText>
             </View>
           ))

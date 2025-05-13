@@ -1,0 +1,116 @@
+name: Version Management
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  process-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Get previous tag
+        id: previous_tag
+        run: |
+          # Get all tags sorted by version
+          TAGS=$(git tag -l "v*" --sort=-v:refname)
+          CURRENT_TAG=${GITHUB_REF#refs/tags/v}
+
+          # Find the previous tag
+          PREVIOUS_TAG=""
+          for tag in $TAGS; do
+            if [ "$tag" != "v$CURRENT_TAG" ]; then
+              PREVIOUS_TAG=${tag#v}
+              break
+            fi
+          done
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "This is the first version"
+            echo "type=major" >> $GITHUB_OUTPUT
+          else
+            echo "Previous tag: $PREVIOUS_TAG"
+            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            
+            # Split versions into components
+            CURRENT_MAJOR=$(echo $CURRENT_TAG | cut -d. -f1)
+            CURRENT_MINOR=$(echo $CURRENT_TAG | cut -d. -f2)
+            CURRENT_PATCH=$(echo $CURRENT_TAG | cut -d. -f3)
+            
+            PREV_MAJOR=$(echo $PREVIOUS_TAG | cut -d. -f1)
+            PREV_MINOR=$(echo $PREVIOUS_TAG | cut -d. -f2)
+            PREV_PATCH=$(echo $PREVIOUS_TAG | cut -d. -f3)
+            
+            # Determine version type
+            if [ "$CURRENT_MAJOR" -gt "$PREV_MAJOR" ]; then
+              echo "type=major" >> $GITHUB_OUTPUT
+            elif [ "$CURRENT_MINOR" -gt "$PREV_MINOR" ]; then
+              echo "type=minor" >> $GITHUB_OUTPUT
+            else
+              echo "type=patch" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Update backend version
+        run: |
+          curl -X POST ${{ secrets.BACKEND_URL }}/api/version \
+            -H "Content-Type: application/json" \
+            -d '{
+              "version": "${GITHUB_REF#refs/tags/v}",
+              "type": "${{ steps.previous_tag.outputs.type }}",
+              "releaseNotes": "Version ${GITHUB_REF#refs/tags/v}"
+            }'
+
+  update:
+    needs: process-version
+    if: needs.process-version.outputs.type == 'minor' || needs.process-version.outputs.type == 'patch'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        profile: [preview, production]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Trigger EAS Update
+        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  build:
+    needs: process-version
+    if: needs.process-version.outputs.type == 'major'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        profile: [preview, production]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Trigger EAS Build
+        run: eas build --platform android --profile ${{ matrix.profile }} --non-interactive --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

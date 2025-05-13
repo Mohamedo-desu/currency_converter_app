@@ -4,7 +4,6 @@ import CustomText from "@/components/CustomText";
 import PrivacyTerms from "@/components/PrivacyTerms";
 import SwapButton from "@/components/SwapButton";
 import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
 import { useTheme } from "@/context/ThemeContext";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -245,7 +244,10 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
    * Memoized display string for converted amount
    */
   const convertedDisplay = useMemo(
-    () => (convertedAmount ? `${convertedAmount} ${toCurrency?.code}` : ""),
+    () =>
+      convertedAmount
+        ? `${convertedAmount} ${toCurrency?.symbol || toCurrency?.code}`
+        : "",
     [convertedAmount, toCurrency]
   );
 
@@ -258,8 +260,10 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
       const toRate = exchangeRates[toCurrency.code];
       if (fromRate && toRate) {
         const conversionRate = toRate / fromRate;
-        return `1 ${fromCurrency.code} = ${conversionRate.toFixed(3)} ${
-          toCurrency.code
+        return `1 ${
+          fromCurrency.symbol || fromCurrency.code
+        } = ${conversionRate.toFixed(3)} ${
+          toCurrency.symbol || toCurrency.code
         }`;
       }
     }
@@ -364,12 +368,12 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
 
       {/* App title and description */}
       <View style={styles.textContainer}>
-        <CustomText variant="h1" fontFamily={Fonts.Bold}>
+        <CustomText variant="h1" fontWeight="bold">
           Currency Converter
         </CustomText>
         <CustomText
           variant="h6"
-          fontFamily={Fonts.Medium}
+          fontWeight="medium"
           style={{ color: colors.gray[400] }}
         >
           Convert between any currencies
@@ -407,12 +411,24 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
 
       {/* Exchange rate display */}
       <View style={styles.exchangeRateContainer}>
-        <CustomText variant="h6" style={{ color: colors.gray[400] }}>
+        <CustomText
+          variant="h6"
+          fontWeight="medium"
+          style={{ color: colors.gray[400] }}
+        >
           Indicative Exchange Rate
         </CustomText>
-        {exchangeRateDisplay && (
-          <CustomText variant="h5" fontFamily={Fonts.Medium}>
+        {exchangeRateDisplay ? (
+          <CustomText variant="h5" fontWeight="medium">
             {exchangeRateDisplay}
+          </CustomText>
+        ) : (
+          <CustomText
+            variant="h6"
+            fontWeight="medium"
+            style={{ color: colors.gray[400] }}
+          >
+            N/A
           </CustomText>
         )}
       </View>

@@ -1,3 +1,5 @@
+import { Spacing } from "@/constants/Spacing";
+import { Typography } from "@/constants/Typography";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -15,49 +17,46 @@ export const styles = StyleSheet.create({
   modalContent: {
     width: "90%",
     maxHeight: "80%",
-    borderRadius: 10,
-    padding: 20,
+    borderRadius: Spacing.inputBorderRadius,
+    padding: Spacing.lg,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
-    position: "relative",
+    marginBottom: Spacing.lg,
+    backgroundColor: "transparent",
+    paddingHorizontal: Spacing.inputPadding,
+    height: Spacing.inputHeight,
+    borderRadius: Spacing.inputBorderRadius,
+    gap: Spacing.gap.xs,
   },
-  searchIcon: {
-    position: "absolute",
-    left: 10,
-    zIndex: 1,
-  },
+  searchIcon: {},
   searchInput: {
     flex: 1,
-    height: 45,
-    borderRadius: 5,
-    paddingHorizontal: 40,
-    fontSize: 16,
+    fontSize: Typography.fontSize.body,
   },
-  clearButton: {
-    position: "absolute",
-    right: 10,
-    zIndex: 1,
-  },
+  clearButton: {},
   currenciesList: {
-    paddingBottom: 20,
+    paddingBottom: Spacing.lg,
   },
   currencyItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
   },
   flagIcon: {
-    marginRight: 10,
+    width: 30,
+    height: 30,
+    borderRadius: Spacing.borderRadius.round,
+    overflow: "hidden",
+    marginRight: Spacing.sm,
   },
   currencyInfo: {
     flex: 1,

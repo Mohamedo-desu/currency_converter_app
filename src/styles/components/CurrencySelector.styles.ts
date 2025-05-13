@@ -1,17 +1,19 @@
+import { Spacing } from "@/constants/Spacing";
+import { Typography } from "@/constants/Typography";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   input: {
     flex: 1,
-    fontSize: 16,
-    padding: 10,
-    borderRadius: 5,
+    fontSize: Typography.fontSize.body,
+    padding: Spacing.inputPadding,
+    borderRadius: Spacing.inputBorderRadius,
     ...(Platform.OS === "web" && {
       minWidth: 200,
     }),
   },
   label: {
-    fontSize: 13,
+    fontSize: Typography.fontSize.small,
   },
   amountContainer: {
     ...(Platform.OS === "web" && {
@@ -22,18 +24,18 @@ export const styles = StyleSheet.create({
   flagIcon: {
     width: 30,
     height: 30,
-    borderRadius: 25,
+    borderRadius: Spacing.borderRadius.round,
     overflow: "hidden",
-    marginRight: 10,
+    marginRight: Spacing.sm,
   },
   headerCurrency: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: Spacing.xs,
   },
   headerCurrencyContainer: {
-    marginTop: 15,
-    gap: 15,
+    marginTop: Spacing.md,
+    gap: Spacing.md,
     ...(Platform.OS === "web" && {
       width: "100%",
     }),
@@ -47,6 +49,6 @@ export const styles = StyleSheet.create({
   },
   clearButton: {
     position: "absolute",
-    right: 10,
+    right: Spacing.sm,
   },
 });

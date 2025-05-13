@@ -1,4 +1,6 @@
 import { Colors } from "@/constants/Colors";
+import { Spacing } from "@/constants/Spacing";
+import { Typography } from "@/constants/Typography";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -12,68 +14,85 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: Spacing.screenPadding,
+  },
+  formContainer: {
+    paddingVertical: Spacing.cardPadding,
+    padding: Spacing.cardPadding,
+    borderRadius: Spacing.inputBorderRadius,
+    ...(Platform.OS === "web" && {
+      maxWidth: 500,
+      marginHorizontal: "auto",
+      width: "100%",
+    }),
+    gap: Spacing.gap.lg,
+    marginBottom: Spacing.margin.lg,
   },
   subTitle: {
-    marginTop: 10,
+    marginTop: Spacing.sm,
   },
   reportTypeContainer: {
     flexDirection: "row",
-    marginVertical: 20,
-    gap: 10,
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+    marginTop: Spacing.md,
   },
   reportTypeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Spacing.inputBorderRadius,
     borderWidth: 1,
-    borderRadius: 5,
+    minWidth: 100,
+    alignItems: "center",
+    justifyContent: "center",
   },
   // Larger input style for report description
   textInput: {
     height: 150,
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: Spacing.inputBorderRadius,
+    padding: Spacing.sm,
   },
   // Smaller input style for name and email
   textInputSmall: {
-    height: 40,
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    flex: 1,
+    fontSize: Typography.fontSize.body,
+    padding: Spacing.inputPadding,
+    borderRadius: Spacing.inputBorderRadius,
+    ...(Platform.OS === "web" && {
+      minWidth: 200,
+    }),
   },
   submitButton: {
+    backgroundColor: Colors.primary,
+    padding: Spacing.inputPadding,
+    borderRadius: Spacing.inputBorderRadius,
     alignItems: "center",
-    paddingVertical: 15,
-    borderRadius: 5,
+    justifyContent: "center",
+    height: Spacing.inputHeight,
   },
   submitButtonText: {
     color: Colors.white,
+    fontWeight: Typography.fontWeight.medium,
+    fontSize: Typography.fontSize.body,
   },
   feedbackListContainer: {
-    marginTop: 30,
-    marginBottom: 20,
+    marginTop: Spacing.xxl,
+    marginBottom: Spacing.lg,
   },
   feedbackCard: {
-    marginBottom: 16,
-    padding: 12,
-    borderRadius: 8,
+    marginBottom: Spacing.lg,
+    padding: Spacing.inputPadding,
+    borderRadius: Spacing.inputBorderRadius,
   },
-  feedbackCardTitle: {
-    // for CustomText variant h6, fontFamily Medium
+  feedbackHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  feedbackCardText: {
-    marginTop: 4,
-  },
-  feedbackCardMeta: {
-    color: "#BDBDBD",
-    fontSize: 12,
-    marginTop: 4,
-  },
-  feedbackCardTimestamp: {
-    color: "#BDBDBD",
-    fontSize: 12,
+  feedbackTypeLabel: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: Spacing.inputBorderRadius,
+    borderWidth: 1,
   },
 });

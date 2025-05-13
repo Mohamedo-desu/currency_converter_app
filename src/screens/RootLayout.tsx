@@ -1,9 +1,7 @@
 // RootLayout.tsx
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { Screen } from "@/types/AuthHeader.types";
-import * as Font from "expo-font";
 import React, { useEffect, useState } from "react";
-import { Platform } from "react-native";
 import CurrencyConverterScreen from "./CurrencyConverterScreen";
 import HelpScreen from "./help";
 import HistoryScreen from "./history";
@@ -41,17 +39,6 @@ export default function RootLayout() {
         return <CurrencyConverterScreen navigate={navigate} />;
     }
   };
-
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      // Load fonts for web
-      Font.loadAsync({
-        "Okra-Bold": require("@/assets/fonts/Okra-Bold.ttf"),
-        "Okra-Medium": require("@/assets/fonts/Okra-Medium.ttf"),
-        "Okra-Regular": require("@/assets/fonts/Okra-Regular.ttf"),
-      });
-    }
-  }, []);
 
   return renderScreen();
 }

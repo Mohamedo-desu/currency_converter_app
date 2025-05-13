@@ -1,5 +1,5 @@
 import CustomText from "@/components/CustomText";
-import { Fonts } from "@/constants/Fonts";
+import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/CurrenciesModal.styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -54,6 +54,34 @@ const CurrenciesModal = ({
     [onCurrenciesSelect]
   );
 
+  const renderCurrencyItem = useCallback(
+    ({ item }: { item: Currency }) => (
+      <TouchableOpacity
+        style={styles.currencyItem}
+        onPress={() => handleCurrencySelect(item)}
+      >
+        <CountryFlag isoCode={item.flag} size={25} style={styles.flagIcon} />
+        <View style={styles.currencyInfo}>
+          <CustomText
+            variant="h5"
+            fontWeight="medium"
+            style={{ color: colors.text }}
+          >
+            {item.code}
+          </CustomText>
+          <CustomText
+            variant="h6"
+            fontWeight="medium"
+            style={{ color: colors.gray[400] }}
+          >
+            {item.name}
+          </CustomText>
+        </View>
+      </TouchableOpacity>
+    ),
+    [colors, handleCurrencySelect]
+  );
+
   return (
     <Modal
       visible={visible}
@@ -70,23 +98,29 @@ const CurrenciesModal = ({
               <View style={styles.header}>
                 <CustomText
                   variant="h4"
-                  fontFamily={Fonts.Bold}
+                  fontWeight="bold"
                   style={{ color: colors.text }}
                 >
                   Select Currency
                 </CustomText>
-                <TouchableOpacity
-                  onPress={onClose}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <Ionicons name="close" size={24} color={colors.text} />
+                <TouchableOpacity onPress={onClose} hitSlop={10}>
+                  <Ionicons
+                    name="close"
+                    size={Spacing.iconSize}
+                    color={colors.text}
+                  />
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.searchContainer}>
+              <View
+                style={[
+                  styles.searchContainer,
+                  { backgroundColor: colors.background },
+                ]}
+              >
                 <Ionicons
                   name="search"
-                  size={20}
+                  size={Spacing.iconSize}
                   color={colors.gray[400]}
                   style={styles.searchIcon}
                 />
@@ -94,10 +128,7 @@ const CurrenciesModal = ({
                   value={searchTerm}
                   onChangeText={setSearchTerm}
                   placeholder="Search currency"
-                  style={[
-                    styles.searchInput,
-                    { color: colors.text, backgroundColor: colors.background },
-                  ]}
+                  style={[styles.searchInput, { color: colors.text }]}
                   placeholderTextColor={colors.gray[400]}
                 />
                 {searchTerm ? (
@@ -108,7 +139,7 @@ const CurrenciesModal = ({
                   >
                     <Ionicons
                       name="close-circle"
-                      size={20}
+                      size={Spacing.iconSize}
                       color={colors.gray[400]}
                     />
                   </TouchableOpacity>
@@ -117,33 +148,7 @@ const CurrenciesModal = ({
 
               <FlatList
                 data={filteredCurrencies}
-                renderItem={({ item }: { item: Currency }) => (
-                  <TouchableOpacity
-                    style={styles.currencyItem}
-                    onPress={() => handleCurrencySelect(item)}
-                  >
-                    <CountryFlag
-                      isoCode={item.flag}
-                      size={20}
-                      style={styles.flagIcon}
-                    />
-                    <View style={styles.currencyInfo}>
-                      <CustomText
-                        variant="h5"
-                        fontFamily={Fonts.Medium}
-                        style={{ color: colors.text }}
-                      >
-                        {item.code}
-                      </CustomText>
-                      <CustomText
-                        variant="h6"
-                        style={{ color: colors.gray[400] }}
-                      >
-                        {item.name}
-                      </CustomText>
-                    </View>
-                  </TouchableOpacity>
-                )}
+                renderItem={renderCurrencyItem}
                 keyExtractor={(item) => item.code}
                 contentContainerStyle={styles.currenciesList}
                 keyboardShouldPersistTaps="handled"

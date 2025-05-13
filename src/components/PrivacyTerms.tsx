@@ -1,5 +1,4 @@
 import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/PrivacyTerms.styles";
 import * as Application from "expo-application";
@@ -38,7 +37,7 @@ const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
         <TouchableOpacity onPress={() => navigate("Help")} activeOpacity={0.8}>
           <CustomText
             variant="h6"
-            fontFamily={Fonts.Medium}
+            fontWeight="medium"
             style={[styles.helpLink, { color: Colors.primary }]}
           >
             Need Help? Contact Support
@@ -60,7 +59,7 @@ const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
       {/* Version Code */}
       <CustomText
         variant="h6"
-        fontFamily={Fonts.Medium}
+        fontWeight="medium"
         style={[styles.versionCodeText, { color: colors.gray[400] }]}
       >
         v{version}

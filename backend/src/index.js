@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const feedbackRoutes = require("./routes/feedback");
+const versionRoutes = require("./routes/version");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/version", versionRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

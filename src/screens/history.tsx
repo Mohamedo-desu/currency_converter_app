@@ -1,7 +1,9 @@
 import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
+import { Spacing } from "@/constants/Spacing";
+import { Typography } from "@/constants/Typography";
 import { useTheme } from "@/context/ThemeContext";
+import { getCurrencySymbol } from "@/services/currencyService";
 import {
   deleteStoredValues,
   getStoredValues,
@@ -11,7 +13,7 @@ import { styles } from "@/styles/screens/HistoryScreen.styles";
 import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -165,62 +167,69 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
   /**
    * Renders a single history item with currency flags and conversion details
    */
-  const renderHistoryItem = ({ item }: { item: ConversionHistory }) => (
-    <View style={[styles.historyItem, { backgroundColor: colors.card }]}>
-      <View style={styles.historyHeader}>
-        <View style={styles.currencyPair}>
-          <View style={styles.flagContainer}>
-            <CountryFlag
-              isoCode={item.fromFlag}
-              size={FLAG_SIZE}
-              style={styles.flag}
-            />
-            <CountryFlag
-              isoCode={item.toFlag}
-              size={FLAG_SIZE}
-              style={[styles.flag, styles.flagOverlap]}
-            />
+  const renderHistoryItem = useCallback(
+    ({ item }: { item: ConversionHistory }) => (
+      <View style={[styles.historyItem, { backgroundColor: colors.card }]}>
+        <View style={styles.historyHeader}>
+          <View style={styles.currencyPair}>
+            <View style={styles.flagContainer}>
+              <CountryFlag
+                isoCode={item.fromFlag}
+                size={Spacing.flagIconSize}
+                style={styles.flag}
+              />
+              <CountryFlag
+                isoCode={item.toFlag}
+                size={Spacing.flagIconSize}
+                style={[styles.flag, styles.flagOverlap]}
+              />
+            </View>
+            <View style={styles.currencyColumn}>
+              <CustomText
+                variant="h6"
+                fontWeight="medium"
+                style={{ color: colors.text }}
+              >
+                {getCurrencySymbol(item.fromCurrency)}
+              </CustomText>
+              <MaterialIcons
+                name="arrow-right-alt"
+                size={Typography.fontSize.h6}
+                color={colors.text}
+                style={{ marginHorizontal: Spacing.xs }}
+              />
+              <CustomText
+                variant="h6"
+                fontWeight="medium"
+                style={{ color: colors.text }}
+              >
+                {getCurrencySymbol(item.toCurrency)}
+              </CustomText>
+            </View>
           </View>
-          <View style={styles.currencyColumn}>
-            <CustomText
-              variant="h6"
-              fontFamily={Fonts.Medium}
-              style={{ color: colors.text }}
-            >
-              {item.fromCurrency}
-            </CustomText>
-            <MaterialIcons
-              name="arrow-right-alt"
-              size={12}
-              color={colors.text}
-              style={{ marginHorizontal: 4 }}
-            />
-            <CustomText
-              variant="h6"
-              fontFamily={Fonts.Medium}
-              style={{ color: colors.text }}
-            >
-              {item.toCurrency}
-            </CustomText>
-          </View>
+          <CustomText variant="h7" style={{ color: colors.gray[400] }}>
+            {formatDate(item.timestamp)}
+          </CustomText>
         </View>
-        <CustomText variant="h6" style={{ color: colors.gray[400] }}>
-          {formatDate(item.timestamp)}
-        </CustomText>
+        <View style={styles.historyDetails}>
+          <CustomText
+            variant="h6"
+            fontWeight="medium"
+            style={{ color: colors.gray[400] }}
+          >
+            {item.amount} {getCurrencySymbol(item.fromCurrency)}
+          </CustomText>
+          <CustomText
+            variant="h5"
+            fontWeight="bold"
+            style={{ color: Colors.primary }}
+          >
+            {item.convertedAmount} {getCurrencySymbol(item.toCurrency)}
+          </CustomText>
+        </View>
       </View>
-      <View style={styles.historyDetails}>
-        <CustomText variant="h6" style={{ color: colors.gray[400] }}>
-          {item.amount} {item.fromCurrency}
-        </CustomText>
-        <CustomText
-          variant="h5"
-          fontFamily={Fonts.Medium}
-          style={{ color: Colors.primary }}
-        >
-          {item.convertedAmount} {item.toCurrency}
-        </CustomText>
-      </View>
-    </View>
+    ),
+    [colors, formatDate]
   );
 
   return (
@@ -232,33 +241,44 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
     >
       {/* Navigation header with back button and clear history option */}
       <View style={[styles.header, { paddingTop: top + 10 }]}>
-        <TouchableOpacity
-          onPress={() => navigate("Settings")}
-          activeOpacity={0.8}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-        </TouchableOpacity>
-        <CustomText variant="h4" fontFamily={Fonts.Bold}>
-          History
-        </CustomText>
-        {history.length > 0 && (
+        <View style={styles.headerLeft}>
           <TouchableOpacity
-            onPress={handleClearHistory}
+            onPress={() => navigate("Settings")}
             activeOpacity={0.8}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={10}
           >
-            <Ionicons name="trash-outline" size={24} color={Colors.primary} />
+            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
           </TouchableOpacity>
-        )}
+        </View>
+        <View style={styles.headerCenter}>
+          <CustomText variant="h4" fontWeight="bold">
+            History
+          </CustomText>
+        </View>
+        <View style={styles.headerRight}>
+          {history.length > 0 && (
+            <TouchableOpacity
+              onPress={handleClearHistory}
+              activeOpacity={0.8}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="trash-outline" size={24} color={Colors.primary} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* Success message for history cleanup */}
       {showCleanupMessage && (
         <View style={[styles.cleanupMessage, { backgroundColor: colors.card }]}>
-          <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
+          <Ionicons
+            name="checkmark-circle"
+            size={Spacing.iconSize}
+            color={Colors.primary}
+          />
           <CustomText
             variant="h6"
+            fontWeight="medium"
             style={{ color: colors.text, marginLeft: 8 }}
           >
             History cleaned up successfully
@@ -274,9 +294,14 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
           </View>
         ) : history.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="time-outline" size={40} color={colors.gray[400]} />
+            <Ionicons
+              name="time-outline"
+              size={Spacing.iconSize}
+              color={colors.gray[400]}
+            />
             <CustomText
-              variant="h5"
+              variant="h6"
+              fontWeight="medium"
               style={{
                 color: colors.gray[400],
                 textAlign: "center",

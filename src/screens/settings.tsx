@@ -1,7 +1,7 @@
 import CustomText from "@/components/CustomText";
 import UpdateSection from "@/components/UpdateSection";
 import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
+import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/screens/SettingsScreen.styles";
 import { Navigate } from "@/types/AuthHeader.types";
@@ -25,16 +25,20 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
       activeOpacity={0.8}
     >
       <View style={styles.optionLeft}>
-        <Ionicons name={icon} size={20} color={Colors.primary} />
+        <Ionicons name={icon} size={Spacing.iconSize} color={Colors.primary} />
         <CustomText
           variant="h5"
-          fontFamily={Fonts.Medium}
+          fontWeight="medium"
           style={{ color: colors.text, marginLeft: 10 }}
         >
           {title}
         </CustomText>
       </View>
-      <Ionicons name="chevron-forward" size={20} color={colors.gray[400]} />
+      <Ionicons
+        name="chevron-forward"
+        size={Spacing.iconSize}
+        color={colors.gray[400]}
+      />
     </TouchableOpacity>
   );
 
@@ -51,7 +55,7 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
         </TouchableOpacity>
         <CustomText
           variant="h4"
-          fontFamily={Fonts.Bold}
+          fontWeight="bold"
           style={{ color: colors.text }}
         >
           Settings

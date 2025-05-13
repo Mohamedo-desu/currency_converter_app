@@ -60,7 +60,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     web: {
       bundler: "metro",
-
       favicon: "./assets/icons/ios-prod.png",
     },
     plugins: [
@@ -77,18 +76,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
-
-      [
-        "expo-font",
-        {
-          fonts: [
-            "./assets/fonts/Okra-Bold.ttf",
-            "./assets/fonts/Okra-Medium.ttf",
-            "./assets/fonts/Okra-Regular.ttf",
-          ],
-        },
-      ],
-
       [
         "react-native-edge-to-edge",
         {
@@ -106,6 +93,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
+      //"./plugins/customize.js",
     ],
     experiments: {
       reactCanary: true,

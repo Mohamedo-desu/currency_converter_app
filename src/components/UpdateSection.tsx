@@ -1,15 +1,17 @@
 import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
+import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import { useUpdate } from "@/context/UpdateContext";
+import { styles } from "@/styles/components/UpdateSection.styles";
+import { Ionicons } from "@expo/vector-icons";
 import * as Application from "expo-application";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
   Platform,
-  StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -20,6 +22,7 @@ const UpdateSection = () => {
   const { colors } = useTheme();
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const [isDevelopment, setIsDevelopment] = useState(false);
+  const [isMajorUpdate, setIsMajorUpdate] = useState(false);
 
   useEffect(() => {
     const checkEnvironment = async () => {
@@ -28,14 +31,28 @@ const UpdateSection = () => {
         setIsDevelopment(false);
         if (update.isAvailable) {
           const manifest = update.manifest as { version?: string };
-          setUpdateVersion(manifest.version || null);
+          const newVersion = manifest.version || null;
+          setUpdateVersion(newVersion);
+
+          // Check if it's a major update
+          if (newVersion) {
+            const currentVersion =
+              Platform.OS === "web"
+                ? Constants.expoConfig?.version
+                : Application.nativeApplicationVersion;
+
+            if (currentVersion) {
+              const currentMajor = currentVersion.split(".")[0];
+              const newMajor = newVersion.split(".")[0];
+              setIsMajorUpdate(newMajor > currentMajor);
+            }
+          }
         }
       } catch (error) {
         if (
           error instanceof Error &&
           error.message.includes("development mode")
         ) {
-          console.log("Running in development mode - update checks disabled");
           setIsDevelopment(true);
         } else {
           console.error("Error checking for updates:", error);
@@ -59,43 +76,73 @@ const UpdateSection = () => {
     return "Just now";
   };
 
+  const handleUpdate = async () => {
+    if (isMajorUpdate) {
+      // Replace with your Play Store link
+      Linking.openURL(
+        "https://play.google.com/store/apps/details?id=your.app.id"
+      );
+    } else {
+      checkForUpdates();
+    }
+  };
+
   const nativeVersion = Application.nativeApplicationVersion;
   const webVersion = Constants.expoConfig?.version;
   const version = Platform.OS === "web" ? webVersion : nativeVersion;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.card }]}>
-      <CustomText
-        variant="h6"
-        fontFamily={Fonts.Medium}
-        style={{ color: colors.text }}
-      >
-        App Updates
-      </CustomText>
-
       <View style={styles.content}>
         <View style={styles.infoRow}>
-          <CustomText variant="h6" style={{ color: colors.gray[400] }}>
-            Version:
-          </CustomText>
-          <CustomText variant="h6" style={{ color: colors.text }}>
-            v{version}
-          </CustomText>
+          <View style={{ flex: 1 }}>
+            <CustomText
+              variant="h5"
+              fontWeight="medium"
+              style={{ color: colors.text }}
+            >
+              App Updates
+            </CustomText>
+            <CustomText
+              variant="h6"
+              fontWeight="medium"
+              style={{ color: colors.gray[400], marginTop: 4 }}
+            >
+              Version: v{version}
+            </CustomText>
+          </View>
+          <Ionicons
+            name="information-circle"
+            size={Spacing.iconSize}
+            color={colors.gray[400]}
+          />
         </View>
 
         {isDevelopment ? (
           <View style={styles.infoRow}>
-            <CustomText variant="h6" style={{ color: colors.gray[400] }}>
+            <CustomText
+              variant="h6"
+              fontWeight="medium"
+              style={{ color: colors.gray[400] }}
+            >
               Environment:
             </CustomText>
-            <CustomText variant="h6" style={{ color: Colors.secondary }}>
+            <CustomText
+              variant="h6"
+              fontWeight="medium"
+              style={{ color: Colors.secondary }}
+            >
               Development
             </CustomText>
           </View>
         ) : (
           updateVersion && (
             <View style={styles.infoRow}>
-              <CustomText variant="h6" style={{ color: colors.gray[400] }}>
+              <CustomText
+                variant="h6"
+                fontWeight="medium"
+                style={{ color: colors.gray[400] }}
+              >
                 New Version:
               </CustomText>
               <CustomText variant="h6" style={{ color: Colors.primary }}>
@@ -106,10 +153,18 @@ const UpdateSection = () => {
         )}
 
         <View style={styles.infoRow}>
-          <CustomText variant="h6" style={{ color: colors.gray[400] }}>
+          <CustomText
+            variant="h6"
+            fontWeight="medium"
+            style={{ color: colors.gray[400] }}
+          >
             Last Checked:
           </CustomText>
-          <CustomText variant="h6" style={{ color: colors.text }}>
+          <CustomText
+            variant="h7"
+            fontWeight="medium"
+            style={{ color: colors.text }}
+          >
             {formatLastChecked(lastChecked)}
           </CustomText>
         </View>
@@ -120,7 +175,7 @@ const UpdateSection = () => {
             (isChecking || isUpdating || isDevelopment) &&
               styles.buttonDisabled,
           ]}
-          onPress={checkForUpdates}
+          onPress={handleUpdate}
           disabled={isChecking || isUpdating || isDevelopment}
         >
           {isChecking || isUpdating ? (
@@ -134,7 +189,9 @@ const UpdateSection = () => {
                 : isUpdating
                 ? "Updating..."
                 : updateVersion
-                ? "Update Available"
+                ? isMajorUpdate
+                  ? "Update from Store"
+                  : "Update Available"
                 : "Check for Updates"}
             </CustomText>
           )}
@@ -143,38 +200,5 @@ const UpdateSection = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 8,
-    marginVertical: 8,
-  },
-  content: {
-    gap: 16,
-    marginTop: 10,
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: Colors.primary,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 35,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontFamily: Fonts.Medium,
-    fontSize: 14,
-  },
-});
 
 export default UpdateSection;

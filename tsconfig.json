@@ -5,19 +5,10 @@
     "jsx": "react-native",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/assets/*": [
-        "./assets/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/assets/*": ["./assets/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "plugins/customize.js"],
+  "exclude": ["node_modules"]
 }

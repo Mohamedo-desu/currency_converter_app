@@ -1,14 +1,15 @@
 import { Colors } from "@/constants/Colors";
+import { Spacing } from "@/constants/Spacing";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   breakerContainer: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: Spacing.sm,
     overflow: "hidden",
     width: "100%",
-    marginVertical: 15,
+    marginVertical: Spacing.md,
     flexDirection: "row",
   },
   horizontalLine: {
@@ -18,7 +19,7 @@ export const styles = StyleSheet.create({
 
   icon: {
     backgroundColor: Colors.primary,
-    borderRadius: 50,
-    padding: 10,
+    borderRadius: Spacing.borderRadius.round,
+    padding: Spacing.iconPadding,
   },
 });

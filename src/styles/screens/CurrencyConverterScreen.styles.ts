@@ -1,3 +1,4 @@
+import { Spacing } from "@/constants/Spacing";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -11,7 +12,7 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: Spacing.screenPadding,
   },
   header: {
     flexDirection: "row",
@@ -21,13 +22,13 @@ export const styles = StyleSheet.create({
   textContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: Spacing.lg,
   },
   card: {
-    paddingVertical: 15,
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 30,
+    paddingVertical: Spacing.cardPadding,
+    padding: Spacing.cardPadding,
+    borderRadius: Spacing.inputBorderRadius,
+    marginTop: Spacing.xxl,
     ...(Platform.OS === "web" && {
       maxWidth: 500,
       marginHorizontal: "auto",
@@ -35,7 +36,7 @@ export const styles = StyleSheet.create({
     }),
   },
   exchangeRateContainer: {
-    marginTop: 30,
-    gap: 10,
+    marginTop: Spacing.xxl,
+    gap: Spacing.sm,
   },
 });

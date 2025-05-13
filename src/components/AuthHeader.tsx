@@ -3,7 +3,8 @@ import { styles } from "@/styles/components/AuthHeader.styles";
 import { AuthHeaderProps, IconProps } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { FC } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import CustomText from "./CustomText";
 
 const Icon: FC<IconProps> = ({ onPress, color }) => (
   <TouchableOpacity
@@ -26,24 +27,18 @@ const AuthHeader: FC<AuthHeaderProps> = ({
   return (
     <View>
       {showBackButton && (
-        <Icon onPress={() => Navigate("Converter")} color={colors.text} />
+        <Icon onPress={() => Navigate("Converter")} color={colors.primary} />
       )}
 
-      {title && (
-        <Text
-          style={[styles.title, { color: colors.text }]}
-          adjustsFontSizeToFit
-        >
-          {title}
-        </Text>
-      )}
+      {title && <CustomText style={styles.title}>{title}</CustomText>}
       {description && (
-        <Text
-          style={[styles.description, { color: colors.gray[500] }]}
-          adjustsFontSizeToFit
+        <CustomText
+          variant="h6"
+          fontWeight="medium"
+          style={{ color: colors.gray[400] }}
         >
           {description}
-        </Text>
+        </CustomText>
       )}
     </View>
   );

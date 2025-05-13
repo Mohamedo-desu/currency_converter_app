@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { Fonts } from "@/constants/Fonts";
+import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/CurrencySelector.styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -13,11 +13,11 @@ import {
 import CountryFlag from "react-native-country-flag";
 import CustomText from "./CustomText";
 
-const HEADER_ICON_SIZE = 12;
-
 interface Currency {
   code: string;
   flag: string;
+  name: string;
+  symbol?: string;
 }
 
 interface CurrencySelectorProps
@@ -43,7 +43,8 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
   return (
     <View style={styles.amountContainer}>
       <CustomText
-        fontFamily={Fonts.Medium}
+        variant="h6"
+        fontWeight="medium"
         style={[styles.label, { color: colors.gray[400] }]}
       >
         {label}
@@ -57,22 +58,18 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
           {currency?.flag && (
             <CountryFlag
               isoCode={currency.flag}
-              size={HEADER_ICON_SIZE}
+              size={Spacing.flagIconSize}
               style={styles.flagIcon}
             />
           )}
           <CustomText
-            fontFamily={Fonts.Medium}
+            fontWeight="medium"
             style={{ color: colors.primary }}
             variant="h6"
           >
             {currency?.code || "Select"}
           </CustomText>
-          <AntDesign
-            name="down"
-            size={HEADER_ICON_SIZE}
-            color={Colors.primary}
-          />
+          <AntDesign name="down" size={12} color={Colors.primary} />
         </TouchableOpacity>
         <View style={styles.inputContainer}>
           <TextInput
@@ -97,13 +94,25 @@ const CurrencySelector: FC<CurrencySelectorProps> = ({
             >
               <Ionicons
                 name="close-circle"
-                size={20}
+                size={Spacing.iconSize}
                 color={colors.gray[400]}
               />
             </TouchableOpacity>
           )}
         </View>
       </View>
+      <CustomText
+        variant="tiny"
+        fontWeight="medium"
+        style={[
+          styles.label,
+          { color: colors.gray[300], marginTop: Spacing.margin.sm },
+        ]}
+      >
+        {currency
+          ? `${currency.name}${currency.symbol ? ` (${currency.symbol})` : ""}`
+          : ""}
+      </CustomText>
     </View>
   );
 };
