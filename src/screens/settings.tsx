@@ -1,5 +1,4 @@
 import CustomText from "@/components/CustomText";
-import UpdateSection from "@/components/UpdateSection";
 import { Colors } from "@/constants/Colors";
 import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
@@ -69,7 +68,6 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
           navigate("Help")
         )}
         {renderSettingOption("time", "History", () => navigate("History"))}
-        <UpdateSection />
       </View>
     </View>
   );

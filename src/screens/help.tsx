@@ -8,11 +8,14 @@ import {
   getDeviceInfo,
   submitFeedback,
 } from "@/services/feedbackService";
+import { fetchVersionInfo } from "@/services/versionService";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
 import { Navigate } from "@/types/AuthHeader.types";
+import { isRunningInExpoGo } from "expo";
 import * as Application from "expo-application";
 import Constants from "expo-constants";
+import * as Updates from "expo-updates";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -58,6 +61,8 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
   const [reportText, setReportText] = useState("");
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [backendVersion, setBackendVersion] = useState<string | null>(null);
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(true);
 
   // Get app version
   const nativeVersion = Application.nativeApplicationVersion;
@@ -65,7 +70,86 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
     Platform.OS === "web"
       ? Constants.manifest?.version || Constants.expoConfig?.version || "1.0.0"
       : "1.0.0";
-  const version = Platform.OS === "web" ? webVersion : nativeVersion;
+  const localVersion = Platform.OS === "web" ? webVersion : nativeVersion;
+
+  // Load cached version on mount
+  useEffect(() => {
+    const loadCachedVersion = async () => {
+      const stored = getStoredValues(["cachedVersion"]);
+      if (stored.cachedVersion) {
+        setBackendVersion(stored.cachedVersion);
+      }
+    };
+    loadCachedVersion();
+  }, []);
+
+  // Check for OTA updates and fetch backend version
+  useEffect(() => {
+    const checkVersions = async () => {
+      try {
+        // Skip OTA check in development or Expo Go
+        if (__DEV__ || isRunningInExpoGo()) {
+          const versionInfo = await fetchVersionInfo();
+          if (versionInfo) {
+            // Only use backend version if it's the same major version
+            const currentMajor = localVersion.split(".")[0];
+            const backendMajor = versionInfo.version.split(".")[0];
+
+            if (currentMajor === backendMajor) {
+              setBackendVersion(versionInfo.version);
+              // Cache the version
+              saveSecurely([
+                { key: "cachedVersion", value: versionInfo.version },
+              ]);
+            } else {
+              setBackendVersion(localVersion);
+              // Cache the local version
+              saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+            }
+          }
+        } else {
+          // In production, check for OTA updates first
+          const update = await Updates.checkForUpdateAsync();
+
+          if (update.isAvailable) {
+            // If there's an OTA update, use the local version
+            setBackendVersion(localVersion);
+            // Cache the local version
+            saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+          } else {
+            // If no OTA update, fetch from backend
+            const versionInfo = await fetchVersionInfo();
+            if (versionInfo) {
+              // Only use backend version if it's the same major version
+              const currentMajor = localVersion.split(".")[0];
+              const backendMajor = versionInfo.version.split(".")[0];
+
+              if (currentMajor === backendMajor) {
+                setBackendVersion(versionInfo.version);
+                // Cache the version
+                saveSecurely([
+                  { key: "cachedVersion", value: versionInfo.version },
+                ]);
+              } else {
+                setBackendVersion(localVersion);
+                // Cache the local version
+                saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking versions:", error);
+        setBackendVersion(localVersion);
+        // Cache the local version as fallback
+        saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+      } finally {
+        setIsCheckingUpdates(false);
+      }
+    };
+
+    checkVersions();
+  }, [localVersion]);
 
   // Helper to show alerts differently on web vs native
   const showAlert = (title: string, message: string) => {
@@ -126,7 +210,7 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
         text: reportText,
         timestamp: Date.now(),
         platform: Platform.OS,
-        version,
+        version: backendVersion || localVersion,
         deviceInfo: getDeviceInfo(),
       };
 

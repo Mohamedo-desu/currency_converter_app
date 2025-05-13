@@ -16,7 +16,7 @@ export interface Feedback {
 }
 
 // API endpoint - ensure it ends with /api/feedback
-const API_ENDPOINT = process.env.EXPO_PUBLIC_FEEDBACK_API_URL + "/api/feedback";
+const API_ENDPOINT = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/feedback";
 
 // Remote feedback submission
 export const submitFeedback = async (feedback: Feedback): Promise<boolean> => {
