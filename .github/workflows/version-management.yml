@@ -155,8 +155,20 @@ jobs:
     if: always() && (needs.update.result == 'failure' || needs.build.result == 'failure')
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Delete failed version from backend
         run: |
           VERSION=${{ needs.version-check.outputs.version }}
           echo "Deleting failed version $VERSION from backend"
           curl -X DELETE ${{ secrets.BACKEND_URL }}/api/version/$VERSION
+
+      - name: Delete GitHub tag
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "Deleting tag $TAG from GitHub"
+          git tag -d $TAG
+          git push origin :refs/tags/$TAG
