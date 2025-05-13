@@ -15,8 +15,8 @@ export interface Feedback {
   deviceInfo?: string;
 }
 
-// API endpoint
-const API_ENDPOINT = process.env.EXPO_PUBLIC_FEEDBACK_API_URL;
+// API endpoint - ensure it ends with /api/feedback
+const API_ENDPOINT = process.env.EXPO_PUBLIC_FEEDBACK_API_URL + "/api/feedback";
 
 // Remote feedback submission
 export const submitFeedback = async (feedback: Feedback): Promise<boolean> => {
@@ -25,16 +25,20 @@ export const submitFeedback = async (feedback: Feedback): Promise<boolean> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify(feedback),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.text();
+      console.error("Server response:", errorData);
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorData}`
+      );
     }
 
-    const data = await response.json();
-    console.log("Feedback submitted successfully:", data);
+    await response.json();
     return true;
   } catch (error) {
     console.error("Error submitting feedback:", error);
