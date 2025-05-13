@@ -39,35 +39,6 @@ jobs:
             fi
           fi
 
-      - name: Update backend version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          curl -X POST ${{ secrets.BACKEND_URL }}/api/version \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"version\": \"$VERSION\",
-              \"type\": \"${{ steps.previous_tag.outputs.type }}\",
-              \"releaseNotes\": \"Version $VERSION\"
-            }"
-
-      - name: Trigger update
-        if: steps.previous_tag.outputs.type != 'major'
-        run: |
-          curl -X POST ${{ secrets.BACKEND_URL }}/api/trigger-update \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"version\": \"${GITHUB_REF#refs/tags/v}\"
-            }"
-
-      - name: Trigger build
-        if: steps.previous_tag.outputs.type == 'major'
-        run: |
-          curl -X POST ${{ secrets.BACKEND_URL }}/api/trigger-build \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"version\": \"${GITHUB_REF#refs/tags/v}\"
-            }"
-
   update:
     needs: version-check
     if: needs.version-check.outputs.type == 'minor' || needs.version-check.outputs.type == 'patch'
@@ -88,8 +59,17 @@ jobs:
         run: bun install
       - name: Install EAS CLI
         run: npm install -g eas-cli
-      - name: Trigger EAS Update
-        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive
+      - name: Create OTA Update
+        run: |
+          # Get version info
+          VERSION=${GITHUB_REF#refs/tags/v}
+          UPDATE_TYPE=${{ needs.version-check.outputs.type }}
+
+          # Create update message with version info
+          UPDATE_MSG="Version $VERSION ($UPDATE_TYPE update)"
+
+          # Create and publish the update
+          eas update --branch ${{ matrix.profile }} --message "$UPDATE_MSG" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -99,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        profile: [preview, production]
+        profile: [preview]
     steps:
       - uses: actions/checkout@v4
       - uses: expo/expo-github-action@v7
