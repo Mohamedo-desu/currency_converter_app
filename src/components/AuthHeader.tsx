@@ -1,3 +1,4 @@
+import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/components/AuthHeader.styles";
 import { AuthHeaderProps, IconProps } from "@/types/AuthHeader.types";
@@ -13,7 +14,7 @@ const Icon: FC<IconProps> = ({ onPress, color }) => (
     style={styles.iconBtn}
     hitSlop={10}
   >
-    <Ionicons name="arrow-back" size={24} style={{ color }} />
+    <Ionicons name="arrow-back" size={Spacing.iconSize} style={{ color }} />
   </TouchableOpacity>
 );
 

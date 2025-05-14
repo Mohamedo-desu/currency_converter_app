@@ -48,9 +48,13 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
         <TouchableOpacity
           onPress={() => navigate("Converter")}
           activeOpacity={0.8}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={10}
         >
-          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+          <Ionicons
+            name="arrow-back"
+            size={Spacing.iconSize}
+            color={Colors.primary}
+          />
         </TouchableOpacity>
         <CustomText
           variant="h4"

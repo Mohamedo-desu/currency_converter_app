@@ -14,10 +14,17 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Alert, Platform, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  Platform,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Import reusable service functions
+import { Spacing } from "@/constants/Spacing";
 import {
   Currency,
   fetchCurrencies,
@@ -297,6 +304,7 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
             setIsModalVisible(true);
           }
         );
+        Keyboard.dismiss();
         return;
       }
 
@@ -349,20 +357,24 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
         <TouchableOpacity
           onPress={toggleTheme}
           activeOpacity={0.8}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={10}
         >
           <Ionicons
             name="color-palette-outline"
-            size={22}
+            size={Spacing.iconSize}
             color={Colors.primary}
           />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigate("Settings")}
           activeOpacity={0.8}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={10}
         >
-          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+          <Ionicons
+            name="settings-outline"
+            size={Spacing.iconSize}
+            color={Colors.primary}
+          />
         </TouchableOpacity>
       </View>
 

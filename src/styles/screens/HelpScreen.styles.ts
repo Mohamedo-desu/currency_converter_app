@@ -49,8 +49,9 @@ export const styles = StyleSheet.create({
   // Larger input style for report description
   textInput: {
     height: 150,
+    fontSize: Typography.fontSize.body,
+    padding: Spacing.inputPadding,
     borderRadius: Spacing.inputBorderRadius,
-    padding: Spacing.sm,
   },
   // Smaller input style for name and email
   textInputSmall: {

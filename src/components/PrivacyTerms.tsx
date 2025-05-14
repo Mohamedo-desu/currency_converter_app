@@ -24,7 +24,7 @@ const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
   };
 
   return (
-    <View style={[styles.footer, { bottom: bottom + 10 }]}>
+    <View style={[styles.footer, { bottom: bottom }]}>
       {/* Help Link */}
       <View style={styles.helpLinkContainer}>
         <TouchableOpacity onPress={() => navigate("Help")} activeOpacity={0.8}>

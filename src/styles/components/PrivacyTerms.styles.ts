@@ -15,13 +15,13 @@ export const styles = StyleSheet.create({
       maxWidth: 800,
       marginHorizontal: "auto",
     }),
+    gap: 2,
   },
   footerTextContainer: {
     flexDirection: "row",
-    gap: Spacing.sm,
+    gap: Spacing.gap.xs,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: Spacing.xs,
     flexWrap: "wrap",
   },
   footerText: {
@@ -31,15 +31,12 @@ export const styles = StyleSheet.create({
   },
   versionCodeText: {
     textAlign: "center",
-    marginTop: Spacing.sm,
     fontSize: Typography.fontSize.tiny,
     ...(Platform.OS === "web" && {
       fontSize: Typography.fontSize.small,
     }),
   },
-  helpLinkContainer: {
-    marginBottom: Spacing.xs,
-  },
+  helpLinkContainer: {},
   helpLink: {
     textDecorationLine: "underline",
     fontSize: Typography.fontSize.small,

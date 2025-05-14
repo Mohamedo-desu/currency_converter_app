@@ -27,8 +27,8 @@ export const styles = StyleSheet.create({
   card: {
     paddingVertical: Spacing.cardPadding,
     padding: Spacing.cardPadding,
+    marginVertical: Spacing.margin.md,
     borderRadius: Spacing.inputBorderRadius,
-    marginTop: Spacing.xxl,
     ...(Platform.OS === "web" && {
       maxWidth: 500,
       marginHorizontal: "auto",
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
     }),
   },
   exchangeRateContainer: {
-    marginTop: Spacing.xxl,
+    marginTop: 0,
     gap: Spacing.sm,
   },
 });

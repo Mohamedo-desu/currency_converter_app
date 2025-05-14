@@ -247,7 +247,11 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
             activeOpacity={0.8}
             hitSlop={10}
           >
-            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+            <Ionicons
+              name="arrow-back"
+              size={Spacing.iconSize}
+              color={Colors.primary}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.headerCenter}>
@@ -260,9 +264,13 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
             <TouchableOpacity
               onPress={handleClearHistory}
               activeOpacity={0.8}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={10}
             >
-              <Ionicons name="trash-outline" size={24} color={Colors.primary} />
+              <Ionicons
+                name="trash-outline"
+                size={Spacing.iconSize}
+                color={Colors.primary}
+              />
             </TouchableOpacity>
           )}
         </View>

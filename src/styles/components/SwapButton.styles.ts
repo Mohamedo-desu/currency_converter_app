@@ -21,5 +21,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: Spacing.borderRadius.round,
     padding: Spacing.iconPadding,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
