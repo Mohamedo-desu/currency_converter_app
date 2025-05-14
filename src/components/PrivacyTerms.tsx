@@ -13,6 +13,7 @@ type Navigate = (screen: Screen) => void;
 const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
   const { colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
+
   const { currentVersion } = useVersion();
 
   const openPrivacyPolicy = () => {

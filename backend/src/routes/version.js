@@ -49,12 +49,22 @@ router.post("/", async (req, res) => {
         .json({ message: "Invalid version format. Use x.y.z format" });
     }
 
+    // Extract major version and construct x.0.0 version
+    const majorVersion = version.split(".")[0];
+    const baseVersion = `${majorVersion}.0.0`;
+
+    // Find the x.0.0 version
+    const baseVersionDoc = await AppVersion.findOne({ version: baseVersion });
+
     // Check if version already exists
     const existingVersion = await AppVersion.findOne({ version });
     if (existingVersion) {
       // Update existing version
       existingVersion.type = type;
       existingVersion.releaseNotes = releaseNotes;
+      if (baseVersionDoc?.downloadUrl) {
+        existingVersion.downloadUrl = baseVersionDoc.downloadUrl;
+      }
       await existingVersion.save();
       return res.json(existingVersion);
     }
@@ -64,7 +74,7 @@ router.post("/", async (req, res) => {
       version,
       type,
       releaseNotes,
-      downloadUrl: "X",
+      downloadUrl: baseVersionDoc?.downloadUrl || "X",
     });
 
     await newVersion.save();
