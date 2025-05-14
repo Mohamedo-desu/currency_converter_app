@@ -1,10 +1,10 @@
 import { fetchVersionInfo } from "@/services/versionService";
-import { saveSecurely } from "@/store/storage";
+import { getStoredValues, saveSecurely } from "@/store/storage";
 import * as Application from "expo-application";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Platform } from "react-native";
+import { Alert, Linking, Platform } from "react-native";
 
 export const useVersion = () => {
   const [backendVersion, setBackendVersion] = useState<string | null>(null);
@@ -37,6 +37,21 @@ export const useVersion = () => {
     []
   );
 
+  // Load cached version immediately
+  useEffect(() => {
+    const loadCachedVersion = async () => {
+      try {
+        const { cachedVersion } = await getStoredValues(["cachedVersion"]);
+        if (cachedVersion) {
+          setBackendVersion(cachedVersion);
+        }
+      } catch (error) {
+        console.error("[DEBUG] Error loading cached version:", error);
+      }
+    };
+    loadCachedVersion();
+  }, []);
+
   // Check for updates and fetch version
   useEffect(() => {
     let isMounted = true;
@@ -59,12 +74,10 @@ export const useVersion = () => {
 
         // Step 2: Get local version after potential OTA update
         const localMajor = getMajorVersion(localVersion);
-        console.log("[DEBUG] Local major version:", localMajor);
 
         // Step 3: Fetch latest backend version
         const latestVersion = await fetchBackendVersion(0);
         const latestMajor = getMajorVersion(latestVersion);
-        console.log("[DEBUG] Latest backend version:", latestVersion);
 
         if (isMounted) {
           if (localMajor === latestMajor) {
@@ -77,22 +90,39 @@ export const useVersion = () => {
             );
           } else if (parseInt(latestMajor) > parseInt(localMajor)) {
             // New major version available
+            const versionInfo = await fetchVersionInfo();
+            const downloadUrl = versionInfo?.buildUrl;
+
             Alert.alert(
               "New Build Available",
-              `A new build (${latestVersion}) is available. Please update your app.`
+              `A new build (${latestVersion}) is available. Would you like to download it now?`,
+              [
+                {
+                  text: "Download Now",
+                  onPress: () => {
+                    if (downloadUrl) {
+                      Linking.openURL(downloadUrl);
+                    } else {
+                      Alert.alert(
+                        "Error",
+                        "Download URL not available. Please try again later."
+                      );
+                    }
+                  },
+                },
+                {
+                  text: "Later",
+                  style: "cancel",
+                },
+              ]
             );
 
             // Fetch compatible version for current major
             try {
               const versionInfo = await fetchVersionInfo(localMajor);
-              console.log("[DEBUG] Compatible version info:", versionInfo);
 
               if (versionInfo?.version) {
                 const compatibleVersion = versionInfo.version;
-                console.log(
-                  "[DEBUG] Setting compatible version:",
-                  compatibleVersion
-                );
                 setBackendVersion(compatibleVersion);
                 saveSecurely([
                   { key: "cachedVersion", value: compatibleVersion },
