@@ -9,9 +9,6 @@ on:
 permissions:
   contents: write
 
-env:
-  APP_ENV: preview
-
 jobs:
   version-check:
     runs-on: ubuntu-latest
@@ -74,12 +71,6 @@ jobs:
       matrix:
         profile: [preview]
     steps:
-      - name: Debug update condition
-        run: |
-          echo "Version type from previous job: ${{ needs.version-check.outputs.type }}"
-          echo "Update job condition: ${{ needs.version-check.outputs.type == 'minor' || needs.version-check.outputs.type == 'patch' }}"
-          echo "Current version: ${GITHUB_REF#refs/tags/v}"
-
       - uses: actions/checkout@v4
       - uses: expo/expo-github-action@v7
         with:
@@ -93,38 +84,13 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      - name: Verify backend version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "Verifying version $VERSION exists in backend..."
-          response=$(curl -s -w "\n%{http_code}" ${{ secrets.BACKEND_URL }}/api/version/latest)
-          status_code=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | sed '$d')
-
-          if [ "$status_code" -eq 200 ]; then
-            echo "Version exists in backend"
-            echo "$body"
-          else
-            echo "Error: Version not found in backend"
-            echo "Status code: $status_code"
-            echo "Response: $body"
-            exit 1
-          fi
-
       - name: Create OTA Update
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "Creating update for version: $VERSION"
-          echo "Using branch: ${{ matrix.profile }}"
-
-          # Wait for backend to be ready
-          sleep 5
-
-          eas update --branch ${{ matrix.profile }} --message "Version $VERSION" --non-interactive
+        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           APP_ENV: ${{ matrix.profile }}
-          VERSION: ${GITHUB_REF#refs/tags/v}
+          EXPO_PUBLIC_BACKEND_URL: ${{ secrets.EXPO_PUBLIC_BACKEND_URL }}
+          EXPO_PUBLIC_RATES_API_URL: ${{ secrets.EXPO_PUBLIC_RATES_API_URL }}
 
   build:
     needs: version-check
@@ -158,6 +124,8 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           APP_ENV: ${{ matrix.profile }}
+          EXPO_PUBLIC_BACKEND_URL: ${{ secrets.EXPO_PUBLIC_BACKEND_URL }}
+          EXPO_PUBLIC_RATES_API_URL: ${{ secrets.EXPO_PUBLIC_RATES_API_URL }}
 
   release:
     needs: [version-check, update, build]
