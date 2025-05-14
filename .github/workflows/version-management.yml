@@ -85,7 +85,7 @@ jobs:
         run: npm install -g eas-cli
 
       - name: Create OTA Update
-        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive
+        run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           APP_ENV: ${{ matrix.profile }}
