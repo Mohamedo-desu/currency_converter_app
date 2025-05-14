@@ -18,6 +18,7 @@ const appVersionSchema = new mongoose.Schema(
     },
     downloadUrl: {
       type: String,
+      required: true,
     },
   },
   { timestamps: true }

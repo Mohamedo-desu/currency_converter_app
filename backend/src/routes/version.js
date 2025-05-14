@@ -64,7 +64,7 @@ router.post("/", async (req, res) => {
       version,
       type,
       releaseNotes,
-      downloadUrl: "",
+      downloadUrl: "X",
     });
 
     await newVersion.save();
