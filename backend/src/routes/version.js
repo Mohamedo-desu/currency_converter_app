@@ -74,7 +74,8 @@ router.post("/", async (req, res) => {
       version,
       type,
       releaseNotes,
-      downloadUrl: baseVersionDoc?.downloadUrl || "X",
+      downloadUrl:
+        baseVersionDoc?.downloadUrl || "https://drive.google.com/placeholder", // Temporary placeholder
     });
 
     await newVersion.save();
