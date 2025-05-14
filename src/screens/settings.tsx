@@ -68,9 +68,6 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
 
       {/* Settings Content */}
       <View style={styles.content}>
-        {renderSettingOption("help-circle", "Help & Support", () =>
-          navigate("Help")
-        )}
         {renderSettingOption("time", "History", () => navigate("History"))}
       </View>
     </View>
