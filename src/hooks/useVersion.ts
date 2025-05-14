@@ -45,48 +45,45 @@ export const useVersion = () => {
     checkOtaUpdate();
   }, []); // Run only on mount
 
-  // Load cached version on mount
+  // Fetch backend version
+  const fetchLatestVersion = async () => {
+    try {
+      const versionInfo = await fetchVersionInfo();
+      if (versionInfo) {
+        setBackendVersion(versionInfo.version);
+        saveSecurely([{ key: "cachedVersion", value: versionInfo.version }]);
+      } else {
+        setBackendVersion(localVersion);
+        saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch backend version:", error);
+      setBackendVersion(localVersion);
+      saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+    } finally {
+      setIsCheckingUpdates(false);
+    }
+  };
+
+  // Load cached version and fetch latest on mount
   useEffect(() => {
-    const loadCachedVersion = async () => {
+    const initializeVersion = async () => {
       const stored = getStoredValues(["cachedVersion"]);
       if (stored.cachedVersion) {
         setBackendVersion(stored.cachedVersion);
       }
+      // Always fetch latest version from backend
+      await fetchLatestVersion();
     };
-    loadCachedVersion();
+    initializeVersion();
   }, []);
 
   // Fetch backend version after OTA check
   useEffect(() => {
-    const fetchBackendVersion = async () => {
-      if (!isOtaChecked) return; // Wait for OTA check to complete
-
-      try {
-        const versionInfo = await fetchVersionInfo();
-        // Only update if we got version info (not null)
-        if (versionInfo) {
-          setBackendVersion(versionInfo.version);
-          // Cache the version
-          saveSecurely([{ key: "cachedVersion", value: versionInfo.version }]);
-        } else {
-          // If null, use local version
-          setBackendVersion(localVersion);
-          // Cache the local version
-          saveSecurely([{ key: "cachedVersion", value: localVersion }]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch backend version:", error);
-        // Fallback to local version if backend fetch fails
-        setBackendVersion(localVersion);
-        // Cache the local version as fallback
-        saveSecurely([{ key: "cachedVersion", value: localVersion }]);
-      } finally {
-        setIsCheckingUpdates(false);
-      }
-    };
-
-    fetchBackendVersion();
-  }, [isOtaChecked, localVersion]);
+    if (isOtaChecked) {
+      fetchLatestVersion();
+    }
+  }, [isOtaChecked]);
 
   return {
     backendVersion,
