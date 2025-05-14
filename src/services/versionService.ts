@@ -12,6 +12,8 @@ export const fetchVersionInfo = async (
 ): Promise<VersionInfo | null> => {
   const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 
+  alert(backendUrl);
+
   try {
     const url = `${backendUrl}/api/version/latest${
       major ? `?major=${major}` : ""

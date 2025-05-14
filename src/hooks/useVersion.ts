@@ -22,7 +22,6 @@ export const useVersion = () => {
     async (retryCount = 0, major?: string): Promise<string> => {
       try {
         const versionInfo = await fetchVersionInfo(major);
-        alert(JSON.stringify(versionInfo));
 
         if (versionInfo?.version) {
           return versionInfo.version;
