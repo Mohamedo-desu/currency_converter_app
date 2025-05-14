@@ -9,6 +9,9 @@ on:
 permissions:
   contents: write
 
+env:
+  APP_ENV: preview
+
 jobs:
   version-check:
     runs-on: ubuntu-latest
@@ -92,6 +95,7 @@ jobs:
         run: eas update --branch ${{ matrix.profile }} --message "Version ${GITHUB_REF#refs/tags/v}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_ENV: ${{ matrix.profile }}
 
   build:
     needs: version-check
@@ -124,6 +128,7 @@ jobs:
         run: eas build --platform android --profile ${{ matrix.profile }} --non-interactive --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_ENV: ${{ matrix.profile }}
 
   release:
     needs: [version-check, update, build]
