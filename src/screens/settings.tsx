@@ -44,7 +44,7 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: top }]}>
+      <View style={[styles.header, { paddingTop: top + 10 }]}>
         <TouchableOpacity
           onPress={() => navigate("Converter")}
           activeOpacity={0.8}

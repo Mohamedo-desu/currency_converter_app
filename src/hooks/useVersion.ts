@@ -88,31 +88,38 @@ export const useVersion = () => {
           } else if (parseInt(latestMajor) > parseInt(localMajor)) {
             // New major version available
             const versionInfo = await fetchVersionInfo();
-            const downloadUrl = versionInfo?.downloadUrl;
 
-            Alert.alert(
-              "New Build Available",
-              `A new build (${latestVersion}) is available. Would you like to download it now?`,
-              [
-                {
-                  text: "Download Now",
-                  onPress: () => {
-                    if (downloadUrl) {
-                      Linking.openURL(downloadUrl);
-                    } else {
-                      Alert.alert(
-                        "Error",
-                        "Download URL not available. Please try again later."
-                      );
-                    }
+            if (
+              versionInfo?.type === "major" &&
+              versionInfo?.downloadUrl &&
+              versionInfo.downloadUrl !==
+                "https://drive.google.com/placeholder" &&
+              versionInfo.downloadUrl.trim() !== ""
+            ) {
+              Alert.alert(
+                "New Build Available",
+                `A new build (${latestVersion}) is available. Would you like to download it now?`,
+                [
+                  {
+                    text: "Download Now",
+                    onPress: () => {
+                      if (versionInfo.downloadUrl) {
+                        Linking.openURL(versionInfo.downloadUrl);
+                      } else {
+                        Alert.alert(
+                          "Error",
+                          "Download URL not available. Please try again later."
+                        );
+                      }
+                    },
                   },
-                },
-                {
-                  text: "Later",
-                  style: "cancel",
-                },
-              ]
-            );
+                  {
+                    text: "Later",
+                    style: "cancel",
+                  },
+                ]
+              );
+            }
 
             // Fetch compatible version for current major
             try {

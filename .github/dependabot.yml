@@ -1,6 +1,0 @@
-version: 2
-updates:
-  - package-ecosystem: "bun"
-    directory: "/"                  # location of bun.lock
-    schedule:
-      interval: "weekly"            # checking for updates every week

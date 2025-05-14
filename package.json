@@ -1,7 +1,7 @@
 {
   "name": "convertly_app",
   "main": "App.tsx",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "scripts": {
     "start": "expo start",
     "build:android": "eas build --platform android --profile preview",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@expo/config-plugins": "~10.0.0",
+    "@expo/metro-runtime": "~5.0.4",
     "@expo/vector-icons": "^14.1.0",
     "expo": "~53.0.9",
     "expo-application": "~6.1.4",
