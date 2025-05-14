@@ -25,18 +25,22 @@ export const useVersion = () => {
       // Check for OTA updates in both development and production
       if (Platform.OS !== "web") {
         try {
+          console.log("[DEBUG] Starting OTA check");
           const update = await Updates.checkForUpdateAsync();
           if (update.isAvailable) {
+            console.log("[DEBUG] OTA update available");
             await Updates.fetchUpdateAsync();
             // Clear cached version before reload to force fresh fetch
             saveSecurely([{ key: "cachedVersion", value: "" }]);
             await Updates.reloadAsync();
             return; // App will reload, so we don't need to continue
           }
+          console.log("[DEBUG] No OTA update available");
         } catch (error) {
-          console.error("Error checking for OTA updates:", error);
+          console.error("[DEBUG] OTA check error:", error);
         }
       }
+      console.log("[DEBUG] Setting OTA check complete");
       setIsOtaChecked(true);
     };
 
@@ -46,16 +50,24 @@ export const useVersion = () => {
   // Fetch backend version
   const fetchLatestVersion = async () => {
     try {
+      console.log("[DEBUG] Fetching latest version from backend");
       const versionInfo = await fetchVersionInfo();
+      console.log("[DEBUG] Backend version response:", versionInfo);
+
       if (versionInfo) {
+        console.log("[DEBUG] Setting backend version:", versionInfo.version);
         setBackendVersion(versionInfo.version);
         saveSecurely([{ key: "cachedVersion", value: versionInfo.version }]);
       } else {
+        console.log(
+          "[DEBUG] No version info, using local version:",
+          localVersion
+        );
         setBackendVersion(localVersion);
         saveSecurely([{ key: "cachedVersion", value: localVersion }]);
       }
     } catch (error) {
-      console.error("Failed to fetch backend version:", error);
+      console.error("[DEBUG] Version fetch error:", error);
       setBackendVersion(localVersion);
       saveSecurely([{ key: "cachedVersion", value: localVersion }]);
     } finally {
@@ -66,7 +78,10 @@ export const useVersion = () => {
   // Load cached version and fetch latest on mount
   useEffect(() => {
     const initializeVersion = async () => {
+      console.log("[DEBUG] Initializing version");
       const stored = getStoredValues(["cachedVersion"]);
+      console.log("[DEBUG] Cached version:", stored.cachedVersion);
+
       if (stored.cachedVersion) {
         setBackendVersion(stored.cachedVersion);
       }
@@ -78,6 +93,7 @@ export const useVersion = () => {
 
   // Fetch backend version after OTA check
   useEffect(() => {
+    console.log("[DEBUG] OTA check status changed:", isOtaChecked);
     if (isOtaChecked) {
       fetchLatestVersion();
     }
