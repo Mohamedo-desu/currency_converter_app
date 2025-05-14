@@ -84,14 +84,10 @@ export const useVersion = () => {
             // Same major version - show backend version
             setBackendVersion(latestVersion);
             saveSecurely([{ key: "cachedVersion", value: latestVersion }]);
-            Alert.alert(
-              "Version Information",
-              `No new build available.\nLatest version: ${latestVersion}`
-            );
           } else if (parseInt(latestMajor) > parseInt(localMajor)) {
             // New major version available
             const versionInfo = await fetchVersionInfo();
-            const downloadUrl = versionInfo?.buildUrl;
+            const downloadUrl = versionInfo?.downloadUrl;
 
             Alert.alert(
               "New Build Available",

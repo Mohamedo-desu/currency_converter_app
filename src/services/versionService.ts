@@ -4,7 +4,7 @@ interface VersionInfo {
   type: "major" | "minor" | "patch";
   releaseNotes?: string;
   createdAt: string;
-  buildUrl?: string;
+  downloadUrl: string;
 }
 
 export const fetchVersionInfo = async (
@@ -27,7 +27,7 @@ export const fetchVersionInfo = async (
     }
 
     const data = await response.json();
-
+    console.log("[DEBUG] Received version data:", data);
     return data;
   } catch (error) {
     console.error("Error fetching version info:", error);
