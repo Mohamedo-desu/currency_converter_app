@@ -22,10 +22,8 @@ export const useVersion = () => {
   // Check for OTA updates on app launch
   useEffect(() => {
     const checkOtaUpdate = async () => {
-      if (
-        Platform.OS !== "web" &&
-        Constants.executionEnvironment === "storeClient"
-      ) {
+      // Check for OTA updates in both development and production
+      if (Platform.OS !== "web") {
         try {
           const update = await Updates.checkForUpdateAsync();
           if (update.isAvailable) {
