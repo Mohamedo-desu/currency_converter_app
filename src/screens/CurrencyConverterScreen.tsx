@@ -295,6 +295,7 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
     (input: string) => {
       // Check if currencies are selected
       if (!fromCurrency || !toCurrency) {
+        Keyboard.dismiss();
         showAlert(
           "Select Currencies",
           "Please select both source and target currencies before entering an amount.",
@@ -304,7 +305,7 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
             setIsModalVisible(true);
           }
         );
-        Keyboard.dismiss();
+
         return;
       }
 
