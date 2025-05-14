@@ -1,103 +1,130 @@
 import { fetchVersionInfo } from "@/services/versionService";
-import { getStoredValues, saveSecurely } from "@/store/storage";
+import { saveSecurely } from "@/store/storage";
 import * as Application from "expo-application";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
-import { useEffect, useState } from "react";
-import { Platform } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, Platform } from "react-native";
 
 export const useVersion = () => {
   const [backendVersion, setBackendVersion] = useState<string | null>(null);
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(true);
-  const [isOtaChecked, setIsOtaChecked] = useState(false);
 
   // Get local version from native or web manifest
   const nativeVersion = Application.nativeApplicationVersion;
-  const webVersion =
-    // Expo SDK ≥47
-    (Constants.manifest as any)?.version ??
-    (Constants.expoConfig as any)?.version;
+  const webVersion = (Constants.expoConfig as any)?.version;
   const localVersion = Platform.OS === "web" ? webVersion : nativeVersion;
 
-  // Check for OTA updates on app launch
+  const getMajorVersion = (version: string) => version.split(".")[0];
+
+  // Fetch backend version with retry
+  const fetchBackendVersion = useCallback(
+    async (retryCount = 0, major?: string): Promise<string> => {
+      try {
+        const versionInfo = await fetchVersionInfo(major);
+        if (versionInfo?.version) {
+          return versionInfo.version;
+        }
+        throw new Error("No version info received");
+      } catch (error) {
+        if (retryCount < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return fetchBackendVersion(retryCount + 1, major);
+        }
+        throw error;
+      }
+    },
+    []
+  );
+
+  // Check for updates and fetch version
   useEffect(() => {
-    const checkOtaUpdate = async () => {
-      // Check for OTA updates in both development and production
-      if (Platform.OS !== "web") {
-        try {
-          console.log("[DEBUG] Starting OTA check");
-          const update = await Updates.checkForUpdateAsync();
-          if (update.isAvailable) {
-            console.log("[DEBUG] OTA update available");
-            await Updates.fetchUpdateAsync();
-            // Clear cached version before reload to force fresh fetch
-            saveSecurely([{ key: "cachedVersion", value: "" }]);
-            await Updates.reloadAsync();
-            return; // App will reload, so we don't need to continue
+    let isMounted = true;
+
+    const checkUpdatesAndVersion = async () => {
+      try {
+        // Step 1: Check for OTA updates first
+        if (Platform.OS !== "web") {
+          try {
+            const update = await Updates.checkForUpdateAsync();
+            if (update.isAvailable) {
+              await Updates.fetchUpdateAsync();
+              saveSecurely([{ key: "cachedVersion", value: "" }]);
+              return await Updates.reloadAsync();
+            }
+          } catch (error) {
+            console.error("[DEBUG] OTA check error:", error);
           }
-          console.log("[DEBUG] No OTA update available");
-        } catch (error) {
-          console.error("[DEBUG] OTA check error:", error);
+        }
+
+        // Step 2: Get local version after potential OTA update
+        const localMajor = getMajorVersion(localVersion);
+        console.log("[DEBUG] Local major version:", localMajor);
+
+        // Step 3: Fetch latest backend version
+        const latestVersion = await fetchBackendVersion(0);
+        const latestMajor = getMajorVersion(latestVersion);
+        console.log("[DEBUG] Latest backend version:", latestVersion);
+
+        if (isMounted) {
+          if (localMajor === latestMajor) {
+            // Same major version - show backend version
+            setBackendVersion(latestVersion);
+            saveSecurely([{ key: "cachedVersion", value: latestVersion }]);
+            Alert.alert(
+              "Version Information",
+              `No new build available.\nLatest version: ${latestVersion}`
+            );
+          } else if (parseInt(latestMajor) > parseInt(localMajor)) {
+            // New major version available
+            Alert.alert(
+              "New Build Available",
+              `A new build (${latestVersion}) is available. Please update your app.`
+            );
+
+            // Fetch compatible version for current major
+            try {
+              const versionInfo = await fetchVersionInfo(localMajor);
+              console.log("[DEBUG] Compatible version info:", versionInfo);
+
+              if (versionInfo?.version) {
+                const compatibleVersion = versionInfo.version;
+                console.log(
+                  "[DEBUG] Setting compatible version:",
+                  compatibleVersion
+                );
+                setBackendVersion(compatibleVersion);
+                saveSecurely([
+                  { key: "cachedVersion", value: compatibleVersion },
+                ]);
+              }
+            } catch (error) {
+              console.error(
+                "[DEBUG] Error fetching compatible version:",
+                error
+              );
+            }
+          }
+        }
+      } catch (error: any) {
+        if (isMounted) {
+          setBackendVersion(localVersion);
+          saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+          Alert.alert("Error", error.message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingUpdates(false);
         }
       }
-      console.log("[DEBUG] Setting OTA check complete");
-      setIsOtaChecked(true);
     };
 
-    checkOtaUpdate();
-  }, []); // Run only on mount
+    checkUpdatesAndVersion();
 
-  // Fetch backend version
-  const fetchLatestVersion = async () => {
-    try {
-      console.log("[DEBUG] Fetching latest version from backend");
-      const versionInfo = await fetchVersionInfo();
-      console.log("[DEBUG] Backend version response:", versionInfo);
-
-      if (versionInfo) {
-        console.log("[DEBUG] Setting backend version:", versionInfo.version);
-        setBackendVersion(versionInfo.version);
-        saveSecurely([{ key: "cachedVersion", value: versionInfo.version }]);
-      } else {
-        console.log(
-          "[DEBUG] No version info, using local version:",
-          localVersion
-        );
-        setBackendVersion(localVersion);
-        saveSecurely([{ key: "cachedVersion", value: localVersion }]);
-      }
-    } catch (error) {
-      console.error("[DEBUG] Version fetch error:", error);
-      setBackendVersion(localVersion);
-      saveSecurely([{ key: "cachedVersion", value: localVersion }]);
-    } finally {
-      setIsCheckingUpdates(false);
-    }
-  };
-
-  // Load cached version and fetch latest on mount
-  useEffect(() => {
-    const initializeVersion = async () => {
-      console.log("[DEBUG] Initializing version");
-      const stored = getStoredValues(["cachedVersion"]);
-      console.log("[DEBUG] Cached version:", stored.cachedVersion);
-
-      if (stored.cachedVersion) {
-        setBackendVersion(stored.cachedVersion);
-      }
-      // Always fetch latest version from backend
-      await fetchLatestVersion();
+    return () => {
+      isMounted = false;
     };
-    initializeVersion();
-  }, []);
-
-  // Fetch backend version after OTA check
-  useEffect(() => {
-    console.log("[DEBUG] OTA check status changed:", isOtaChecked);
-    if (isOtaChecked) {
-      fetchLatestVersion();
-    }
-  }, [isOtaChecked]);
+  }, [localVersion, fetchBackendVersion]);
 
   return {
     backendVersion,

@@ -90,6 +90,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           android: {
             enableProguardInReleaseBuilds: true,
+            usesCleartextTraffic: true,
           },
         },
       ],

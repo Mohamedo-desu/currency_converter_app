@@ -5,17 +5,25 @@ const AppVersion = require("../models/AppVersion");
 // Get latest version
 router.get("/latest", async (req, res) => {
   try {
-    const latestVersion = await AppVersion.findOne({ isActive: true }).sort({
-      createdAt: -1,
-    });
+    const { major } = req.query;
+    let query = {};
+
+    // If major version is specified, filter by major version
+    if (major) {
+      // Use a more precise query to match the major version
+      const majorPattern = new RegExp(`^${major}\\.`);
+      query.version = { $regex: majorPattern };
+    }
+
+    const latestVersion = await AppVersion.findOne(query)
+      .sort({ createdAt: -1 })
+      .limit(1);
 
     if (!latestVersion) {
-      // Return a more informative response when no version is found
       return res.status(404).json({
-        message: "No active version found",
+        message: "No version found",
         error: "NO_VERSION",
-        details:
-          "The version database is empty or no version is marked as active",
+        details: "No version found for the specified criteria",
       });
     }
 
@@ -47,20 +55,15 @@ router.post("/", async (req, res) => {
       // Update existing version
       existingVersion.type = type;
       existingVersion.releaseNotes = releaseNotes;
-      existingVersion.isActive = true;
       await existingVersion.save();
       return res.json(existingVersion);
     }
-
-    // Deactivate all previous versions
-    await AppVersion.updateMany({}, { isActive: false });
 
     // Create new version
     const newVersion = new AppVersion({
       version,
       type,
       releaseNotes,
-      isActive: true,
     });
 
     await newVersion.save();
@@ -86,26 +89,12 @@ router.delete("/:version", async (req, res) => {
         .json({ message: "Invalid version format. Use x.y.z format" });
     }
 
-    // Find the version to delete
-    const versionToDelete = await AppVersion.findOne({ version });
-    if (!versionToDelete) {
+    // Find and delete the version
+    const result = await AppVersion.deleteOne({ version });
+    if (result.deletedCount === 0) {
       return res.status(404).json({ message: "Version not found" });
     }
 
-    // If this was the active version, reactivate the previous version
-    if (versionToDelete.isActive) {
-      const previousVersion = await AppVersion.findOne({ isActive: false })
-        .sort({ createdAt: -1 })
-        .limit(1);
-
-      if (previousVersion) {
-        previousVersion.isActive = true;
-        await previousVersion.save();
-      }
-    }
-
-    // Delete the version
-    await AppVersion.deleteOne({ version });
     res.json({ message: "Version deleted successfully" });
   } catch (error) {
     console.error("Error deleting version:", error);

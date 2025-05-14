@@ -3,23 +3,30 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 interface VersionInfo {
+  _id: string;
   version: string;
   type: "major" | "minor" | "patch";
   releaseNotes?: string;
+  createdAt: string;
+  buildUrl?: string;
 }
 
 const getNativeVersion = (): string => {
   const nativeVersion = Application.nativeApplicationVersion;
-  const webVersion =
-    Constants.manifest?.version ?? Constants.expoConfig?.version;
+  const webVersion = (Constants.expoConfig as any)?.version;
   return Platform.OS === "web" ? webVersion : nativeVersion;
 };
 
-export const fetchVersionInfo = async (): Promise<VersionInfo | null> => {
+export const fetchVersionInfo = async (
+  major?: string
+): Promise<VersionInfo | null> => {
   const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 
   try {
-    const url = `${backendUrl}/api/version/latest`;
+    const url = `${backendUrl}/api/version/latest${
+      major ? `?major=${major}` : ""
+    }`;
+    console.log("[DEBUG] Fetching version from URL:", url);
 
     const response = await fetch(url);
 
@@ -28,31 +35,14 @@ export const fetchVersionInfo = async (): Promise<VersionInfo | null> => {
         console.log("No version found in backend, using local version");
         return null;
       }
-      console.error("Response not OK:", response.status, response.statusText);
-      throw new Error(
-        `Failed to fetch version info: ${response.status} ${response.statusText}`
-      );
+      throw new Error(`Failed to fetch version info: ${response.status}`);
     }
 
     const data = await response.json();
-
-    // If it's a major update, check if it matches native version
-    if (data.type === "major") {
-      const nativeVersion = getNativeVersion();
-
-      // Only return major update if versions match
-      if (data.version === nativeVersion) {
-        return data;
-      }
-      console.log("Major version mismatch, using local version");
-      return null;
-    }
-
-    // For minor and patch updates, always return the data
+    console.log("[DEBUG] Received version data:", data);
     return data;
   } catch (error) {
     console.error("Error fetching version info:", error);
-    // Return null instead of throwing to allow fallback to local version
     return null;
   }
 };

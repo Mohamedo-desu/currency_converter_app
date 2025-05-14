@@ -41,4 +41,3 @@ ios
 .env.sentry-build-plugin
 
 assets/screenshots/ 
-backend
