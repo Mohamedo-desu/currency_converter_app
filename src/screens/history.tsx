@@ -17,6 +17,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   FlatList,
   Platform,
   TouchableOpacity,
@@ -48,6 +49,20 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
   const [history, setHistory] = useState<ConversionHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCleanupMessage, setShowCleanupMessage] = useState(false);
+
+  // Add back button handler
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigate("Settings");
+        return true; // Prevent default behavior (exit app)
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => backHandler.remove();
+  }, [navigate]);
 
   /**
    * Removes conversion records older than 3 days

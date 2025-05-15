@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   Platform,
   TextInput,
   TouchableOpacity,
@@ -46,7 +47,21 @@ const labelColors = {
 const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
   const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
-  const { currentVersion, isCheckingUpdates } = useVersion();
+  const { currentVersion } = useVersion();
+
+  // Add back button handler
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigate("Converter");
+        return true; // Prevent default behavior (exit app)
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => backHandler.remove();
+  }, [navigate]);
 
   // State to hold report type, user details, and the report text
   const [selectedType, setSelectedType] = useState<FeedbackType>(

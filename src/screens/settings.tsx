@@ -5,13 +5,27 @@ import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/screens/SettingsScreen.styles";
 import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import React, { useEffect } from "react";
+import { BackHandler, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
   const { colors } = useTheme();
   const { top } = useSafeAreaInsets();
+
+  // Add back button handler
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigate("Converter");
+        return true; // Prevent default behavior (exit app)
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => backHandler.remove();
+  }, [navigate]);
 
   const renderSettingOption = (
     icon: keyof typeof Ionicons.glyphMap,

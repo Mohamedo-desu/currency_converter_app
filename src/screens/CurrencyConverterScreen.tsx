@@ -16,8 +16,10 @@ import React, {
 } from "react";
 import {
   Alert,
+  BackHandler,
   Keyboard,
   Platform,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -52,6 +54,7 @@ const DEBOUNCE_DELAY = 500;
 const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
   const { colors, toggleTheme } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
+  const [lastBackPress, setLastBackPress] = useState(0);
 
   // State management for currencies and conversion
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -341,6 +344,30 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
     },
     [fromCurrency, toCurrency]
   );
+
+  // Add back button handler
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        const currentTime = new Date().getTime();
+        if (currentTime - lastBackPress < 2000) {
+          // If pressed within 2 seconds, exit the app
+          BackHandler.exitApp();
+          return true;
+        }
+        // Show toast message and update last press time
+        if (Platform.OS === "android") {
+          ToastAndroid.show("Press back again to exit", ToastAndroid.SHORT);
+        }
+        setLastBackPress(currentTime);
+        return true; // Prevent default behavior
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => backHandler.remove();
+  }, [lastBackPress]);
 
   return (
     <KeyboardAwareScrollView
