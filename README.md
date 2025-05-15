@@ -39,11 +39,10 @@ A modern currency converter application built with React Native, featuring real-
 
 ## Screenshots
 
-| Main Interface                                            | Currency Selection & States                                         | History & Help                             |
-| --------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------ |
-| ![Initial](assets/screenshots/init.png)                   | ![Modal](assets/screenshots/modal.png)                              | ![History](assets/screenshots/history.png) |
-| ![No Currency](assets/screenshots/nocurrencyselected.png) | ![No Currency Dark](assets/screenshots/nocurrencyselectedwhite.png) | ![Help](assets/screenshots/help.png)       |
-| ![No History](assets/screenshots/nohistory.png)           | ![Help Submitted](assets/screenshots/helpsubmitted.png)             |                                            |
+|                                               |                                                    |                                           |
+| --------------------------------------------- | -------------------------------------------------- | ----------------------------------------- |
+| ![Initial](assets/screenshots/image1.png)     | ![Modal](assets/screenshots/image2.png)            | ![History](assets/screenshots/image3.png) |
+| ![No Currency](assets/screenshots/image4.png) | ![No Currency Dark](assets/screenshots/image5.png) |                                           |
 
 ## Tech Stack
 
