@@ -39,9 +39,8 @@ interface ConversionHistory {
   timestamp: number;
 }
 
-// Time constant for history retention (3 days in milliseconds)
-const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-const FLAG_SIZE = 20;
+// Time constant for history retention (30 days in milliseconds)
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
 const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
   const { colors } = useTheme();
@@ -50,23 +49,20 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCleanupMessage, setShowCleanupMessage] = useState(false);
 
-  // Add back button handler
+  // Handle Android back press to navigate back
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
         navigate("Settings");
-        return true; // Prevent default behavior (exit app)
+        return true;
       }
     );
-
-    // Cleanup listener on unmount
     return () => backHandler.remove();
   }, [navigate]);
 
   /**
-   * Removes conversion records older than 3 days
-   * @param showMessage - Whether to display a success message after cleanup
+   * Removes conversion records older than 30 days
    */
   const cleanupOldHistory = async (showMessage = true) => {
     setIsLoading(true);
@@ -77,13 +73,10 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
           storedHistory.conversionHistory
         );
         const now = Date.now();
-
-        // Filter out entries older than 3 days
         const recentHistory = parsedHistory.filter(
-          (item) => now - item.timestamp <= THREE_DAYS_MS
+          ({ timestamp }) => now - timestamp <= THIRTY_DAYS_MS
         );
 
-        // Update storage if any entries were removed
         if (recentHistory.length !== parsedHistory.length) {
           if (recentHistory.length === 0) {
             deleteStoredValues(["conversionHistory"]);
@@ -95,13 +88,11 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
               },
             ]);
           }
-
           if (showMessage) {
             setShowCleanupMessage(true);
             setTimeout(() => setShowCleanupMessage(false), 3000);
           }
         }
-
         setHistory(recentHistory);
       }
     } catch (error) {
@@ -112,13 +103,8 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
     }
   };
 
-  /**
-   * Handles the clear history action with confirmation dialog
-   */
-
   const showError = (title: string, message: string) => {
     if (Platform.OS === "web") {
-      // browser alert only shows the message
       window.alert(`${title}: ${message}`);
     } else {
       Alert.alert(title, message);
@@ -142,10 +128,9 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
 
   const handleClearHistory = async () => {
     if (Platform.OS === "web") {
-      const confirmed = window.confirm(
-        "Are you sure you want to clear all conversion history?"
-      );
-      if (confirmed) {
+      if (
+        window.confirm("Are you sure you want to clear all conversion history?")
+      ) {
         await doClear();
       }
     } else {
@@ -153,35 +138,22 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
         "Clear History",
         "Are you sure you want to clear all conversion history?",
         [
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: doClear,
-          },
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
+          { text: "Delete", style: "destructive", onPress: doClear },
+          { text: "Cancel", style: "cancel" },
         ]
       );
     }
   };
 
-  // Initialize history on component mount
+  // Load on mount
   useEffect(() => {
     cleanupOldHistory(false);
   }, []);
 
-  /**
-   * Formats timestamp to local date string
-   */
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
   };
 
-  /**
-   * Renders a single history item with currency flags and conversion details
-   */
   const renderHistoryItem = useCallback(
     ({ item }: { item: ConversionHistory }) => (
       <View style={[styles.historyItem, { backgroundColor: colors.card }]}>
@@ -232,19 +204,21 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
             fontWeight="medium"
             style={{ color: colors.gray[400] }}
           >
-            {item.amount} {getCurrencySymbol(item.fromCurrency)}
+            {getCurrencySymbol(item.fromCurrency)}
+            {item.amount}
           </CustomText>
           <CustomText
             variant="h5"
             fontWeight="bold"
             style={{ color: Colors.primary }}
           >
-            {item.convertedAmount} {getCurrencySymbol(item.toCurrency)}
+            {getCurrencySymbol(item.toCurrency)}
+            {item.convertedAmount}
           </CustomText>
         </View>
       </View>
     ),
-    [colors, formatDate]
+    [colors]
   );
 
   return (
@@ -254,7 +228,6 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
         { backgroundColor: colors.background, paddingBottom: bottom + 10 },
       ]}
     >
-      {/* Navigation header with back button and clear history option */}
       <View style={[styles.header, { paddingTop: top + 10 }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity
@@ -290,8 +263,6 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
           )}
         </View>
       </View>
-
-      {/* Success message for history cleanup */}
       {showCleanupMessage && (
         <View style={[styles.cleanupMessage, { backgroundColor: colors.card }]}>
           <Ionicons
@@ -308,13 +279,13 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
           </CustomText>
         </View>
       )}
-
-      {/* Main content area with loading state, empty state, or history list */}
       <View style={styles.content}>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-          </View>
+          <ActivityIndicator
+            size="large"
+            color={Colors.primary}
+            style={styles.loadingContainer}
+          />
         ) : history.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons
@@ -338,9 +309,9 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
           <FlatList
             data={history}
             renderItem={renderHistoryItem}
+            keyExtractor={(item) => item.timestamp.toString()}
             contentContainerStyle={styles.historyList}
             showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item.timestamp.toString()}
             removeClippedSubviews
           />
         )}

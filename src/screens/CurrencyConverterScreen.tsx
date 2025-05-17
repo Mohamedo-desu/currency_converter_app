@@ -256,7 +256,7 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
   const convertedDisplay = useMemo(
     () =>
       convertedAmount
-        ? `${convertedAmount} ${toCurrency?.symbol || toCurrency?.code}`
+        ? `${toCurrency?.symbol || toCurrency?.code} ${convertedAmount}`
         : "",
     [convertedAmount, toCurrency]
   );
@@ -270,11 +270,9 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
       const toRate = exchangeRates[toCurrency.code];
       if (fromRate && toRate) {
         const conversionRate = toRate / fromRate;
-        return `1 ${
-          fromCurrency.symbol || fromCurrency.code
-        } = ${conversionRate.toFixed(3)} ${
+        return `${fromCurrency.symbol || fromCurrency.code} 1 =  ${
           toCurrency.symbol || toCurrency.code
-        }`;
+        } ${conversionRate.toFixed(3)}`;
       }
     }
     return "";

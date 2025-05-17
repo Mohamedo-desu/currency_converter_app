@@ -251,7 +251,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   JMD: "$", // Jamaican Dollar
   JOD: "د.ا", // Jordanian Dinar
   JPY: "¥", // Japanese Yen
-  KES: "KSh", // Kenyan Shilling
+  KES: "Ksh", // Kenyan Shilling
   KGS: "с", // Kyrgyzstani Som
   KHR: "៛", // Cambodian Riel
   KID: "$", // Kiribati Dollar
@@ -324,7 +324,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   TWD: "NT$", // New Taiwan Dollar
   TZS: "TSh", // Tanzanian Shilling
   UAH: "₴", // Ukrainian Hryvnia
-  UGX: "USh", // Ugandan Shilling
+  UGX: "Ush", // Ugandan Shilling
   USD: "$", // United States Dollar
   UYU: "$", // Uruguayan Peso
   UZS: "so'm", // Uzbekistani So'm
