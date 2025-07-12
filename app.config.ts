@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "1.0.0",
+    version: "2.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     newArchEnabled: true,
@@ -94,6 +94,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
+      "expo-background-task",
       "./plugins/scrollbar-color.js",
       "./plugins/customize.js",
     ],

@@ -144,7 +144,7 @@ export const useVersion = () => {
         if (isMounted) {
           setBackendVersion(localVersion);
           saveSecurely([{ key: "cachedVersion", value: localVersion }]);
-          Alert.alert("Error", error.message);
+          // Alert.alert("Error", error.message);
         }
       } finally {
         if (isMounted) {
