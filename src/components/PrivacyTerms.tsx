@@ -2,15 +2,13 @@ import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
 import { useVersion } from "@/hooks/useVersion";
 import { styles } from "@/styles/components/PrivacyTerms.styles";
+import { router } from "expo-router";
 import React from "react";
 import { Linking, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomText from "./CustomText";
 
-type Screen = "Converter" | "Settings" | "History" | "Help";
-type Navigate = (screen: Screen) => void;
-
-const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
+const PrivacyTerms = () => {
   const { colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
 
@@ -28,7 +26,10 @@ const PrivacyTerms = ({ navigate }: { navigate: Navigate }) => {
     <View style={[styles.footer, { bottom: bottom + 5 }]}>
       {/* Help Link */}
       <View style={styles.helpLinkContainer}>
-        <TouchableOpacity onPress={() => navigate("Help")} activeOpacity={0.8}>
+        <TouchableOpacity
+          onPress={() => router.navigate("/help")}
+          activeOpacity={0.8}
+        >
           <CustomText
             variant="h6"
             fontWeight="medium"

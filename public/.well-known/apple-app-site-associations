@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appID": "XQAX5LF48P.com.mohamedodesu.RenMarRentals",
+        "paths": [
+          "/properties/*",
+          "/(main)/(tabs)/*"
+        ]
+      }
+    ]
+  }
+}

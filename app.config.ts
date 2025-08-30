@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "2.0.0",
+    version: "3.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     newArchEnabled: true,
@@ -46,6 +46,20 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       package: packageName,
       softwareKeyboardLayoutMode: "pan",
       edgeToEdgeEnabled: true,
+      intentFilters: [
+        {
+          action: "VIEW",
+          autoVerify: true,
+          data: [
+            {
+              scheme: "https",
+              host: `${PROJECT_SLUG}.expo.app`,
+              pathPrefix: "/",
+            },
+          ],
+          category: ["BROWSABLE", "DEFAULT"],
+        },
+      ],
     },
     updates: {
       url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
@@ -60,6 +74,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     web: {
       bundler: "metro",
+      output: "server",
       favicon: "./assets/images/ios-prod.png",
     },
     plugins: [
@@ -94,7 +109,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
+      "expo-router",
       "expo-background-task",
+      "expo-font",
       "./plugins/scrollbar-color.js",
       "./plugins/customize.js",
     ],
@@ -123,11 +140,11 @@ export const getDynamicAppConfig = (
   if (environment === "preview") {
     return {
       name: `${APP_NAME}`,
-      bundleIdentifier: `${BUNDLE_IDENTIFIER}.preview`,
-      packageName: `${PACKAGE_NAME}.preview`,
+      bundleIdentifier: `${BUNDLE_IDENTIFIER}`,
+      packageName: `${PACKAGE_NAME}`,
       icon: ICON,
       adaptiveIcon: ADAPTIVE_ICON,
-      scheme: `${SCHEME}-prev`,
+      scheme: `${SCHEME}`,
     };
   }
 

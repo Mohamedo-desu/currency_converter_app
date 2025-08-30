@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mohamedodesu.convertly",
+      "sha256_cert_fingerprints": [
+        "46:4F:F3:0A:2C:FF:C5:FB:E8:3E:47:78:FD:27:5B:47:36:8F:2D:05:22:7B:50:97:45:5A:53:57:95:B5:AF:9F"
+      ]
+    }
+  }
+]

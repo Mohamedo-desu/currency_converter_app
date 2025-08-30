@@ -9,6 +9,7 @@ import { Alert, Linking, Platform } from "react-native";
 export const useVersion = () => {
   const [backendVersion, setBackendVersion] = useState<string | null>(null);
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(true);
+  const [isLoadingFromCache, setIsLoadingFromCache] = useState(true);
 
   // Get local version from native or web manifest
   const nativeVersion = Application.nativeApplicationVersion;
@@ -38,33 +39,45 @@ export const useVersion = () => {
     []
   );
 
-  // Load cached version immediately
+  // Load cached version immediately on app start
   useEffect(() => {
     const loadCachedVersion = async () => {
       try {
         const { cachedVersion } = await getStoredValues(["cachedVersion"]);
         if (cachedVersion) {
+          console.log("[DEBUG] Loading cached version:", cachedVersion);
           setBackendVersion(cachedVersion);
+        } else {
+          console.log("[DEBUG] No cached version found - first time load");
         }
       } catch (error) {
         console.error("[DEBUG] Error loading cached version:", error);
+      } finally {
+        setIsLoadingFromCache(false);
       }
     };
     loadCachedVersion();
   }, []);
 
-  // Check for updates and fetch version
+  // Fetch fresh version data from backend after loading cached version
   useEffect(() => {
     let isMounted = true;
 
-    const checkUpdatesAndVersion = async () => {
+    const fetchFreshVersion = async () => {
+      // Only start fetching after cache is loaded
+      if (isLoadingFromCache) return;
+
       try {
-        // Step 1: Check for OTA updates first
+        console.log("[DEBUG] Fetching fresh version from backend...");
+
+        // Step 1: Check for OTA updates first (for non-web platforms)
         if (Platform.OS !== "web") {
           try {
             const update = await Updates.checkForUpdateAsync();
             if (update.isAvailable) {
+              console.log("[DEBUG] OTA update available, downloading...");
               await Updates.fetchUpdateAsync();
+              // Clear cache since we're about to reload with new version
               saveSecurely([{ key: "cachedVersion", value: "" }]);
               return await Updates.reloadAsync();
             }
@@ -82,11 +95,16 @@ export const useVersion = () => {
 
         if (isMounted) {
           if (localMajor === latestMajor) {
-            // Same major version - show backend version
+            // Same major version - update with backend version and cache it
+            console.log(
+              "[DEBUG] Same major version, updating to:",
+              latestVersion
+            );
             setBackendVersion(latestVersion);
             saveSecurely([{ key: "cachedVersion", value: latestVersion }]);
           } else if (parseInt(latestMajor) > parseInt(localMajor)) {
             // New major version available
+            console.log("[DEBUG] New major version available:", latestVersion);
             const versionInfo = await fetchVersionInfo();
 
             if (
@@ -127,6 +145,10 @@ export const useVersion = () => {
 
               if (versionInfo?.version) {
                 const compatibleVersion = versionInfo.version;
+                console.log(
+                  "[DEBUG] Using compatible version:",
+                  compatibleVersion
+                );
                 setBackendVersion(compatibleVersion);
                 saveSecurely([
                   { key: "cachedVersion", value: compatibleVersion },
@@ -141,10 +163,16 @@ export const useVersion = () => {
           }
         }
       } catch (error: any) {
+        console.error("[DEBUG] Error fetching fresh version:", error);
         if (isMounted) {
-          setBackendVersion(localVersion);
-          saveSecurely([{ key: "cachedVersion", value: localVersion }]);
-          // Alert.alert("Error", error.message);
+          // If we already have a cached version, keep it; otherwise use local version
+          if (!backendVersion) {
+            console.log(
+              "[DEBUG] No cached version, falling back to local version"
+            );
+            setBackendVersion(localVersion);
+            saveSecurely([{ key: "cachedVersion", value: localVersion }]);
+          }
         }
       } finally {
         if (isMounted) {
@@ -153,17 +181,18 @@ export const useVersion = () => {
       }
     };
 
-    checkUpdatesAndVersion();
+    fetchFreshVersion();
 
     return () => {
       isMounted = false;
     };
-  }, [localVersion, fetchBackendVersion]);
+  }, [localVersion, fetchBackendVersion, isLoadingFromCache, backendVersion]);
 
   return {
     backendVersion,
     localVersion,
     isCheckingUpdates,
+    isLoadingFromCache,
     currentVersion: backendVersion || localVersion,
   };
 };

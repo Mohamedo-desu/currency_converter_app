@@ -7,6 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -19,6 +20,7 @@ import {
   BackHandler,
   Keyboard,
   Platform,
+  Share,
   ToastAndroid,
   TouchableOpacity,
   View,
@@ -34,7 +36,6 @@ import {
   registerBackgroundTask,
 } from "@/services/currencyService";
 import { styles } from "@/styles/screens/CurrencyConverterScreen.styles";
-import { Navigate } from "@/types/AuthHeader.types";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 /**
@@ -51,7 +52,7 @@ const formatNumber = (num: number): string =>
 // Debounce delay for conversion calculations (ms)
 const DEBOUNCE_DELAY = 500;
 
-const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
+const CurrencyConverterScreen = () => {
   const { colors, toggleTheme } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
   const [lastBackPress, setLastBackPress] = useState(0);
@@ -343,6 +344,25 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
     [fromCurrency, toCurrency]
   );
 
+  const handleShare = () => {
+    const url = "https://convertly.expo.app";
+
+    const message = `Check out this awesome Currency Converter app! Convert between any currencies with ease. Download it now! ${`https://drive.google.com/file/d/1rkbXYGlzObBMXSel2SZ1T_038cSZzmY9/view?usp=drive_link`}`;
+
+    if (Platform.OS === "web") {
+      navigator.share({
+        title: "Currency Converter",
+        text: message,
+        url: window.location.href,
+      });
+    } else {
+      Share.share({
+        message,
+        title: "Currency Converter",
+        url,
+      });
+    }
+  };
   // Add back button handler
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -391,17 +411,30 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
             color={Colors.primary}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigate("Settings")}
-          activeOpacity={0.8}
-          hitSlop={10}
-        >
-          <Ionicons
-            name="settings-outline"
-            size={Spacing.iconSize}
-            color={Colors.primary}
-          />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity
+            onPress={handleShare}
+            activeOpacity={0.8}
+            hitSlop={10}
+          >
+            <Ionicons
+              name="share-social-outline"
+              size={Spacing.iconSize}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.navigate("/settings")}
+            activeOpacity={0.8}
+            hitSlop={10}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={Spacing.iconSize}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* App title and description */}
@@ -471,7 +504,7 @@ const CurrencyConverterScreen = ({ navigate }: { navigate: Navigate }) => {
         )}
       </View>
 
-      <PrivacyTerms navigate={navigate} />
+      <PrivacyTerms />
 
       {/* Currency selection modal */}
       <CurrenciesModal

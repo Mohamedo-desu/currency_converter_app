@@ -1,5 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 
+// These types are now unused as we're using Expo Router navigation
+// but keeping them for potential future use
+
 export type Screen = "Converter" | "Settings" | "History" | "Help";
 export type Navigate = (screen: Screen) => void;
 

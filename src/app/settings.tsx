@@ -3,13 +3,13 @@ import { Colors } from "@/constants/Colors";
 import { Spacing } from "@/constants/Spacing";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/screens/SettingsScreen.styles";
-import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect } from "react";
 import { BackHandler, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
+const SettingsScreen = () => {
   const { colors } = useTheme();
   const { top } = useSafeAreaInsets();
 
@@ -18,14 +18,14 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        navigate("Converter");
+        router.push("/");
         return true; // Prevent default behavior (exit app)
       }
     );
 
     // Cleanup listener on unmount
     return () => backHandler.remove();
-  }, [navigate]);
+  }, []);
 
   const renderSettingOption = (
     icon: keyof typeof Ionicons.glyphMap,
@@ -60,7 +60,7 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
       {/* Header */}
       <View style={[styles.header, { paddingTop: top + 10 }]}>
         <TouchableOpacity
-          onPress={() => navigate("Converter")}
+          onPress={() => router.back()}
           activeOpacity={0.8}
           hitSlop={10}
         >
@@ -82,7 +82,9 @@ const SettingsScreen = ({ navigate }: { navigate: Navigate }) => {
 
       {/* Settings Content */}
       <View style={styles.content}>
-        {renderSettingOption("time", "History", () => navigate("History"))}
+        {renderSettingOption("time", "History", () =>
+          router.navigate("/history")
+        )}
       </View>
     </View>
   );

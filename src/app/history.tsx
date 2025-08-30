@@ -10,8 +10,8 @@ import {
   saveSecurely,
 } from "@/store/storage";
 import { styles } from "@/styles/screens/HistoryScreen.styles";
-import { Navigate } from "@/types/AuthHeader.types";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -42,7 +42,7 @@ interface ConversionHistory {
 // Time constant for history retention (30 days in milliseconds)
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
-const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
+const HistoryScreen = () => {
   const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
   const [history, setHistory] = useState<ConversionHistory[]>([]);
@@ -54,12 +54,12 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        navigate("Settings");
+        router.push("/settings");
         return true;
       }
     );
     return () => backHandler.remove();
-  }, [navigate]);
+  }, []);
 
   /**
    * Removes conversion records older than 30 days
@@ -231,7 +231,7 @@ const HistoryScreen = ({ navigate }: { navigate: Navigate }) => {
       <View style={[styles.header, { paddingTop: top + 10 }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity
-            onPress={() => navigate("Settings")}
+            onPress={() => router.back()}
             activeOpacity={0.8}
             hitSlop={10}
           >

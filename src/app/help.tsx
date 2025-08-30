@@ -11,7 +11,7 @@ import {
 } from "@/services/feedbackService";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
-import { Navigate } from "@/types/AuthHeader.types";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -44,7 +44,7 @@ const labelColors = {
   },
 } as const;
 
-const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
+const HelpScreen = () => {
   const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
   const { currentVersion } = useVersion();
@@ -54,14 +54,14 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        navigate("Converter");
+        router.back();
         return true; // Prevent default behavior (exit app)
       }
     );
 
     // Cleanup listener on unmount
     return () => backHandler.remove();
-  }, [navigate]);
+  }, []);
 
   // State to hold report type, user details, and the report text
   const [selectedType, setSelectedType] = useState<FeedbackType>(
@@ -185,7 +185,6 @@ const HelpScreen = ({ navigate }: { navigate: Navigate }) => {
       <AuthHeader
         title="Help & Reports"
         description="Please let us know your feedback or any issues you are facing."
-        Navigate={navigate}
       />
 
       {/* Report Type Selection */}

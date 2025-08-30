@@ -39,4 +39,9 @@ export const styles = StyleSheet.create({
     marginTop: 0,
     gap: Spacing.sm,
   },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.lg,
+  },
 });

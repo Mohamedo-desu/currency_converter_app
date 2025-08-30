@@ -1,17 +1,16 @@
-// App.tsx
 import { ThemeProvider } from "@/context/ThemeContext";
-import RootLayout from "@/screens/RootLayout";
-import { registerRootComponent } from "expo";
+import { Stack } from "expo-router";
+import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function App() {
+const RootLayout = () => {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <RootLayout />
+        <Stack screenOptions={{ headerShown: false }} />
       </ThemeProvider>
     </SafeAreaProvider>
   );
-}
+};
 
-registerRootComponent(App);
+export default RootLayout;
