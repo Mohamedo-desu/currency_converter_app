@@ -347,7 +347,7 @@ const CurrencyConverterScreen = () => {
   const handleShare = () => {
     const url = "https://convertly.expo.app";
 
-    const message = `Check out this awesome Currency Converter app! Convert between any currencies with ease. Download it now! ${`https://drive.google.com/file/d/1rkbXYGlzObBMXSel2SZ1T_038cSZzmY9/view?usp=drive_link`}`;
+    const message = `Check out this awesome Currency Converter app! Convert between any currencies with ease. Download it now! ${`https://drive.google.com/file/d/1VZ1EGi_9EAmMQ5w4JbyME9uCApaq7PeJ/view?usp=drive_link`}`;
 
     if (Platform.OS === "web") {
       navigator.share({
