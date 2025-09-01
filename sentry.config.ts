@@ -6,8 +6,7 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
 
-const sentryConfig = {
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+export const sentryConfig = {
   enableAutoSessionTracking: true,
   attachStacktrace: true,
   attachScreenshot: true,
@@ -16,6 +15,9 @@ const sentryConfig = {
   profilesSampleRate: 1.0,
   replaysSessionSampleRate: 1.0,
   replaysOnErrorSampleRate: 1.0,
+  dsn: "https://105027801e0105036ed28d0d15cb3d72@o4507503716794368.ingest.us.sentry.io/4509944158420992",
+  sendDefaultPii: true,
+  // Configure Session Replay
   integrations: [
     Sentry.mobileReplayIntegration({
       maskAllText: false,
@@ -24,15 +26,9 @@ const sentryConfig = {
       enableExperimentalViewRenderer: true,
       enableFastViewRendering: true,
     }),
-    Sentry.spotlightIntegration(),
+
+    Sentry.feedbackIntegration(),
     navigationIntegration,
   ],
-  _experiments: {
-    profilesSampleRate: 1.0,
-    replaysSessionSampleRate: 1.0,
-    replaysOnErrorSampleRate: 1.0,
-  },
-  debug: false,
+  spotlight: __DEV__,
 };
-
-export default sentryConfig;

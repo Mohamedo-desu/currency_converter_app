@@ -46,6 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       package: packageName,
       softwareKeyboardLayoutMode: "pan",
       edgeToEdgeEnabled: true,
+      googleServicesFile: "./google-services.json",
       intentFilters: [
         {
           action: "VIEW",
@@ -109,6 +110,25 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           },
         },
       ],
+      [
+        "@sentry/react-native/expo",
+        {
+          organization: "mohamedo-apps-desu",
+          project: PROJECT_SLUG,
+          url: "https://sentry.io",
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/icons/splash-icon.png",
+          color: "#069140",
+          defaultChannel: "default",
+          sounds: ["./assets/sounds/update.wav"],
+          enableBackgroundRemoteNotifications: true,
+        },
+      ],
+
       "expo-router",
       "expo-background-task",
       "expo-font",

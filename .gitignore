@@ -39,3 +39,4 @@ app-example
 android
 ios
 .env.sentry-build-plugin
+.env.local

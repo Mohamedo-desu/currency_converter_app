@@ -138,6 +138,33 @@ jobs:
       - name: Get tag version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Send push notification for major release
+        if: needs.version-check.outputs.type == 'major'
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          BUILD_TYPE="${{ needs.version-check.outputs.type }}"
+          REPO_NAME="${{ github.repository }}"
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/$VERSION"
+
+          echo "Sending push notification for major version $VERSION"
+
+          curl -X POST "${{ secrets.BACKEND_URL }}/api/notifications/webhook/new-build" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"version\": \"$VERSION\",
+              \"buildType\": \"$BUILD_TYPE\",
+              \"ref\": \"${{ github.ref }}\",
+              \"repository\": \"$REPO_NAME\",
+              \"buildUrl\": \"$RELEASE_URL\",
+              \"title\": \"🎉 Currency Converter $VERSION is Here!\",
+              \"body\": \"A major update with exciting new features is now available! Tap to download $VERSION and discover what's new.\"
+            }" \
+            --max-time 30 \
+            --retry 3 \
+            --retry-delay 5 \
+            --fail || echo "Failed to send push notification, but continuing with release..."
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -146,6 +173,8 @@ jobs:
           body: |
             ## What's Changed
             This release includes all changes since the last version.
+
+            ${{ needs.version-check.outputs.type == 'major' && '📱 **Push notifications have been sent to all app users about this major update!**' || '' }}
 
             ## Full Changelog
             [View the complete changelog](https://github.com/Mohamedo-desu/currency-converter-app/commits/${{ steps.get_version.outputs.VERSION }})

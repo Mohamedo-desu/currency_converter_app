@@ -5,6 +5,9 @@ const cors = require("cors");
 const cron = require("node-cron");
 const feedbackRoutes = require("./routes/feedback");
 const versionRoutes = require("./routes/version");
+const pushTokenRoutes = require("./routes/pushTokens");
+const notificationRoutes = require("./routes/notifications");
+const PushToken = require("./models/PushToken");
 
 const app = express();
 
@@ -21,6 +24,8 @@ app.use(express.json());
 // Routes
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/version", versionRoutes);
+app.use("/api/push-tokens", pushTokenRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -44,6 +49,16 @@ const pingHealthEndpoint = async () => {
 cron.schedule("*/14 * * * *", () => {
   console.log("Running scheduled health check ping...");
   pingHealthEndpoint();
+});
+
+// Schedule daily cleanup of old push tokens (runs at 2 AM every day)
+cron.schedule("0 2 * * *", async () => {
+  console.log("Running scheduled push token cleanup...");
+  try {
+    await PushToken.cleanupOldTokens();
+  } catch (error) {
+    console.error("Error during scheduled push token cleanup:", error);
+  }
 });
 
 // Connect to MongoDB
