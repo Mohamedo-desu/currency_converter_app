@@ -1,6 +1,5 @@
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
-import { useVersion } from "@/hooks/useVersion";
 import { styles } from "@/styles/components/PrivacyTerms.styles";
 import { router } from "expo-router";
 import React from "react";
@@ -8,11 +7,9 @@ import { Linking, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomText from "./CustomText";
 
-const PrivacyTerms = () => {
+const PrivacyTerms = ({ currentVersion }: { currentVersion: string }) => {
   const { colors } = useTheme();
   const { bottom } = useSafeAreaInsets();
-
-  const { currentVersion } = useVersion();
 
   const openPrivacyPolicy = () => {
     const url =

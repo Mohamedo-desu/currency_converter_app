@@ -5,6 +5,7 @@ import PrivacyTerms from "@/components/PrivacyTerms";
 import SwapButton from "@/components/SwapButton";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
+import { useVersion } from "@/hooks/useVersion";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -55,6 +56,7 @@ const DEBOUNCE_DELAY = 500;
 const CurrencyConverterScreen = () => {
   const { colors, toggleTheme } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
+  const { getCachedDownloadUrl, currentVersion } = useVersion();
   const [lastBackPress, setLastBackPress] = useState(0);
 
   // State management for currencies and conversion
@@ -344,23 +346,74 @@ const CurrencyConverterScreen = () => {
     [fromCurrency, toCurrency]
   );
 
-  const handleShare = () => {
-    const url = "https://convertly.expo.app";
+  const handleShare = async () => {
+    // Check if there's a conversion to share
+    const hasConversion =
+      amount && convertedAmount && fromCurrency && toCurrency;
 
-    const message = `Check out this awesome Currency Converter app! Convert between any currencies with ease. Download it now! ${`https://drive.google.com/file/d/1VZ1EGi_9EAmMQ5w4JbyME9uCApaq7PeJ/view?usp=drive_link`}`;
+    const webUrl = "https://convertly.expo.app";
+    // Get cached download URL or use fallback
+    const downloadUrl =
+      (await getCachedDownloadUrl()) ||
+      "https://drive.google.com/file/d/1VZ1EGi_9EAmMQ5w4JbyME9uCApaq7PeJ/view?usp=drive_link";
 
-    if (Platform.OS === "web") {
-      navigator.share({
-        title: "Currency Converter",
-        text: message,
-        url: window.location.href,
+    if (hasConversion) {
+      // Share conversion
+      const exchangeRate =
+        exchangeRates[toCurrency.code] / exchangeRates[fromCurrency.code];
+      const formattedRate = exchangeRate.toLocaleString("en-US", {
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4,
       });
+
+      const message = `💱 Currency Conversion\n\n${amount} ${fromCurrency.code} = ${convertedAmount} ${toCurrency.code}\n\nExchange Rate: 1 ${fromCurrency.code} = ${formattedRate} ${toCurrency.code}\n\nCalculated with Currency Converter app\n🌐 Try online: ${webUrl}\n📲 Download: ${downloadUrl}`;
+
+      if (Platform.OS === "web") {
+        navigator
+          .share({
+            title: "Currency Conversion Result",
+            text: message,
+          })
+          .catch(() => {
+            // Fallback for browsers that don't support navigator.share
+            navigator.clipboard
+              .writeText(message)
+              .then(() => {
+                Alert.alert(
+                  "Copied!",
+                  "Conversion details copied to clipboard."
+                );
+              })
+              .catch(() => {
+                Alert.alert("Share", message);
+              });
+          });
+      } else {
+        Share.share({
+          message,
+          title: "Currency Conversion Result",
+          url: webUrl, // Use deep link for mobile sharing
+        }).catch((error) => {
+          console.error("Error sharing conversion:", error);
+        });
+      }
     } else {
-      Share.share({
-        message,
-        title: "Currency Converter",
-        url,
-      });
+      // Share app
+      const message = `Check out this awesome Currency Converter app! Convert between any currencies with ease.\n🌐 Try online: ${webUrl}\n📲 Download: ${downloadUrl}`;
+
+      if (Platform.OS === "web") {
+        navigator.share({
+          title: "Currency Converter",
+          text: message,
+          url: webUrl,
+        });
+      } else {
+        Share.share({
+          message,
+          title: "Currency Converter",
+          url: webUrl, // Use deep link for mobile sharing
+        });
+      }
     }
   };
   // Add back button handler
@@ -424,7 +477,7 @@ const CurrencyConverterScreen = () => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => router.navigate("/settings")}
+            onPress={() => router.push("/settings")}
             activeOpacity={0.8}
             hitSlop={10}
           >
@@ -504,7 +557,7 @@ const CurrencyConverterScreen = () => {
         )}
       </View>
 
-      <PrivacyTerms />
+      <PrivacyTerms currentVersion={currentVersion} />
 
       {/* Currency selection modal */}
       <CurrenciesModal

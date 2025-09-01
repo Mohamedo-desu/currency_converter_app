@@ -7,7 +7,27 @@ const RootLayout = () => {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen
+            name="settings"
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="history"
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="help"
+            options={{
+              animation: "slide_from_bottom",
+            }}
+          />
+        </Stack>
       </ThemeProvider>
     </SafeAreaProvider>
   );

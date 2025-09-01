@@ -18,6 +18,37 @@ export const useVersion = () => {
 
   const getMajorVersion = (version: string) => version.split(".")[0];
 
+  // Helper function to get cached download URL
+  const getCachedDownloadUrl = useCallback(async (): Promise<string | null> => {
+    try {
+      const { cachedDownloadUrl } = await getStoredValues([
+        "cachedDownloadUrl",
+      ]);
+      return cachedDownloadUrl || null;
+    } catch (error) {
+      console.error("[DEBUG] Error getting cached download URL:", error);
+      return null;
+    }
+  }, []);
+
+  // Helper function to update download URL only if it changes
+  const updateDownloadUrlIfChanged = useCallback(
+    async (newUrl: string) => {
+      try {
+        const currentCachedUrl = await getCachedDownloadUrl();
+        if (currentCachedUrl !== newUrl) {
+          console.log("[DEBUG] Download URL changed, updating cache:", newUrl);
+          saveSecurely([{ key: "cachedDownloadUrl", value: newUrl }]);
+        } else {
+          console.log("[DEBUG] Download URL unchanged, skipping cache update");
+        }
+      } catch (error) {
+        console.error("[DEBUG] Error updating download URL:", error);
+      }
+    },
+    [getCachedDownloadUrl]
+  );
+
   // Fetch backend version with retry
   const fetchBackendVersion = useCallback(
     async (retryCount = 0, major?: string): Promise<string> => {
@@ -102,6 +133,19 @@ export const useVersion = () => {
             );
             setBackendVersion(latestVersion);
             saveSecurely([{ key: "cachedVersion", value: latestVersion }]);
+
+            // Fetch version info to get download URL for current major version
+            try {
+              const versionInfo = await fetchVersionInfo(localMajor);
+              if (versionInfo?.downloadUrl) {
+                await updateDownloadUrlIfChanged(versionInfo.downloadUrl);
+              }
+            } catch (error) {
+              console.error(
+                "[DEBUG] Error fetching version info for download URL:",
+                error
+              );
+            }
           } else if (parseInt(latestMajor) > parseInt(localMajor)) {
             // New major version available
             console.log("[DEBUG] New major version available:", latestVersion);
@@ -115,8 +159,8 @@ export const useVersion = () => {
               versionInfo.downloadUrl.trim() !== ""
             ) {
               Alert.alert(
-                "New Build Available",
-                `A new build (${latestVersion}) is available. Would you like to download it now?`,
+                "App Update Required",
+                `A new version (${latestVersion}) is required. Please download and install the latest version to continue using the app.`,
                 [
                   {
                     text: "Download Now",
@@ -131,11 +175,8 @@ export const useVersion = () => {
                       }
                     },
                   },
-                  {
-                    text: "Later",
-                    style: "cancel",
-                  },
-                ]
+                ],
+                { cancelable: false }
               );
             }
 
@@ -153,6 +194,11 @@ export const useVersion = () => {
                 saveSecurely([
                   { key: "cachedVersion", value: compatibleVersion },
                 ]);
+
+                // Cache download URL for the compatible version
+                if (versionInfo.downloadUrl) {
+                  await updateDownloadUrlIfChanged(versionInfo.downloadUrl);
+                }
               }
             } catch (error) {
               console.error(
@@ -186,7 +232,7 @@ export const useVersion = () => {
     return () => {
       isMounted = false;
     };
-  }, [localVersion, fetchBackendVersion, isLoadingFromCache, backendVersion]);
+  }, [localVersion, fetchBackendVersion, isLoadingFromCache]);
 
   return {
     backendVersion,
@@ -194,5 +240,6 @@ export const useVersion = () => {
     isCheckingUpdates,
     isLoadingFromCache,
     currentVersion: backendVersion || localVersion,
+    getCachedDownloadUrl,
   };
 };
