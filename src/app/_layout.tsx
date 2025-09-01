@@ -17,15 +17,16 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
 
+// Initialize Sentry
 Sentry.init(sentryConfig);
+
+// Handle OTA update metadata (for tracking builds/updates)
 handleExpoUpdateMetadata();
 
-export const unstable_settings = {
-  initialRouteName: "index",
-};
-
+// Initialize analytics
 vexo(process.env.EXPO_PUBLIC_VEXO_API_KEY);
 
+// Configure foreground notification handler
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
@@ -35,16 +36,36 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const RootLayout = () => {
-  const ref = useNavigationContainerRef();
+export const unstable_settings = {
+  initialRouteName: "index",
+};
 
+const RootLayout = () => {
+  const navigationRef = useNavigationContainerRef();
+
+  // Set up push notification registration (permissions, token, listeners, etc.)
   useSetupForPushNotifications();
 
+  // Register custom Android channel (with sound, vibration, lights, etc.)
   useEffect(() => {
-    if (ref?.current) {
-      navigationIntegration.registerNavigationContainer(ref);
+    Notifications.setNotificationChannelAsync("currency-converter-updates", {
+      name: "Currency Converter Updates",
+      description: "Notifications for app updates and important announcements",
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: "update.wav",
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#069140",
+      enableLights: true,
+      enableVibrate: true,
+    });
+  }, []);
+
+  // Hook Sentry into navigation container
+  useEffect(() => {
+    if (navigationRef?.current) {
+      navigationIntegration.registerNavigationContainer(navigationRef);
     }
-  }, [ref]);
+  }, [navigationRef]);
 
   return (
     <SafeAreaProvider>
@@ -53,21 +74,15 @@ const RootLayout = () => {
           <Stack.Screen name="index" />
           <Stack.Screen
             name="settings"
-            options={{
-              animation: "slide_from_right",
-            }}
+            options={{ animation: "slide_from_right" }}
           />
           <Stack.Screen
             name="history"
-            options={{
-              animation: "slide_from_right",
-            }}
+            options={{ animation: "slide_from_right" }}
           />
           <Stack.Screen
             name="help"
-            options={{
-              animation: "slide_from_bottom",
-            }}
+            options={{ animation: "slide_from_bottom" }}
           />
         </Stack>
       </ThemeProvider>

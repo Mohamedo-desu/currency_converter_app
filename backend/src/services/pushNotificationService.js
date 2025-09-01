@@ -3,6 +3,7 @@ const PushToken = require("../models/PushToken");
 class PushNotificationService {
   constructor() {
     this.expoPushURL = "https://exp.host/--/api/v2/push/send";
+    this.channelId = "currency-converter-updates";
   }
 
   /**
@@ -33,7 +34,7 @@ class PushNotificationService {
         body: notification.body,
         data: notification.data || {},
         priority: "high",
-        channelId: "default",
+        channelId: this.channelId,
       };
 
       const response = await fetch(this.expoPushURL, {
@@ -82,7 +83,7 @@ class PushNotificationService {
         body: notification.body,
         data: notification.data || {},
         priority: "high",
-        channelId: "default",
+        channelId: this.channelId,
       }));
 
       const response = await fetch(this.expoPushURL, {
