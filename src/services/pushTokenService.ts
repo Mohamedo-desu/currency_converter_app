@@ -1,7 +1,7 @@
 import { getStoredValues, saveSecurely } from "@/store/storage";
 
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api";
+  process.env.EXPO_PUBLIC_BACKEND_URL + "/api" || "http://localhost:3000/api";
 
 interface RegisterTokenResponse {
   success: boolean;

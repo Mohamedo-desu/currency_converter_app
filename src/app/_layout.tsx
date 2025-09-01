@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/context/ThemeContext";
+import useSetupForPushNotifications from "@/hooks/useSetupForPushNotifications";
 import * as Sentry from "@sentry/react-native";
 import { isRunningInExpoGo } from "expo";
 import * as Notifications from "expo-notifications";
@@ -59,6 +60,8 @@ Notifications.setNotificationHandler({
 
 const RootLayout = () => {
   const ref = useNavigationContainerRef();
+
+  useSetupForPushNotifications();
 
   useEffect(() => {
     if (ref?.current) {
