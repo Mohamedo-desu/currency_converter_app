@@ -28,7 +28,7 @@ class PushNotificationService {
     try {
       const message = {
         to: expoPushToken,
-        sound: "update",
+        sound: "update.wav",
         title: notification.title,
         body: notification.body,
         data: notification.data || {},
@@ -77,7 +77,7 @@ class PushNotificationService {
     try {
       const messages = tokens.map((token) => ({
         to: token,
-        sound: "update",
+        sound: "update.wav",
         title: notification.title,
         body: notification.body,
         data: notification.data || {},
