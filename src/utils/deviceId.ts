@@ -31,7 +31,7 @@ export const getDeviceId = async (): Promise<string> => {
     }
 
     // Store the generated ID for future use
-    await saveSecurely([{ key: "deviceId", value: generatedId }]);
+    saveSecurely([{ key: "deviceId", value: generatedId }]);
 
     return generatedId;
   } catch (error) {
@@ -42,23 +42,11 @@ export const getDeviceId = async (): Promise<string> => {
       .substring(2, 9)}`;
 
     try {
-      await saveSecurely([{ key: "deviceId", value: fallbackId }]);
+      saveSecurely([{ key: "deviceId", value: fallbackId }]);
     } catch (saveError) {
       console.error("Error saving fallback device ID:", saveError);
     }
 
     return fallbackId;
-  }
-};
-
-/**
- * Clears the stored device ID (useful for testing or user logout)
- */
-export const clearDeviceId = async (): Promise<void> => {
-  try {
-    const { deleteStoredValues } = await import("@/store/storage");
-    await deleteStoredValues(["deviceId"]);
-  } catch (error) {
-    console.error("Error clearing device ID:", error);
   }
 };

@@ -15,22 +15,16 @@ const useSetupForPushNotifications = () => {
 
   async function registerForPushNotificationsAsync() {
     try {
-      console.log("🔔 Starting push notification setup...");
-
       // Check if we've already registered a push token
       const isAlreadyRegistered =
         await PushTokenService.isPushTokenRegistered();
 
       if (isAlreadyRegistered) {
-        console.log("✅ Push token already registered, skipping registration");
         return;
       }
 
-      console.log("📱 No cached token found, proceeding with registration...");
-
       // Set up notification channel for Android
       if (Platform.OS === "android") {
-        console.log("🤖 Setting up Android notification channel...");
         await Notifications.setNotificationChannelAsync("default", {
           name: "default",
           importance: Notifications.AndroidImportance.MAX,
@@ -39,8 +33,6 @@ const useSetupForPushNotifications = () => {
         });
       }
 
-      // Request permissions
-      console.log("🔐 Requesting notification permissions...");
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
@@ -57,8 +49,6 @@ const useSetupForPushNotifications = () => {
         return;
       }
 
-      console.log("✅ Notification permissions granted");
-
       // Get project ID
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ??
@@ -68,8 +58,6 @@ const useSetupForPushNotifications = () => {
         handleRegistrationError("Project ID not found in Expo config");
         return;
       }
-
-      console.log("📋 Project ID found, getting push token...");
 
       // Get push token
       const pushTokenString = (
@@ -83,17 +71,11 @@ const useSetupForPushNotifications = () => {
         return;
       }
 
-      console.log(
-        "🎫 Push token obtained:",
-        pushTokenString.substring(0, 50) + "..."
-      );
-
       // Get device ID
       const deviceId = await getDeviceId();
-      console.log("📱 Device ID:", deviceId);
 
       // Register token with backend
-      console.log("🌐 Registering token with backend...");
+
       const result = await PushTokenService.registerPushToken(
         pushTokenString,
         deviceId
@@ -105,8 +87,6 @@ const useSetupForPushNotifications = () => {
           pushTokenString,
           result.tokenId
         );
-
-        console.log("✅ Push token registered successfully:", result.message);
 
         if (result.alreadyExists) {
           console.log("ℹ️ Token was already registered on backend");
@@ -124,14 +104,10 @@ const useSetupForPushNotifications = () => {
   useEffect(() => {
     // Prevent multiple initializations
     if (hasInitialized.current) {
-      console.log(
-        "⚠️ Push notification setup already initialized, skipping..."
-      );
       return;
     }
 
     hasInitialized.current = true;
-    console.log("🚀 Initializing push notification setup...");
 
     // Register for push notifications on app launch
     registerForPushNotificationsAsync();

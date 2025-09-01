@@ -54,7 +54,7 @@ export class PushTokenService {
    */
   static async isPushTokenRegistered(): Promise<boolean> {
     try {
-      const { pushTokenString, pushTokenRegistered } = await getStoredValues([
+      const { pushTokenString, pushTokenRegistered } = getStoredValues([
         "pushTokenString",
         "pushTokenRegistered",
       ]);
@@ -87,7 +87,7 @@ export class PushTokenService {
         dataToSave.push({ key: "pushTokenId", value: tokenId });
       }
 
-      await saveSecurely(dataToSave);
+      saveSecurely(dataToSave);
     } catch (error) {
       console.error("Error saving push token registration:", error);
       throw error;

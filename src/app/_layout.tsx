@@ -1,10 +1,10 @@
 import { ThemeProvider } from "@/context/ThemeContext";
 import useSetupForPushNotifications from "@/hooks/useSetupForPushNotifications";
+import { handleExpoUpdateMetadata } from "@/utils/expoUpdateMetadata";
 import * as Sentry from "@sentry/react-native";
 import { isRunningInExpoGo } from "expo";
 import * as Notifications from "expo-notifications";
 import { Stack, useNavigationContainerRef } from "expo-router";
-import * as Updates from "expo-updates";
 import React, { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
@@ -17,31 +17,8 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
 
-const manifest = Updates.manifest;
-const metadata = "metadata" in manifest ? manifest.metadata : undefined;
-const extra = "extra" in manifest ? manifest.extra : undefined;
-const updateGroup =
-  metadata && "updateGroup" in metadata ? metadata.updateGroup : undefined;
-
 Sentry.init(sentryConfig);
-
-const scope = Sentry.getGlobalScope();
-
-scope.setTag("expo-update-id", Updates.updateId);
-scope.setTag("expo-is-embedded-update", Updates.isEmbeddedLaunch);
-
-if (typeof updateGroup === "string") {
-  scope.setTag("expo-update-group-id", updateGroup);
-
-  const owner = extra?.expoClient?.owner ?? "[account]";
-  const slug = extra?.expoClient?.slug ?? "[project]";
-  scope.setTag(
-    "expo-update-debug-url",
-    `https://expo.dev/accounts/${owner}/projects/${slug}/updates/${updateGroup}`
-  );
-} else if (Updates.isEmbeddedLaunch) {
-  scope.setTag("expo-update-debug-url", "not applicable for embedded updates");
-}
+handleExpoUpdateMetadata();
 
 export const unstable_settings = {
   initialRouteName: "index",
