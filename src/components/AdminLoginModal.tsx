@@ -29,7 +29,8 @@ const AdminLoginModal = ({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || "";
+  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+
   const handleLogin = async () => {
     setLoading(true);
     setError("");
@@ -50,6 +51,7 @@ const AdminLoginModal = ({
       }
     } catch (err) {
       setError("Network error");
+      console.log(err);
     }
     setLoading(false);
   };
