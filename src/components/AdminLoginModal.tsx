@@ -35,14 +35,18 @@ const AdminLoginModal = ({
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(`${backendUrl}/admin/login`, {
+      const response = await fetch(`${backendUrl}/api/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
+      console.log({ email, password, response });
+
       const data = await response.json();
+      console.log({ data });
+
       if (data.success) {
         // You can add logic here to close modal or set admin state
         onClose();

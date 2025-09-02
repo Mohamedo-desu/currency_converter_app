@@ -7,8 +7,8 @@ const feedbackRoutes = require("./routes/feedback");
 const versionRoutes = require("./routes/version");
 const pushTokenRoutes = require("./routes/pushTokens");
 const notificationRoutes = require("./routes/notifications");
+const adminRoutes = require("./routes/admin");
 const PushToken = require("./models/PushToken");
-const Admin = require("./models/Admin");
 
 const app = express();
 
@@ -27,6 +27,7 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/version", versionRoutes);
 app.use("/api/push-tokens", pushTokenRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
