@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: name,
-    version: "5.0.0",
+    version: "6.0.0",
     slug: PROJECT_SLUG,
     orientation: "portrait",
     newArchEnabled: true,

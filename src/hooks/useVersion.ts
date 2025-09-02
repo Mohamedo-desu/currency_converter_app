@@ -158,22 +158,89 @@ export const useVersion = () => {
                 "https://drive.google.com/placeholder" &&
               versionInfo.downloadUrl.trim() !== ""
             ) {
+              // Major version update: download and install APK using expo-file-system and expo-intent-launcher
+              const handleDownloadAndInstall = async () => {
+                try {
+                  const { default: FileSystem } = await import(
+                    "expo-file-system"
+                  );
+                  const { default: IntentLauncher } = await import(
+                    "expo-intent-launcher"
+                  );
+                  const apkUrl = versionInfo.downloadUrl;
+                  const fileName = `CurrencyConverter(v${latestVersion}).apk`;
+                  const localUri = FileSystem.cacheDirectory + fileName;
+
+                  // Show progress UI (optional, you can use a state and a modal)
+                  let downloadResumable = FileSystem.createDownloadResumable(
+                    apkUrl,
+                    localUri,
+                    {},
+                    (downloadProgress) => {
+                      // You can update a progress state here if you want
+                    }
+                  );
+
+                  // Try to launch the APK installer
+                  if (downloadResumable) {
+                    const downloadResult =
+                      await downloadResumable.downloadAsync();
+                    if (downloadResult && downloadResult.uri) {
+                      try {
+                        await IntentLauncher.startActivityAsync(
+                          "android.intent.action.VIEW",
+                          {
+                            data: downloadResult.uri,
+                            flags: 1,
+                            type: "application/vnd.android.package-archive",
+                          }
+                        );
+                      } catch (installError) {
+                        console.log(
+                          "[DEBUG] Error launching APK installer:",
+                          installError
+                        );
+
+                        Alert.alert(
+                          "Install Failed",
+                          "Please allow installation from unknown sources in your Android settings, then try again.",
+                          [
+                            {
+                              text: "Open Settings",
+                              onPress: () => {
+                                Linking.openSettings();
+                              },
+                            },
+                            { text: "OK" },
+                          ]
+                        );
+                      }
+                    } else {
+                      throw new Error("Download failed or URI not available");
+                    }
+                  } else {
+                    throw new Error("DownloadResumable not created");
+                  }
+                } catch (error) {
+                  // If anything fails, fallback to opening the download URL in browser
+                  if (versionInfo.downloadUrl) {
+                    Linking.openURL(versionInfo.downloadUrl);
+                  } else {
+                    Alert.alert(
+                      "Error",
+                      "Download URL not available. Please try again later."
+                    );
+                  }
+                }
+              };
+
               Alert.alert(
                 "App Update Required",
                 `A new version (${latestVersion}) is required. Please download and install the latest version to continue using the app.`,
                 [
                   {
-                    text: "Download Now",
-                    onPress: () => {
-                      if (versionInfo.downloadUrl) {
-                        Linking.openURL(versionInfo.downloadUrl);
-                      } else {
-                        Alert.alert(
-                          "Error",
-                          "Download URL not available. Please try again later."
-                        );
-                      }
-                    },
+                    text: "Download & Install",
+                    onPress: handleDownloadAndInstall,
                   },
                 ],
                 { cancelable: false }
