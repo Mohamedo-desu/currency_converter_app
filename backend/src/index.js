@@ -8,6 +8,7 @@ const versionRoutes = require("./routes/version");
 const pushTokenRoutes = require("./routes/pushTokens");
 const notificationRoutes = require("./routes/notifications");
 const PushToken = require("./models/PushToken");
+const Admin = require("./models/Admin");
 
 const app = express();
 
@@ -64,8 +65,26 @@ cron.schedule("0 2 * * *", async () => {
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+
+  .then(async () => {
     console.log("Connected to MongoDB");
+
+    // Create default admin if none exists
+
+    const defaultEmail = "admin@currencyapp.com";
+    const defaultPassword = "Ug4586@#";
+    try {
+      const existingAdmin = await Admin.findOne({ email: defaultEmail });
+      if (!existingAdmin) {
+        await Admin.create({ email: defaultEmail, password: defaultPassword });
+        console.log("Default admin created.");
+      } else {
+        console.log("Default admin already exists.");
+      }
+    } catch (err) {
+      console.error("Error creating default admin:", err);
+    }
+
     // Start server
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
