@@ -1,4 +1,5 @@
 import { getStoredValues, saveSecurely } from "@/store/storage";
+import { getDeviceInfo } from "@/utils/deviceInfo";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_BACKEND_URL + "/api" || "http://localhost:3000/api";
@@ -22,6 +23,10 @@ export class PushTokenService {
     deviceId: string
   ): Promise<RegisterTokenResponse> {
     try {
+      // Get device info
+
+      const deviceInfo = getDeviceInfo();
+
       const response = await fetch(`${API_BASE_URL}/push-tokens/register`, {
         method: "POST",
         headers: {
@@ -31,7 +36,14 @@ export class PushTokenService {
           pushToken,
           deviceId,
           platform: require("react-native").Platform.OS,
-          timestamp: new Date().toISOString(),
+          deviceName: deviceInfo.deviceName,
+          deviceType: deviceInfo.deviceType,
+          modelName: deviceInfo.modelName,
+          brand: deviceInfo.brand,
+          manufacturer: deviceInfo.manufacturer,
+          osName: deviceInfo.osName,
+          osVersion: deviceInfo.osVersion,
+          timestamp: new Date().toLocaleString(),
         }),
       });
 

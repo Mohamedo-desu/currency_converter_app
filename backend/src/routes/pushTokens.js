@@ -5,7 +5,18 @@ const router = express.Router();
 // Register a new push token
 router.post("/register", async (req, res) => {
   try {
-    const { pushToken, deviceId, platform } = req.body;
+    const {
+      pushToken,
+      deviceId,
+      platform,
+      deviceName,
+      deviceType,
+      modelName,
+      brand,
+      manufacturer,
+      osName,
+      osVersion,
+    } = req.body;
 
     // Validate required fields
     if (!pushToken || !deviceId || !platform) {
@@ -47,6 +58,13 @@ router.post("/register", async (req, res) => {
       pushToken,
       deviceId,
       platform,
+      deviceName,
+      deviceType,
+      modelName,
+      brand,
+      manufacturer,
+      osName,
+      osVersion,
       isActive: true,
       lastUsed: new Date(),
     });
