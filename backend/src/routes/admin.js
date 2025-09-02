@@ -1,18 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const admin = require("../models/Admin");
+const Admin = require("../models/Admin");
 
 // Admin login route
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  if (email === admin.email && password === admin.password) {
+  try {
+    const admin = await Admin.findOne({ email });
+    if (admin && admin.password === password) {
+      return res
+        .status(200)
+        .json({ success: true, message: "Admin logged in successfully." });
+    }
     return res
-      .status(200)
-      .json({ success: true, message: "Admin logged in successfully." });
+      .status(401)
+      .json({ success: false, message: "Invalid credentials." });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error." });
   }
-  return res
-    .status(401)
-    .json({ success: false, message: "Invalid credentials." });
 });
 
 module.exports = router;

@@ -1,6 +1,20 @@
-const admin = {
-  email: "admin@currencyapp.com",
-  password: "Ug4586@#", // In production, use env vars and hashing
-};
+const mongoose = require("mongoose");
 
-module.exports = admin;
+const AdminSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      default: "admin@currencyapp.com",
+    },
+    password: {
+      type: String,
+      required: true,
+      default: "Ug4586@#",
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Admin", AdminSchema);
