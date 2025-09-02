@@ -6,6 +6,7 @@ import { isRunningInExpoGo } from "expo";
 import * as Notifications from "expo-notifications";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
 import { sentryConfig } from "sentry.config";
@@ -70,21 +71,23 @@ const RootLayout = () => {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen
-            name="settings"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="history"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="help"
-            options={{ animation: "slide_from_bottom" }}
-          />
-        </Stack>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen
+              name="settings"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="history"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="help"
+              options={{ animation: "slide_from_bottom" }}
+            />
+          </Stack>
+        </GestureHandlerRootView>
       </ThemeProvider>
     </SafeAreaProvider>
   );

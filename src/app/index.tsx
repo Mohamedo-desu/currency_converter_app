@@ -29,6 +29,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Import reusable service functions
+import AdminLoginModal from "@/components/AdminLoginModal";
 import { Spacing } from "@/constants/Spacing";
 import {
   Currency,
@@ -37,6 +38,12 @@ import {
   registerBackgroundTask,
 } from "@/services/currencyService";
 import { styles } from "@/styles/screens/CurrencyConverterScreen.styles";
+import {
+  GestureEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+  State,
+} from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 /**
@@ -70,6 +77,11 @@ const CurrencyConverterScreen = () => {
   );
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isSelectingFrom, setIsSelectingFrom] = useState<boolean>(true);
+  const [secretSequence, setSecretSequence] = useState<string[]>([]);
+
+  const [isAdminModalVisible, setIsAdminModalVisible] =
+    useState<boolean>(false);
+
   const conversionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -353,9 +365,7 @@ const CurrencyConverterScreen = () => {
 
     const webUrl = "https://convertly.expo.app";
     // Get cached download URL or use fallback
-    const downloadUrl =
-      (await getCachedDownloadUrl()) ||
-      "https://drive.google.com/file/d/1VZ1EGi_9EAmMQ5w4JbyME9uCApaq7PeJ/view?usp=drive_link";
+    const downloadUrl = await getCachedDownloadUrl();
 
     if (hasConversion) {
       // Share conversion
@@ -439,6 +449,29 @@ const CurrencyConverterScreen = () => {
     // Cleanup listener on unmount
     return () => backHandler.remove();
   }, [lastBackPress]);
+
+  const handleGesture = ({
+    nativeEvent,
+  }: GestureEvent<PanGestureHandlerEventPayload>) => {
+    if (nativeEvent.state === State.END) {
+      const { translationX, translationY } = nativeEvent;
+      let direction: string = "";
+
+      if (Math.abs(translationX) > Math.abs(translationY)) {
+        direction = translationX > 0 ? "right" : "left";
+      } else {
+        direction = translationY > 0 ? "down" : "up";
+      }
+
+      const newSecretSequence = [...secretSequence, direction].slice(-5);
+      setSecretSequence(newSecretSequence);
+
+      if (newSecretSequence.join(" ") === "up up down left right") {
+        setSecretSequence([]);
+        setIsAdminModalVisible(true);
+      }
+    }
+  };
 
   return (
     <KeyboardAwareScrollView
@@ -556,7 +589,9 @@ const CurrencyConverterScreen = () => {
           </CustomText>
         )}
       </View>
-
+      <PanGestureHandler onHandlerStateChange={handleGesture}>
+        <View style={{ width: "100%", flex: 1 }} />
+      </PanGestureHandler>
       <PrivacyTerms currentVersion={currentVersion} />
 
       {/* Currency selection modal */}
@@ -565,6 +600,10 @@ const CurrencyConverterScreen = () => {
         currencies={currencies}
         onClose={() => setIsModalVisible(false)}
         onCurrenciesSelect={handleCurrencySelect}
+      />
+      <AdminLoginModal
+        visible={isAdminModalVisible}
+        onClose={() => setIsAdminModalVisible(false)}
       />
     </KeyboardAwareScrollView>
   );
