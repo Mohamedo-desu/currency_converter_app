@@ -234,17 +234,17 @@ export const useVersion = () => {
                 }
               };
 
-              // Alert.alert(
-              //   "App Update Required",
-              //   `A new version (${latestVersion}) is required. Please download and install the latest version to continue using the app.`,
-              //   [
-              //     {
-              //       text: "Download & Install",
-              //       onPress: handleDownloadAndInstall,
-              //     },
-              //   ],
-              //   { cancelable: false }
-              // );
+              Alert.alert(
+                "App Update Required",
+                `A new version (${latestVersion}) is required. Please download and install the latest version to continue using the app.`,
+                [
+                  {
+                    text: "Download & Install",
+                    onPress: handleDownloadAndInstall,
+                  },
+                ],
+                { cancelable: true } //TODO
+              );
             }
 
             // Fetch compatible version for current major

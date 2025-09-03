@@ -1,6 +1,5 @@
 import { Colors } from "@/constants/Colors";
 import { PushTokenService } from "@/services/pushTokenService";
-import { getDeviceId } from "@/utils/deviceId";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
@@ -71,15 +70,9 @@ const useSetupForPushNotifications = () => {
         return;
       }
 
-      // Get device ID
-      const deviceId = await getDeviceId();
-
       // Register token with backend
 
-      const result = await PushTokenService.registerPushToken(
-        pushTokenString,
-        deviceId
-      );
+      const result = await PushTokenService.registerPushToken(pushTokenString);
 
       if (result.success) {
         // Save registration status locally

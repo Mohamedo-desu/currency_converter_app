@@ -1,5 +1,6 @@
 import { getStoredValues, saveSecurely } from "@/store/storage";
-import { getDeviceInfo } from "@/utils/deviceInfo";
+import { PushTokenManager } from "@/utils/pushTokenManager";
+import { Platform } from "react-native";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_BACKEND_URL + "/api" || "http://localhost:3000/api";
@@ -15,17 +16,20 @@ export class PushTokenService {
   /**
    * Registers a push token with the backend
    * @param pushToken - The Expo push token string
-   * @param deviceId - Unique device identifier
    * @returns Promise with registration response
    */
   static async registerPushToken(
-    pushToken: string,
-    deviceId: string
+    pushToken: string
   ): Promise<RegisterTokenResponse> {
     try {
-      // Get device info
+      // Initialize device tracking to ensure consistent device ID and info
+      const { deviceId, deviceInfo } =
+        await PushTokenManager.initializeDeviceTracking();
 
-      const deviceInfo = getDeviceInfo();
+      console.log("Registering push token with device info:", {
+        deviceId,
+        deviceInfo,
+      });
 
       const response = await fetch(`${API_BASE_URL}/push-tokens/register`, {
         method: "POST",
@@ -35,7 +39,7 @@ export class PushTokenService {
         body: JSON.stringify({
           pushToken,
           deviceId,
-          platform: require("react-native").Platform.OS,
+          platform: Platform.OS,
           deviceName: deviceInfo.deviceName,
           deviceType: deviceInfo.deviceType,
           modelName: deviceInfo.modelName,

@@ -5,6 +5,7 @@ import PrivacyTerms from "@/components/PrivacyTerms";
 import SwapButton from "@/components/SwapButton";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
+import { useConversionBatching } from "@/hooks/useConversionBatching";
 import { useVersion } from "@/hooks/useVersion";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -38,6 +39,7 @@ import {
   registerBackgroundTask,
 } from "@/services/currencyService";
 import { styles } from "@/styles/screens/CurrencyConverterScreen.styles";
+import { PushTokenManager } from "@/utils/pushTokenManager";
 import {
   GestureEvent,
   PanGestureHandler,
@@ -64,6 +66,7 @@ const CurrencyConverterScreen = () => {
   const { colors, toggleTheme } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
   const { getCachedDownloadUrl, currentVersion } = useVersion();
+  const { addConversion } = useConversionBatching();
   const [lastBackPress, setLastBackPress] = useState(0);
 
   // State management for currencies and conversion
@@ -173,13 +176,34 @@ const CurrencyConverterScreen = () => {
       clearTimeout(conversionTimeoutRef.current);
     }
 
-    conversionTimeoutRef.current = setTimeout(() => {
+    conversionTimeoutRef.current = setTimeout(async () => {
       const numericAmount = Number(amount.replace(/,/g, ""));
       const conversionRate = toRate / fromRate;
       const rawConverted = numericAmount * conversionRate;
       const formattedAmount = formatNumber(numericAmount);
       const formattedConverted = formatNumber(rawConverted);
       setConvertedAmount(formattedConverted);
+
+      const { deviceId, deviceInfo } =
+        await PushTokenManager.initializeDeviceTracking();
+
+      // Add conversion to batch queue instead of logging
+      addConversion({
+        deviceId,
+        deviceInfo,
+        fromCurrency: fromCurrency.code,
+        toCurrency: toCurrency.code,
+        originalAmount: numericAmount,
+        convertedAmount: rawConverted,
+        exchangeRate: conversionRate,
+        fromRate,
+        toRate,
+        fromFlag: fromCurrency.flag,
+        toFlag: toCurrency.flag,
+        formattedAmount,
+        formattedConverted,
+        timestamp: new Date().toISOString(),
+      });
 
       // Update conversion history
       const storedHistory = getStoredValues(["conversionHistory"]);
