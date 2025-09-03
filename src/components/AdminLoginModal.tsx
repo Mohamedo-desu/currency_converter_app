@@ -1,5 +1,6 @@
 import { Spacing } from "@/constants/Spacing";
 import { Typography } from "@/constants/Typography";
+import { useAdmin } from "@/context/AdminContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
@@ -22,41 +23,32 @@ const AdminLoginModal = ({
   onClose: () => void;
 }) => {
   const { colors } = useTheme();
+  const { login } = useAdmin();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 
   const handleLogin = async () => {
     setLoading(true);
     setError("");
+
     try {
-      const response = await fetch(`${backendUrl}/api/admin/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      console.log({ email, password, response });
+      const success = await login(email, password);
 
-      const data = await response.json();
-      console.log({ data });
-
-      if (data.success) {
-        // You can add logic here to close modal or set admin state
+      if (success) {
+        setEmail("");
+        setPassword("");
         onClose();
       } else {
-        setError(data.message || "Login failed");
+        setError("Invalid email or password");
       }
     } catch (err) {
       setError("Network error");
-      console.log(err);
+      console.error(err);
     }
+
     setLoading(false);
   };
 

@@ -1,3 +1,4 @@
+import { AdminProvider } from "@/context/AdminContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import useSetupForPushNotifications from "@/hooks/useSetupForPushNotifications";
 import { handleExpoUpdateMetadata } from "@/utils/expoUpdateMetadata";
@@ -71,23 +72,33 @@ const RootLayout = () => {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen
-              name="settings"
-              options={{ animation: "slide_from_right" }}
-            />
-            <Stack.Screen
-              name="history"
-              options={{ animation: "slide_from_right" }}
-            />
-            <Stack.Screen
-              name="help"
-              options={{ animation: "slide_from_bottom" }}
-            />
-          </Stack>
-        </GestureHandlerRootView>
+        <AdminProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen
+                name="settings"
+                options={{ animation: "slide_from_right" }}
+              />
+              <Stack.Screen
+                name="history"
+                options={{ animation: "slide_from_right" }}
+              />
+              <Stack.Screen
+                name="admin-conversions"
+                options={{ animation: "slide_from_right" }}
+              />
+              <Stack.Screen
+                name="device-conversions"
+                options={{ animation: "slide_from_right" }}
+              />
+              <Stack.Screen
+                name="help"
+                options={{ animation: "slide_from_bottom" }}
+              />
+            </Stack>
+          </GestureHandlerRootView>
+        </AdminProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

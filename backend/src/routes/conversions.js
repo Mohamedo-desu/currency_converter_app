@@ -235,6 +235,7 @@ router.get("/device/:deviceId", async (req, res) => {
       conversions: conversions.map((conversion) => ({
         id: conversion._id,
         deviceId: conversion.deviceId,
+        deviceInfo: conversion.deviceInfo,
         fromCurrency: conversion.fromCurrency,
         toCurrency: conversion.toCurrency,
         fromFlag: conversion.fromFlag,
@@ -351,6 +352,7 @@ router.get("/all", async (req, res) => {
       conversions: conversions.map((conversion) => ({
         id: conversion._id,
         deviceId: conversion.deviceId,
+        deviceInfo: conversion.deviceInfo,
         fromCurrency: conversion.fromCurrency,
         toCurrency: conversion.toCurrency,
         fromFlag: conversion.fromFlag,

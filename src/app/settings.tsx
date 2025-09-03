@@ -1,6 +1,7 @@
 import CustomText from "@/components/CustomText";
 import { Colors } from "@/constants/Colors";
 import { Spacing } from "@/constants/Spacing";
+import { useAdmin } from "@/context/AdminContext";
 import { useTheme } from "@/context/ThemeContext";
 import { styles } from "@/styles/screens/SettingsScreen.styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const SettingsScreen = () => {
   const { colors } = useTheme();
   const { top } = useSafeAreaInsets();
+  const { isAdmin, logout } = useAdmin();
 
   // Add back button handler
   useEffect(() => {
@@ -84,6 +86,16 @@ const SettingsScreen = () => {
       <View style={styles.content}>
         {renderSettingOption("time", "History", () =>
           router.navigate("/history")
+        )}
+
+        {/* Admin-only options */}
+        {isAdmin && (
+          <>
+            {renderSettingOption("analytics", "All Conversions", () =>
+              router.navigate("/admin-conversions")
+            )}
+            {renderSettingOption("log-out", "Admin Logout", () => logout())}
+          </>
         )}
       </View>
     </View>
