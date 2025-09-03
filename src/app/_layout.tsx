@@ -1,5 +1,6 @@
 import { AdminProvider } from "@/context/AdminContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { useDeepLinking } from "@/hooks/useDeepLinking";
 import useSetupForPushNotifications from "@/hooks/useSetupForPushNotifications";
 import { handleExpoUpdateMetadata } from "@/utils/expoUpdateMetadata";
 import * as Sentry from "@sentry/react-native";
@@ -47,6 +48,9 @@ const RootLayout = () => {
 
   // Set up push notification registration (permissions, token, listeners, etc.)
   useSetupForPushNotifications();
+
+  // Set up deeplink handling
+  useDeepLinking();
 
   // Register custom Android channel (with sound, vibration, lights, etc.)
   useEffect(() => {

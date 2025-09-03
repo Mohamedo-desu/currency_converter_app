@@ -1,0 +1,24 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "TEAM_ID.com.mohamedodesu.convertly",
+          "TEAM_ID.com.mohamedodesu.convertly.dev"
+        ],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all routes"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.com.mohamedodesu.convertly",
+      "TEAM_ID.com.mohamedodesu.convertly.dev"
+    ]
+  }
+}

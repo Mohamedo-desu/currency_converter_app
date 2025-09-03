@@ -37,6 +37,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         light: "./assets/images/ios-prod.png",
         tinted: "./assets/images/ios-tinted.png",
       },
+      associatedDomains: [
+        `applinks:${PROJECT_SLUG}.expo.app`,
+        `applinks:convertly.expo.app`,
+      ],
     },
     android: {
       adaptiveIcon: {
@@ -56,6 +60,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
               scheme: "https",
               host: `${PROJECT_SLUG}.expo.app`,
               pathPrefix: "/",
+            },
+          ],
+          category: ["BROWSABLE", "DEFAULT"],
+        },
+        {
+          action: "VIEW",
+          data: [
+            {
+              scheme: scheme,
             },
           ],
           category: ["BROWSABLE", "DEFAULT"],

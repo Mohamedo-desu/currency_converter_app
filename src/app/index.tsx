@@ -9,7 +9,7 @@ import { useConversionBatching } from "@/hooks/useConversionBatching";
 import { useVersion } from "@/hooks/useVersion";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -68,6 +68,13 @@ const CurrencyConverterScreen = () => {
   const { getCachedDownloadUrl, currentVersion } = useVersion();
   const { addConversion } = useConversionBatching();
   const [lastBackPress, setLastBackPress] = useState(0);
+
+  // Get deeplink parameters (only processed once)
+  const searchParams = useLocalSearchParams<{
+    fromCurrency?: string;
+    toCurrency?: string;
+    amount?: string;
+  }>();
 
   // State management for currencies and conversion
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -130,6 +137,36 @@ const CurrencyConverterScreen = () => {
       console.error("Error loading stored data:", error);
     }
   }, []);
+
+  /**
+   * Handle deeplink parameters once when currencies are available
+   */
+  useEffect(() => {
+    if (currencies.length === 0) return;
+
+    // Process deeplink parameters only once
+    if (searchParams.fromCurrency) {
+      const foundCurrency = currencies.find(
+        (c) => c.code.toLowerCase() === searchParams.fromCurrency?.toLowerCase()
+      );
+      if (foundCurrency) {
+        setFromCurrency(foundCurrency);
+      }
+    }
+
+    if (searchParams.toCurrency) {
+      const foundCurrency = currencies.find(
+        (c) => c.code.toLowerCase() === searchParams.toCurrency?.toLowerCase()
+      );
+      if (foundCurrency) {
+        setToCurrency(foundCurrency);
+      }
+    }
+
+    if (searchParams.amount) {
+      setAmount(searchParams.amount);
+    }
+  }, [currencies.length]); // Only depend on currencies.length to run once when loaded
 
   /**
    * Fetches latest currency data and exchange rates on mount

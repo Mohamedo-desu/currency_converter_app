@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter - Opening App...</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+      }
+      .container {
+        max-width: 400px;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        backdrop-filter: blur(10px);
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        margin: 8px;
+        transition: background 0.3s;
+      }
+      .button:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="loading">
+        <div class="spinner"></div>
+        <h2>Opening Currency Converter...</h2>
+        <p>If the app doesn't open automatically, you can:</p>
+      </div>
+
+      <div id="fallback" class="hidden">
+        <h2>Currency Converter</h2>
+        <p>Choose how you'd like to access the app:</p>
+      </div>
+
+      <div>
+        <a href="#" id="openApp" class="button">📱 Open App</a>
+        <a href="/web" class="button">🌐 Use Web Version</a>
+      </div>
+
+      <div style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.8">
+        <p>Convert between any currencies with real-time exchange rates</p>
+      </div>
+    </div>
+
+    <script>
+      // Get URL parameters to pass to the app
+      const urlParams = new URLSearchParams(window.location.search);
+      const pathParts = window.location.pathname.split("/").filter((p) => p);
+
+      // Build deeplink URL
+      let deeplinkUrl = "convertly://";
+
+      // Handle conversion parameters
+      if (
+        urlParams.has("from") ||
+        urlParams.has("to") ||
+        urlParams.has("amount")
+      ) {
+        deeplinkUrl += "convert?";
+        const params = new URLSearchParams();
+        if (urlParams.has("from")) params.set("from", urlParams.get("from"));
+        if (urlParams.has("to")) params.set("to", urlParams.get("to"));
+        if (urlParams.has("amount"))
+          params.set("amount", urlParams.get("amount"));
+        deeplinkUrl += params.toString();
+      }
+      // Handle path-based routing
+      else if (pathParts.length > 0) {
+        const path = pathParts[0];
+        if (["settings", "history", "help"].includes(path)) {
+          deeplinkUrl += path;
+        } else if (path === "admin" && pathParts[1]) {
+          deeplinkUrl += `admin?screen=${pathParts[1]}`;
+        }
+      }
+
+      // Set up the open app button
+      document.getElementById("openApp").href = deeplinkUrl;
+
+      // Function to attempt opening the app
+      function tryOpenApp() {
+        // For mobile devices, try to open the app immediately
+        if (
+          /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          )
+        ) {
+          window.location.href = deeplinkUrl;
+
+          // If app doesn't open after 3 seconds, show fallback options
+          setTimeout(() => {
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("fallback").classList.remove("hidden");
+          }, 3000);
+        } else {
+          // For desktop, show options immediately
+          document.getElementById("loading").classList.add("hidden");
+          document.getElementById("fallback").classList.remove("hidden");
+        }
+      }
+
+      // Try to open app on page load
+      tryOpenApp();
+
+      // Handle app link clicks
+      document
+        .getElementById("openApp")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          window.location.href = deeplinkUrl;
+        });
+
+      // Log for debugging
+      console.log("Attempting to open app with URL:", deeplinkUrl);
+    </script>
+  </body>
+</html>
