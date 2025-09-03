@@ -1,4 +1,4 @@
-import { getStoredValues, saveSecurely } from "@/store/storage";
+import { saveSecurely } from "@/store/storage";
 import { PushTokenManager } from "@/utils/pushTokenManager";
 import { Platform } from "react-native";
 
@@ -61,25 +61,6 @@ export class PushTokenService {
     } catch (error) {
       console.error("Error registering push token:", error);
       throw error;
-    }
-  }
-
-  /**
-   * Checks if a push token is already registered locally
-   * @returns Promise with boolean indicating if token exists
-   */
-  static async isPushTokenRegistered(): Promise<boolean> {
-    try {
-      const { pushTokenString, pushTokenRegistered } = getStoredValues([
-        "pushTokenString",
-        "pushTokenRegistered",
-      ]);
-
-      // Return true if we have both a token and registration confirmation
-      return !!(pushTokenString && pushTokenRegistered === "true");
-    } catch (error) {
-      console.error("Error checking token registration status:", error);
-      return false;
     }
   }
 

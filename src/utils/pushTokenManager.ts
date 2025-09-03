@@ -1,4 +1,4 @@
-import { PushTokenService } from "@/services/pushTokenService";
+import { getStoredValues } from "@/store/storage";
 import { getDeviceId } from "@/utils/deviceId";
 import { getDeviceInfo } from "@/utils/deviceInfo";
 
@@ -11,9 +11,28 @@ export class PushTokenManager {
    */
   static async isPushNotificationSetup(): Promise<boolean> {
     try {
-      return await PushTokenService.isPushTokenRegistered();
+      return await this.isPushTokenRegistered();
     } catch (error) {
       console.error("Error checking push notification setup:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Checks if a push token is already registered locally
+   * @returns Promise with boolean indicating if token exists
+   */
+  static async isPushTokenRegistered(): Promise<boolean> {
+    try {
+      const { pushTokenString, pushTokenRegistered } = getStoredValues([
+        "pushTokenString",
+        "pushTokenRegistered",
+      ]);
+
+      // Return true if we have both a token and registration confirmation
+      return !!(pushTokenString && pushTokenRegistered === "true");
+    } catch (error) {
+      console.error("Error checking token registration status:", error);
       return false;
     }
   }

@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { PushTokenService } from "@/services/pushTokenService";
+import { PushTokenManager } from "@/utils/pushTokenManager";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
@@ -16,7 +17,7 @@ const useSetupForPushNotifications = () => {
     try {
       // Check if we've already registered a push token
       const isAlreadyRegistered =
-        await PushTokenService.isPushTokenRegistered();
+        await PushTokenManager.isPushTokenRegistered();
 
       if (isAlreadyRegistered) {
         return;
