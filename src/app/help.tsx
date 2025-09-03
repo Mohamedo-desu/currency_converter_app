@@ -6,11 +6,12 @@ import { useVersion } from "@/hooks/useVersion";
 import {
   Feedback,
   FeedbackType,
-  getDeviceInfo,
   submitFeedback,
 } from "@/services/feedbackService";
 import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
+import { getDeviceId } from "@/utils/deviceId";
+import { getDeviceInfo as getDetailedDeviceInfo } from "@/utils/deviceInfo";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -124,6 +125,10 @@ const HelpScreen = () => {
     setIsSubmitting(true);
 
     try {
+      // Get device ID
+      const deviceId = await getDeviceId();
+      const deviceInfo = getDetailedDeviceInfo();
+
       // Create feedback object
       const feedback: Feedback = {
         type: selectedType,
@@ -133,7 +138,8 @@ const HelpScreen = () => {
         timestamp: Date.now(),
         platform: Platform.OS,
         version: currentVersion,
-        deviceInfo: getDeviceInfo(),
+        deviceId,
+        deviceInfo,
       };
 
       // Submit feedback remotely

@@ -30,8 +30,12 @@ const feedbackSchema = new mongoose.Schema(
     version: {
       type: String,
     },
-    deviceInfo: {
+    deviceId: {
       type: String,
+      required: true,
+    },
+    deviceInfo: {
+      type: mongoose.Schema.Types.Mixed,
     },
   },
   {

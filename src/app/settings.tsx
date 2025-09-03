@@ -94,6 +94,9 @@ const SettingsScreen = () => {
             {renderSettingOption("analytics", "All Conversions", () =>
               router.navigate("/admin-conversions")
             )}
+            {renderSettingOption("chatbubbles", "User Feedbacks", () =>
+              router.navigate("/admin-feedbacks")
+            )}
             {renderSettingOption("log-out", "Admin Logout", () => logout())}
           </>
         )}

@@ -1,3 +1,5 @@
+import { getDeviceId } from "@/utils/deviceId";
+import { getDeviceInfo as getDetailedDeviceInfo } from "@/utils/deviceInfo";
 import { Platform } from "react-native";
 
 // Define feedback types
@@ -12,7 +14,8 @@ export interface Feedback {
   timestamp: number;
   platform: string;
   version?: string;
-  deviceInfo?: string;
+  deviceId?: string;
+  deviceInfo?: any;
 }
 
 // API endpoint - ensure it ends with /api/feedback
@@ -21,13 +24,23 @@ const API_ENDPOINT = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/feedback";
 // Remote feedback submission
 export const submitFeedback = async (feedback: Feedback): Promise<boolean> => {
   try {
+    // Add deviceId and deviceInfo before submitting
+    const deviceId = await getDeviceId();
+    const deviceInfo = getDetailedDeviceInfo();
+
+    const enhancedFeedback = {
+      ...feedback,
+      deviceId,
+      deviceInfo,
+    };
+
     const response = await fetch(API_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify(feedback),
+      body: JSON.stringify(enhancedFeedback),
     });
 
     if (!response.ok) {
@@ -46,7 +59,7 @@ export const submitFeedback = async (feedback: Feedback): Promise<boolean> => {
   }
 };
 
-// Get device information
+// Get device information (legacy function for backward compatibility)
 export const getDeviceInfo = (): string => {
   const platform = Platform.OS;
   const version = Platform.Version;
