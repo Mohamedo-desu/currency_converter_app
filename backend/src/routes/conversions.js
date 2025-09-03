@@ -333,47 +333,52 @@ router.get("/stats", async (req, res) => {
   }
 });
 
-// Get all conversions (Admin only)
+// Get all conversions grouped by device (Admin only)
 router.get("/all", async (req, res) => {
   try {
-    const { page = 1, limit = 100, sortBy = "timestamp" } = req.query;
-    const skip = (page - 1) * limit;
-
-    const conversions = await Conversion.find({})
-      .sort({ [sortBy]: -1 })
-      .skip(skip)
-      .limit(parseInt(limit))
-      .select("-deviceInfo"); // Exclude detailed device info for performance
-
-    const total = await Conversion.countDocuments({});
+    // Aggregate conversions by device to return only device summaries
+    const deviceSummaries = await Conversion.aggregate([
+      {
+        $group: {
+          _id: "$deviceId",
+          totalConversions: { $sum: 1 },
+          deviceInfo: { $first: "$deviceInfo" },
+          lastConversion: { $max: "$timestamp" },
+        },
+      },
+      {
+        $sort: { lastConversion: -1 },
+      },
+      {
+        $project: {
+          deviceId: "$_id",
+          deviceName: {
+            $cond: {
+              if: {
+                $and: [
+                  { $ne: ["$deviceInfo", null] },
+                  { $ne: ["$deviceInfo.deviceName", null] },
+                ],
+              },
+              then: "$deviceInfo.deviceName",
+              else: { $substr: ["$_id", 0, 8] },
+            },
+          },
+          totalConversions: 1,
+          _id: 0,
+        },
+      },
+    ]);
 
     res.json({
       success: true,
-      conversions: conversions.map((conversion) => ({
-        id: conversion._id,
-        deviceId: conversion.deviceId,
-        deviceInfo: conversion.deviceInfo,
-        fromCurrency: conversion.fromCurrency,
-        toCurrency: conversion.toCurrency,
-        fromFlag: conversion.fromFlag,
-        toFlag: conversion.toFlag,
-        originalAmount: conversion.originalAmount,
-        convertedAmount: conversion.convertedAmount,
-        exchangeRate: conversion.exchangeRate,
-        timestamp: conversion.timestamp,
-        createdAt: conversion.createdAt,
-      })),
-      pagination: {
-        current: parseInt(page),
-        total: Math.ceil(total / limit),
-        totalConversions: total,
-      },
+      devices: deviceSummaries,
     });
   } catch (error) {
-    console.error("Error fetching all conversions:", error);
+    console.error("Error fetching device summaries:", error);
     res.status(500).json({
       success: false,
-      message: "Internal server error while fetching conversions",
+      message: "Internal server error while fetching device summaries",
     });
   }
 });

@@ -135,6 +135,8 @@ const AdminConversionsScreen = () => {
     }
   };
 
+  console.log(deviceGroups[0]);
+
   const showError = (title: string, message: string) => {
     if (Platform.OS === "web") {
       window.alert(`${title}: ${message}`);
@@ -147,10 +149,6 @@ const AdminConversionsScreen = () => {
   useEffect(() => {
     fetchAllConversions();
   }, []);
-
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
-  };
 
   const renderDeviceGroup = useCallback(
     ({ item }: { item: DeviceConversions }) => {
