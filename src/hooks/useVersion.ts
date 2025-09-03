@@ -243,7 +243,7 @@ export const useVersion = () => {
                     onPress: handleDownloadAndInstall,
                   },
                 ],
-                { cancelable: true } //TODO
+                { cancelable: true }
               );
             }
 
