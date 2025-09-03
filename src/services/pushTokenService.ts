@@ -26,10 +26,10 @@ export class PushTokenService {
       const { deviceId, deviceInfo } =
         await PushTokenManager.initializeDeviceTracking();
 
-      console.log("Registering push token with device info:", {
-        deviceId,
-        deviceInfo,
-      });
+      // console.log("Registering push token with device info:", {
+      //   deviceId,
+      //   deviceInfo,
+      // });
 
       const response = await fetch(`${API_BASE_URL}/push-tokens/register`, {
         method: "POST",

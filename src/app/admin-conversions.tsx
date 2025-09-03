@@ -18,26 +18,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
- * Represents a single currency conversion record
- */
-interface ConversionHistory {
-  id: string;
-  deviceId: string;
-  deviceInfo?: any;
-  fromCurrency: string;
-  toCurrency: string;
-  fromFlag: string;
-  toFlag: string;
-  originalAmount: number;
-  convertedAmount: number;
-  formattedAmount: string;
-  formattedConverted: string;
-  exchangeRate: number;
-  timestamp: string;
-  createdAt: string;
-}
-
-/**
  * Device summary with conversion count
  */
 interface DeviceSummary {
@@ -135,8 +115,6 @@ const AdminConversionsScreen = () => {
       fetchAllConversions(currentPage + 1, true);
     }
   };
-
-  console.log(deviceSummaries[0]);
 
   const showError = (title: string, message: string) => {
     if (Platform.OS === "web") {

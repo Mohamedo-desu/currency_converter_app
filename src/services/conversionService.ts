@@ -86,9 +86,9 @@ class ConversionBatchService {
    */
   public async processPendingOnStartup(): Promise<void> {
     if (this.pendingConversions.length > 0) {
-      console.log(
-        `Found ${this.pendingConversions.length} pending conversions on startup`
-      );
+      //   console.log(
+      //     `Found ${this.pendingConversions.length} pending conversions on startup`
+      //   );
       await this.processBatch();
     }
   }
@@ -143,9 +143,9 @@ class ConversionBatchService {
 
     try {
       const conversionsToSend = [...this.pendingConversions];
-      console.log(
-        `Processing batch of ${conversionsToSend.length} conversions`
-      );
+      //   console.log(
+      //     `Processing batch of ${conversionsToSend.length} conversions`
+      //   );
 
       const response = await fetch(`${API_BASE_URL}/conversions/track/batch`, {
         method: "POST",
@@ -159,9 +159,9 @@ class ConversionBatchService {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(
-          `Successfully sent ${result.savedCount} conversions to backend`
-        );
+        // console.log(
+        //   `Successfully sent ${result.savedCount} conversions to backend`
+        // );
 
         // Clear the successfully sent conversions
         this.pendingConversions = [];
@@ -172,9 +172,9 @@ class ConversionBatchService {
 
         // If it's a validation error, we might want to remove invalid conversions
         if (response.status === 400 && errorData.validCount !== undefined) {
-          console.log(
-            `${errorData.validCount} out of ${errorData.totalCount} conversions were valid`
-          );
+          //   console.log(
+          //     `${errorData.validCount} out of ${errorData.totalCount} conversions were valid`
+          //   );
           // For now, we'll keep all conversions and retry later
           // In a more sophisticated implementation, you could remove invalid ones
         }

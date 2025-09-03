@@ -37,10 +37,10 @@ export const useVersion = () => {
       try {
         const currentCachedUrl = await getCachedDownloadUrl();
         if (currentCachedUrl !== newUrl) {
-          console.log("[DEBUG] Download URL changed, updating cache:", newUrl);
+          // console.log("[DEBUG] Download URL changed, updating cache:", newUrl);
           saveSecurely([{ key: "cachedDownloadUrl", value: newUrl }]);
         } else {
-          console.log("[DEBUG] Download URL unchanged, skipping cache update");
+          // console.log("[DEBUG] Download URL unchanged, skipping cache update");
         }
       } catch (error) {
         console.error("[DEBUG] Error updating download URL:", error);
@@ -76,10 +76,10 @@ export const useVersion = () => {
       try {
         const { cachedVersion } = await getStoredValues(["cachedVersion"]);
         if (cachedVersion) {
-          console.log("[DEBUG] Loading cached version:", cachedVersion);
+          // console.log("[DEBUG] Loading cached version:", cachedVersion);
           setBackendVersion(cachedVersion);
         } else {
-          console.log("[DEBUG] No cached version found - first time load");
+          // console.log("[DEBUG] No cached version found - first time load");
         }
       } catch (error) {
         console.error("[DEBUG] Error loading cached version:", error);
@@ -99,21 +99,21 @@ export const useVersion = () => {
       if (isLoadingFromCache) return;
 
       try {
-        console.log("[DEBUG] Fetching fresh version from backend...");
+        // console.log("[DEBUG] Fetching fresh version from backend...");
 
         // Step 1: Check for OTA updates first (for non-web platforms)
         if (Platform.OS !== "web") {
           try {
             const update = await Updates.checkForUpdateAsync();
             if (update.isAvailable) {
-              console.log("[DEBUG] OTA update available, downloading...");
+              // console.log("[DEBUG] OTA update available, downloading...");
               await Updates.fetchUpdateAsync();
               // Clear cache since we're about to reload with new version
               saveSecurely([{ key: "cachedVersion", value: "" }]);
               return await Updates.reloadAsync();
             }
           } catch (error) {
-            console.error("[DEBUG] OTA check error:", error);
+            console.log("[DEBUG] OTA check error:", error);
           }
         }
 
@@ -127,10 +127,10 @@ export const useVersion = () => {
         if (isMounted) {
           if (localMajor === latestMajor) {
             // Same major version - update with backend version and cache it
-            console.log(
-              "[DEBUG] Same major version, updating to:",
-              latestVersion
-            );
+            // console.log(
+            //   "[DEBUG] Same major version, updating to:",
+            //   latestVersion
+            // );
             setBackendVersion(latestVersion);
             saveSecurely([{ key: "cachedVersion", value: latestVersion }]);
 
@@ -148,7 +148,7 @@ export const useVersion = () => {
             }
           } else if (parseInt(latestMajor) > parseInt(localMajor)) {
             // New major version available
-            console.log("[DEBUG] New major version available:", latestVersion);
+            // console.log("[DEBUG] New major version available:", latestVersion);
             const versionInfo = await fetchVersionInfo();
 
             if (
@@ -253,10 +253,10 @@ export const useVersion = () => {
 
               if (versionInfo?.version) {
                 const compatibleVersion = versionInfo.version;
-                console.log(
-                  "[DEBUG] Using compatible version:",
-                  compatibleVersion
-                );
+                // console.log(
+                //   "[DEBUG] Using compatible version:",
+                //   compatibleVersion
+                // );
                 setBackendVersion(compatibleVersion);
                 saveSecurely([
                   { key: "cachedVersion", value: compatibleVersion },
