@@ -192,90 +192,167 @@ const DeviceFeedbacksScreen = () => {
 
   const renderFeedbackItem = useCallback(
     ({ item }: { item: Feedback }) => (
-      <View style={[styles.historyItem, { backgroundColor: colors.card }]}>
-        <View style={styles.historyHeader}>
-          <View style={{ flex: 1 }}>
-            <View
+      <View
+        style={[
+          styles.historyItem,
+          {
+            backgroundColor: colors.card,
+            borderRadius: 12,
+            marginBottom: 16,
+            padding: 16,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 3.84,
+            elevation: 5,
+          },
+        ]}
+      >
+        {/* Header with type label and date */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 12,
+          }}
+        >
+          <View
+            style={[
+              {
+                backgroundColor: `${
+                  labelColors[item.type as keyof typeof labelColors]
+                    ?.background || "#6f42c1"
+                }20`,
+                borderColor: `${
+                  labelColors[item.type as keyof typeof labelColors]
+                    ?.background || "#6f42c1"
+                }40`,
+                borderWidth: 1,
+                borderRadius: 12,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+              },
+            ]}
+          >
+            <CustomText
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 4,
+                color:
+                  labelColors[item.type as keyof typeof labelColors]
+                    ?.background || "#6f42c1",
+                fontSize: 12,
+                fontWeight: "600",
               }}
             >
-              <CustomText
-                variant="h5"
-                fontWeight="bold"
-                style={{ color: colors.text }}
-              >
-                {item.name}
-              </CustomText>
-              <View
-                style={[
-                  {
-                    backgroundColor: `${
-                      labelColors[item.type as keyof typeof labelColors]
-                        ?.background || "#6f42c1"
-                    }20`,
-                    borderColor: `${
-                      labelColors[item.type as keyof typeof labelColors]
-                        ?.background || "#6f42c1"
-                    }40`,
-                    borderWidth: 1,
-                    borderRadius: 12,
-                    paddingHorizontal: 8,
-                    paddingVertical: 2,
-                    marginLeft: 10,
-                  },
-                ]}
-              >
-                <CustomText
-                  style={{
-                    color:
-                      labelColors[item.type as keyof typeof labelColors]
-                        ?.background || "#6f42c1",
-                    fontSize: 12,
-                  }}
-                  fontWeight="medium"
-                >
-                  {item.type}
-                </CustomText>
-              </View>
-            </View>
-            <CustomText
-              variant="h6"
-              style={{ color: colors.gray[400], marginBottom: 4 }}
-            >
-              {item.email}
-            </CustomText>
-            <CustomText
-              variant="h6"
-              style={{ color: colors.gray[400], fontSize: 12 }}
-            >
-              {formatDate(item.timestamp)}
+              {item.type}
             </CustomText>
           </View>
+          <CustomText
+            variant="h7"
+            style={{
+              color: colors.gray[400],
+              fontSize: 12,
+            }}
+          >
+            {formatDate(item.timestamp)}
+          </CustomText>
         </View>
 
-        <View style={{ marginTop: 12 }}>
+        {/* User Info */}
+        <View style={{ marginBottom: 12 }}>
+          <CustomText
+            variant="h5"
+            fontWeight="bold"
+            style={{
+              color: colors.text,
+              marginBottom: 4,
+            }}
+          >
+            {item.name}
+          </CustomText>
           <CustomText
             variant="h6"
-            style={{ color: colors.text, lineHeight: 20 }}
+            style={{
+              color: colors.gray[400],
+              fontSize: 14,
+            }}
+          >
+            {item.email}
+          </CustomText>
+        </View>
+
+        {/* Feedback Content */}
+        <View style={{ marginBottom: 12 }}>
+          <CustomText
+            variant="h6"
+            style={{
+              color: colors.text,
+              lineHeight: 22,
+              fontSize: 15,
+            }}
           >
             {item.text}
           </CustomText>
         </View>
 
+        {/* Footer with platform info */}
         <View
           style={{
-            marginTop: 12,
             paddingTop: 12,
             borderTopWidth: 1,
             borderTopColor: colors.border,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          <CustomText variant="h7" style={{ color: colors.gray[400] }}>
-            Platform: {item.platform} • Version: {item.version || "Unknown"}
-          </CustomText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                backgroundColor: colors.gray[200],
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 8,
+                marginRight: 8,
+              }}
+            >
+              <CustomText
+                variant="h7"
+                style={{
+                  color: colors.gray[500],
+                  fontSize: 11,
+                  fontWeight: "500",
+                }}
+              >
+                {item.platform.toUpperCase()}
+              </CustomText>
+            </View>
+            <CustomText
+              variant="h7"
+              style={{
+                color: colors.gray[400],
+                fontSize: 11,
+              }}
+            >
+              v{item.version || "Unknown"}
+            </CustomText>
+          </View>
+
+          {item.deviceInfo?.deviceName && (
+            <CustomText
+              variant="h7"
+              style={{
+                color: colors.gray[400],
+                fontSize: 11,
+                fontStyle: "italic",
+              }}
+            >
+              {item.deviceInfo.deviceName}
+            </CustomText>
+          )}
         </View>
       </View>
     ),
@@ -436,7 +513,7 @@ const DeviceFeedbacksScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.headerCenter}>
-          <CustomText variant="h4" fontWeight="bold">
+          <CustomText variant="h5" fontWeight="bold">
             Device Feedbacks
           </CustomText>
         </View>

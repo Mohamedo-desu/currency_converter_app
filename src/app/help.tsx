@@ -12,6 +12,7 @@ import { getStoredValues, saveSecurely } from "@/store/storage";
 import { styles } from "@/styles/screens/HelpScreen.styles";
 import { getDeviceId } from "@/utils/deviceId";
 import { getDeviceInfo as getDetailedDeviceInfo } from "@/utils/deviceInfo";
+import * as Sentry from "@sentry/react-native";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -102,6 +103,51 @@ const HelpScreen = () => {
     setFeedbacks(updated);
   };
 
+  // Submit feedback to Sentry
+  const submitToSentry = async (
+    feedback: Feedback,
+    deviceId: string,
+    deviceInfo: any
+  ) => {
+    try {
+      // Set user context for Sentry
+      Sentry.setUser({
+        id: deviceId,
+        email: feedback.email,
+        username: feedback.name,
+      });
+
+      // Set additional context
+      Sentry.setContext("feedback", {
+        type: feedback.type,
+        platform: feedback.platform,
+        version: feedback.version,
+        deviceInfo: deviceInfo,
+      });
+
+      // Submit feedback to Sentry using the Feedback API
+      const sentryFeedback = Sentry.captureFeedback({
+        name: feedback.name,
+        email: feedback.email,
+        message: feedback.text,
+        source: "help-screen",
+        tags: {
+          feedbackType: feedback.type,
+          platform: feedback.platform,
+          version: feedback.version || "unknown",
+          deviceName: deviceInfo?.deviceName || "unknown",
+        },
+      });
+
+      console.log("Feedback submitted to Sentry:", sentryFeedback);
+      return true;
+    } catch (error) {
+      console.error("Error submitting feedback to Sentry:", error);
+      // Don't fail the entire submission if Sentry fails
+      return false;
+    }
+  };
+
   // Handle form submission for the report
   const handleSubmit = async () => {
     // Validate inputs
@@ -142,17 +188,28 @@ const HelpScreen = () => {
         deviceInfo,
       };
 
-      // Submit feedback remotely
-      const success = await submitFeedback(feedback);
+      // Submit feedback remotely to our backend
+      const backendSuccess = await submitFeedback(feedback);
 
-      if (success) {
-        // Save locally only if remote submission was successful
+      // Submit feedback to Sentry (independent of backend success)
+      const sentrySuccess = await submitToSentry(
+        feedback,
+        deviceId,
+        deviceInfo
+      );
+
+      if (backendSuccess) {
+        // Save locally only if backend submission was successful
         saveFeedbackLocally(feedback);
 
-        // Notify user
+        // Notify user about successful submission
+        const sentryMessage = sentrySuccess
+          ? " Your feedback has also been sent to our error tracking system for better issue resolution."
+          : "";
+
         showAlert(
           "Report Submitted",
-          `Thank you, ${userName}! Your ${selectedType.toLowerCase()} has been submitted.`
+          `Thank you, ${userName}! Your ${selectedType.toLowerCase()} has been submitted successfully.${sentryMessage}`
         );
 
         // Clear inputs
@@ -160,10 +217,18 @@ const HelpScreen = () => {
         setUserEmail("");
         setReportText("");
       } else {
-        showAlert(
-          "Submission Failed",
-          "Your feedback could not be submitted. Please try again later."
-        );
+        // If backend failed but Sentry succeeded
+        if (sentrySuccess) {
+          showAlert(
+            "Partial Submission",
+            "Your feedback was sent to our error tracking system, but there was an issue with our main submission service. We'll still review your feedback."
+          );
+        } else {
+          showAlert(
+            "Submission Failed",
+            "Your feedback could not be submitted. Please try again later."
+          );
+        }
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);

@@ -247,7 +247,7 @@ const AdminFeedbacksScreen = () => {
         </View>
         <View style={styles.headerCenter}>
           <CustomText variant="h5" fontWeight="bold">
-            User Feedbacks ({totalFeedbacks})
+            User Feedbacks
           </CustomText>
         </View>
         <View style={styles.headerRight}>
