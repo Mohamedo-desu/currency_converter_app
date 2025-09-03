@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/admin");
 const conversionsRoutes = require("./routes/conversions");
 const PushToken = require("./models/PushToken");
 const Admin = require("./models/Admin");
+const Conversion = require("./models/Conversion");
 
 const app = express();
 
@@ -66,6 +67,25 @@ cron.schedule("0 2 * * *", async () => {
   }
 });
 
+// Schedule weekly cleanup of old conversions (runs at 3 AM every Sunday)
+cron.schedule("0 3 * * 0", async () => {
+  console.log("Running scheduled conversion cleanup...");
+  try {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+    const result = await Conversion.deleteMany({
+      timestamp: { $lt: threeMonthsAgo },
+    });
+
+    console.log(
+      `Conversion cleanup completed. Deleted ${result.deletedCount} records older than 3 months.`
+    );
+  } catch (error) {
+    console.error("Error during scheduled conversion cleanup:", error);
+  }
+});
+
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -74,7 +94,6 @@ mongoose
     console.log("Connected to MongoDB");
 
     // Create default admin if none exists
-
     const defaultEmail = "admin@currencyapp.com";
     const defaultPassword = "Ug4586@#";
     try {
@@ -87,6 +106,23 @@ mongoose
       }
     } catch (err) {
       console.error("Error creating default admin:", err);
+    }
+
+    // Initial cleanup of old conversions on server start
+    try {
+      console.log("Running initial conversion cleanup...");
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+      const result = await Conversion.deleteMany({
+        timestamp: { $lt: threeMonthsAgo },
+      });
+
+      console.log(
+        `Initial conversion cleanup completed. Deleted ${result.deletedCount} records older than 3 months.`
+      );
+    } catch (error) {
+      console.error("Error during initial conversion cleanup:", error);
     }
 
     // Start server
