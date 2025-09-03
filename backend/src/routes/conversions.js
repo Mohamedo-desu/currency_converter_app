@@ -336,7 +336,15 @@ router.get("/stats", async (req, res) => {
 // Get all conversions grouped by device (Admin only)
 router.get("/all", async (req, res) => {
   try {
-    // Aggregate conversions by device to return only device summaries
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Get total count of unique devices
+    const totalDevices = await Conversion.distinct("deviceId").then(
+      (devices) => devices.length
+    );
+
+    // Aggregate conversions by device to return only device summaries with pagination
     const deviceSummaries = await Conversion.aggregate([
       {
         $group: {
@@ -348,6 +356,12 @@ router.get("/all", async (req, res) => {
       },
       {
         $sort: { lastConversion: -1 },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: parseInt(limit),
       },
       {
         $project: {
@@ -373,6 +387,12 @@ router.get("/all", async (req, res) => {
     res.json({
       success: true,
       devices: deviceSummaries,
+      pagination: {
+        current: parseInt(page),
+        total: Math.ceil(totalDevices / limit),
+        totalDevices: totalDevices,
+        hasMore: page * limit < totalDevices,
+      },
     });
   } catch (error) {
     console.error("Error fetching device summaries:", error);

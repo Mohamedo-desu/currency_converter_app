@@ -38,19 +38,25 @@ interface ConversionHistory {
 }
 
 /**
- * Grouped conversions by device ID
+ * Device summary with conversion count
  */
-interface DeviceConversions {
+interface DeviceSummary {
   deviceId: string;
-  deviceInfo?: any;
-  conversions: ConversionHistory[];
+  deviceName: string;
+  totalConversions: number;
 }
 
 const AdminConversionsScreen = () => {
   const { colors } = useTheme();
   const { top, bottom } = useSafeAreaInsets();
-  const [deviceGroups, setDeviceGroups] = useState<DeviceConversions[]>([]);
+  const [deviceSummaries, setDeviceSummaries] = useState<DeviceSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [totalDevices, setTotalDevices] = useState(0);
+
+  const ITEMS_PER_PAGE = 20;
 
   // Handle Android back press to navigate back
   useEffect(() => {
@@ -65,14 +71,22 @@ const AdminConversionsScreen = () => {
   }, []);
 
   /**
-   * Fetch all conversions from backend and group by device ID
+   * Fetch device summaries from backend
    */
-  const fetchAllConversions = async () => {
-    setIsLoading(true);
+  const fetchAllConversions = async (
+    page: number = 1,
+    isLoadMore: boolean = false
+  ) => {
+    if (page === 1) {
+      setIsLoading(true);
+    } else {
+      setIsLoadingMore(true);
+    }
+
     try {
       const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
       const response = await fetch(
-        `${backendUrl}/api/conversions/all?limit=1000`,
+        `${backendUrl}/api/conversions/all?page=${page}&limit=${ITEMS_PER_PAGE}`,
         {
           method: "GET",
           headers: {
@@ -82,60 +96,47 @@ const AdminConversionsScreen = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch conversions");
+        throw new Error("Failed to fetch device summaries");
       }
 
       const data = await response.json();
 
-      if (data.success && data.conversions) {
-        // Group conversions by device ID
-        const grouped = data.conversions.reduce(
-          (
-            acc: { [key: string]: ConversionHistory[] },
-            conversion: ConversionHistory
-          ) => {
-            const deviceId = conversion.deviceId;
-            if (!acc[deviceId]) {
-              acc[deviceId] = [];
-            }
-            acc[deviceId].push(conversion);
-            return acc;
-          },
-          {}
-        );
+      if (data.success && data.devices) {
+        if (isLoadMore) {
+          // Append new data for pagination
+          setDeviceSummaries((prev) => [...prev, ...data.devices]);
+        } else {
+          // Replace data for initial load or refresh
+          setDeviceSummaries(data.devices);
+        }
 
-        // Convert to array format and sort by most recent conversion
-        const deviceGroups: DeviceConversions[] = Object.keys(grouped)
-          .map((deviceId) => {
-            const conversions = grouped[deviceId].sort(
-              (a: ConversionHistory, b: ConversionHistory) =>
-                new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime()
-            );
-
-            return {
-              deviceId,
-              deviceInfo: conversions[0]?.deviceInfo || null,
-              conversions,
-            };
-          })
-          .sort(
-            (a, b) =>
-              new Date(b.conversions[0]?.timestamp || 0).getTime() -
-              new Date(a.conversions[0]?.timestamp || 0).getTime()
-          );
-
-        setDeviceGroups(deviceGroups);
+        // Update pagination state
+        setHasMoreData(data.pagination?.hasMore || false);
+        setTotalDevices(data.pagination?.totalDevices || 0);
+        setCurrentPage(page);
       }
     } catch (error) {
-      console.error("Error fetching conversions:", error);
-      showError("Error", "Failed to load conversions. Please try again.");
+      console.error("Error fetching device summaries:", error);
+      showError("Error", "Failed to load device summaries. Please try again.");
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
-  console.log(deviceGroups[0]);
+  const refreshData = () => {
+    setCurrentPage(1);
+    setHasMoreData(true);
+    fetchAllConversions(1, false);
+  };
+
+  const loadMoreData = () => {
+    if (!isLoadingMore && hasMoreData) {
+      fetchAllConversions(currentPage + 1, true);
+    }
+  };
+
+  console.log(deviceSummaries[0]);
 
   const showError = (title: string, message: string) => {
     if (Platform.OS === "web") {
@@ -147,11 +148,27 @@ const AdminConversionsScreen = () => {
 
   // Load on mount
   useEffect(() => {
-    fetchAllConversions();
+    fetchAllConversions(1, false);
   }, []);
 
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+
+    return (
+      <View style={{ padding: 20, alignItems: "center" }}>
+        <ActivityIndicator size="small" color={Colors.primary} />
+        <CustomText
+          variant="h6"
+          style={{ color: colors.gray[400], marginTop: 8 }}
+        >
+          Loading more devices...
+        </CustomText>
+      </View>
+    );
+  };
+
   const renderDeviceGroup = useCallback(
-    ({ item }: { item: DeviceConversions }) => {
+    ({ item }: { item: DeviceSummary }) => {
       return (
         <View style={{ marginBottom: 16 }}>
           <TouchableOpacity
@@ -176,13 +193,13 @@ const AdminConversionsScreen = () => {
                   fontWeight="bold"
                   style={{ color: colors.text }}
                 >
-                  Device: {item.deviceInfo?.deviceName}
+                  Device: {item.deviceName}
                 </CustomText>
                 <CustomText
                   variant="h6"
                   style={{ color: colors.gray[400], marginTop: 2 }}
                 >
-                  {item.conversions.length} conversions
+                  {item.totalConversions} conversions
                 </CustomText>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -234,7 +251,7 @@ const AdminConversionsScreen = () => {
         </View>
         <View style={styles.headerRight}>
           <TouchableOpacity
-            onPress={fetchAllConversions}
+            onPress={refreshData}
             activeOpacity={0.8}
             hitSlop={10}
           >
@@ -254,7 +271,7 @@ const AdminConversionsScreen = () => {
             color={Colors.primary}
             style={styles.loadingContainer}
           />
-        ) : deviceGroups.length === 0 ? (
+        ) : deviceSummaries.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons
               name="analytics-outline"
@@ -275,12 +292,17 @@ const AdminConversionsScreen = () => {
           </View>
         ) : (
           <FlatList
-            data={deviceGroups}
+            data={deviceSummaries}
             renderItem={renderDeviceGroup}
             keyExtractor={(item) => item.deviceId}
             contentContainerStyle={styles.historyList}
             showsVerticalScrollIndicator={false}
             removeClippedSubviews={false}
+            onEndReached={loadMoreData}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={renderFooter}
+            refreshing={isLoading}
+            onRefresh={refreshData}
           />
         )}
       </View>

@@ -65,6 +65,9 @@ const DeviceConversionsScreen = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalConversions, setTotalConversions] = useState(0);
+
+  const ITEMS_PER_PAGE = 50;
 
   // Handle Android back press to navigate back
   useEffect(() => {
@@ -94,7 +97,7 @@ const DeviceConversionsScreen = () => {
     try {
       const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
       const response = await fetch(
-        `${backendUrl}/api/conversions/device/${deviceId}?page=${pageNum}&limit=50`,
+        `${backendUrl}/api/conversions/device/${deviceId}?page=${pageNum}&limit=${ITEMS_PER_PAGE}`,
         {
           method: "GET",
           headers: {
@@ -114,6 +117,7 @@ const DeviceConversionsScreen = () => {
           setConversions((prev) => [...prev, ...data.conversions]);
         } else {
           setConversions(data.conversions);
+          setPage(1);
 
           // Extract device info from the first conversion if available
           if (data.conversions.length > 0 && data.conversions[0].deviceInfo) {
@@ -126,9 +130,14 @@ const DeviceConversionsScreen = () => {
           }
         }
 
-        // Check if there are more pages
-        const totalPages = data.pagination?.total || 1;
-        setHasMore(pageNum < totalPages);
+        // Update pagination state
+        setTotalConversions(
+          data.pagination?.totalConversions || data.conversions.length
+        );
+        setHasMore(data.pagination?.current < data.pagination?.total);
+        if (append) {
+          setPage(pageNum);
+        }
       }
     } catch (error) {
       console.error("Error fetching device conversions:", error);
@@ -160,9 +169,13 @@ const DeviceConversionsScreen = () => {
   const loadMore = () => {
     if (hasMore && !isLoadingMore) {
       const nextPage = page + 1;
-      setPage(nextPage);
       fetchDeviceConversions(nextPage, true);
     }
+  };
+
+  const refreshData = () => {
+    setHasMore(true);
+    fetchDeviceConversions(1, false);
   };
 
   const formatDate = (timestamp: string) => {
@@ -345,7 +358,7 @@ const DeviceConversionsScreen = () => {
               variant="h6"
               style={{ color: Colors.primary, fontWeight: "bold" }}
             >
-              {conversions.length}
+              {totalConversions}
             </CustomText>
           </View>
         </View>
@@ -356,8 +369,14 @@ const DeviceConversionsScreen = () => {
   const renderFooter = () => {
     if (!isLoadingMore) return null;
     return (
-      <View style={{ paddingVertical: 20 }}>
+      <View style={{ paddingVertical: 20, alignItems: "center" }}>
         <ActivityIndicator size="small" color={Colors.primary} />
+        <CustomText
+          variant="h6"
+          style={{ color: colors.gray[400], marginTop: 8 }}
+        >
+          Loading more conversions...
+        </CustomText>
       </View>
     );
   };
@@ -390,7 +409,7 @@ const DeviceConversionsScreen = () => {
         </View>
         <View style={styles.headerRight}>
           <TouchableOpacity
-            onPress={() => fetchDeviceConversions(1, false)}
+            onPress={refreshData}
             activeOpacity={0.8}
             hitSlop={10}
           >
@@ -422,6 +441,8 @@ const DeviceConversionsScreen = () => {
             onEndReached={loadMore}
             onEndReachedThreshold={0.1}
             removeClippedSubviews
+            refreshing={isLoading}
+            onRefresh={refreshData}
             ListEmptyComponent={
               <View style={styles.emptyState}>
                 <Ionicons
